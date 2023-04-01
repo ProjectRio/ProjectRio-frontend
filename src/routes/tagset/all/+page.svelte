@@ -6,9 +6,9 @@
   let tagsets: any = [];
 
   // Call on page load
-  getAvailableTagSets();
+  getAllTagSets();
 
-  async function getAvailableTagSets() {
+  async function getAllTagSets() {
     try {
       const response = await fetch("https://api.projectrio.app/tag_set/list", {
         method: "POST"
@@ -34,7 +34,6 @@
       <th>Type</th>
       <th>Start Date</th>
       <th>End Date</th>
-      <th>Tags</th>
     </tr>
     {#if tagsets.length > 0}
       {#each tagsets as tagset}
@@ -45,11 +44,6 @@
           <td>{tagset.comm_type}</td>
           <td>{new Date(tagset.start_date * 1000).toLocaleString("US", { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</td>
           <td>{new Date(tagset.end_date * 1000).toLocaleString("US", { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</td>
-          <td>
-            <!-- {#each tagsets["tags"] as tag}
-              <div>{tag.name}, </div>
-            {/each} -->
-          </td>
         </tr>
       {/each}
     {/if}
