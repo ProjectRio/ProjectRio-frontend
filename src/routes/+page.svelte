@@ -1,2 +1,11 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<section>
+  <a href="login">Login</a>
+  <a href="community/create">Create Community</a>
+  <a href="tagset/all">View Tagsets</a>
+</section>
+
+<style>
+  section{
+    display: grid;
+  }
+</style>
