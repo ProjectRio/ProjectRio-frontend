@@ -23,11 +23,13 @@
 
 </script>
 
+
+<!-- HTML -->
 <Topbar></Topbar>
 <h1>Ongoing Games</h1>
 
 <section>
-  <table>
+  <table class="table1">
     <tr>
       <th>Away Player</th>
       <th>Home Player</th>
@@ -35,7 +37,9 @@
       <th>Home Score</th>
       <th>Start Date</th>
     </tr>
+    <!-- If theres anything in games -->
     {#if games}
+      <!-- loop through each game in games -->
       {#each games as game}
         <tr>
           <td>{game.away_player}</td>
@@ -50,7 +54,7 @@
   </table>
 </section>
 
-
+<!-- CSS -->
 <style>
   h1{
     text-align: center;

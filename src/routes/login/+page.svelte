@@ -1,11 +1,14 @@
 <script lang="ts">
   // Import components
   import Topbar from "../../components/Topbar.svelte";
+  import { apiFetch } from "../../fetch/apiFetch";
+  
 
   // Instantiate variables
   let email: string = "";
   let password: string = "";
   let username: string = "";
+
 
   async function handleSubmit() {
     if (!email 
@@ -21,24 +24,36 @@
       "Email": email,
       "Password": password
     }
+
     try {
-      const response = await fetch(
-        'https://api.projectrio.app/login/', 
-        {
-          method: 'POST',
-          headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }
-      );
-      console.log(response);
-      const json = await response.json();
-      const result = json.stringify()
+      const options: any = {
+        method: 'POST',
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+        },
+        body: data
+      };
+
+      const result = await apiFetch('/login/', options)
+
       console.log(result);
 
     } catch (error){
+      console.log(error);
+    }
+  }
+
+  async function handleVerifyJWT() {
+    try {
+      const options: any = {
+        method: 'get'
+      };
+      
+      const result = await apiFetch('/validate_JWT/', options);
+      
+      console.log(result);
+    } catch (error) {
       console.log(error);
     }
   }
@@ -67,6 +82,8 @@
   />
   <p></p>
   <button on:click={handleSubmit}>Submit</button>
+
+  <button on:click={handleVerifyJWT}>Verify</button>
 </section>
 
 <style>
