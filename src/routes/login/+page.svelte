@@ -9,7 +9,6 @@
   let password: string = "";
   let username: string = "";
 
-
   async function handleSubmit() {
     if (!email 
         || !password
@@ -35,9 +34,9 @@
         body: data
       };
 
-      const result = await apiFetch('/login/', options)
+      const result = await apiFetch('/login/', options, true);
 
-      console.log(result);
+      localStorage.setItem("jwt", result.access_token);
 
     } catch (error){
       console.log(error);
@@ -50,9 +49,23 @@
         method: 'get'
       };
       
-      const result = await apiFetch('/validate_JWT/', options);
+      const result = await apiFetch('/validate_JWT/', options, true);      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleLogout(){
+    try {
+      const options: any = {
+        method: 'get'
+      };
       
-      console.log(result);
+      const result = await apiFetch('/logout/', options, true);
+
+      localStorage.removeItem("jwt");
+
+      
     } catch (error) {
       console.log(error);
     }
@@ -84,6 +97,8 @@
   <button on:click={handleSubmit}>Submit</button>
 
   <button on:click={handleVerifyJWT}>Verify</button>
+
+  <button on:click={handleLogout}>Logout</button>
 </section>
 
 <style>
