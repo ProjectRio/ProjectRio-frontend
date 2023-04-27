@@ -70,6 +70,10 @@
       console.log(error);
     }
   }
+
+
+  
+  handleVerifyJWT();
 </script>
 
 <Topbar></Topbar>

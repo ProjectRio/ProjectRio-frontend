@@ -10,7 +10,7 @@ export async function apiFetch(route: string, options: any, debug=false) {
     // check for JWT
     if (jwt) {
       // add credentials and headers fields to options to signal JWT being attached
-      options.headers = {'Authorization': `Bearer ${jwt}`};
+      options.headers['Authorization'] = `Bearer ${jwt}`;
     }
 
     if (debug) {
