@@ -27,6 +27,7 @@
         })
       });
       const result = await response.json();
+      console.log(result);
       players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
     } catch (error) {
       console.log(error);
@@ -44,6 +45,7 @@
       <th>#</th>
       <th>Glicko Rating</th>
       <th>Username</th>
+      <th>W/L/T</th>
     </tr>
     {#if players}
       {#each players as player, i}
@@ -51,6 +53,7 @@
           <td>{i + 1}</td>
           <td>{player.rating}</td>
           <td>{player.username}</td>
+          <td>{player.num_wins}/{player.num_losses}/{player.num_ties}</td>
         </tr>
       {/each}
     {/if}
