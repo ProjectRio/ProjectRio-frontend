@@ -46,7 +46,8 @@
   async function handleVerifyJWT() {
     try {
       const options: any = {
-        method: 'get'
+        method: 'get',
+        headers: {}
       };
       
       const result = await apiFetch('/validate_JWT/', options, true);      
@@ -58,7 +59,8 @@
   async function handleLogout(){
     try {
       const options: any = {
-        method: 'get'
+        method: 'get',
+        headers: {}
       };
       
       const result = await apiFetch('/logout/', options, true);
@@ -70,10 +72,6 @@
       console.log(error);
     }
   }
-
-
-  
-  handleVerifyJWT();
 </script>
 
 <Topbar></Topbar>

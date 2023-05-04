@@ -10,7 +10,7 @@
 
   async function getOngoingGames() {
     try {
-      const response = await fetch("https://api.projectrio.app//populate_db/ongoing_game/", {
+      const response = await fetch("https://api.projectrio.app/populate_db/ongoing_game/", {
         method: "GET"
       });
       const result = await response.json();
