@@ -42,8 +42,8 @@
           <td>{tagset.id}</td>
           <td><a href="{tagset.name}/ladder">{tagset.name}</a></td>
           <td>{tagset.comm_type}</td>
-          <td>{new Date(tagset.start_date * 1000).toLocaleString("US", { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</td>
-          <td>{new Date(tagset.end_date * 1000).toLocaleString("US", { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</td>
+          <td>{new Date(tagset.start_date * 1000).toLocaleString("US", {year:"numeric", month:"numeric", day:"numeric"})}</td>
+          <td>{new Date(tagset.end_date * 1000).toLocaleString("US", {year:"numeric", month:"numeric", day:"numeric"})}</td>
         </tr>
       {/each}
     {/if}
