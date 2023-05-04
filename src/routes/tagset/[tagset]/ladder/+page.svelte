@@ -4,6 +4,9 @@
 
   // Import components
   import Topbar from "../../../../components/Topbar.svelte";
+
+  // Import apiFetch function
+  import { apiFetch } from "../../../../fetch/apiFetch";
   
   // Instantiate variables
   let players: any = [];
@@ -24,7 +27,7 @@
         })
       });
       const result = await response.json();
-      players = Object.values(result).sort((a: any, b: any) => a.rating - b.rating);
+      players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
     } catch (error) {
       console.log(error);
     }
@@ -38,12 +41,14 @@
 <section>
   <table>
     <tr>
+      <th>#</th>
       <th>Glicko Rating</th>
       <th>Username</th>
     </tr>
     {#if players}
-      {#each players as player}
+      {#each players as player, i}
         <tr>
+          <td>{i + 1}</td>
           <td>{player.rating}</td>
           <td>{player.username}</td>
         </tr>
