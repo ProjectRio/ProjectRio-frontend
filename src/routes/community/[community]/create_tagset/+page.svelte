@@ -17,7 +17,7 @@
 
 
   /*
-    Used to get a list of availabe tags on page load
+    Used to get a list of available tags on page load
   */
   async function getTags() {
     try {

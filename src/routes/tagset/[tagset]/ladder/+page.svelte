@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
 
   // Import components
-  import Topbar from "../../../../components/Topbar.svelte";
+  import Header from "../../../../components/Header.svelte";
   
   // Instantiate variables
   let players: any = [];
@@ -24,7 +24,8 @@
         })
       });
       const result = await response.json();
-      players = Object.values(result).sort((a: any, b: any) => a.rating - b.rating);
+      // inverted to display top to bottom
+      players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
     } catch (error) {
       console.log(error);
     }
@@ -32,7 +33,7 @@
 
 </script>
 
-<Topbar></Topbar>
+<Header></Header>
 <h1>{$page.params.tagset}</h1>
 
 <section>

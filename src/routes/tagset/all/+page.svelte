@@ -1,6 +1,6 @@
 <script lang="ts">
   // Import components
-  import Topbar from "../../../components/Topbar.svelte";
+  // import Topbar from "../../../components/Topbar.svelte";
   
   // Instantiate variables
   let tagsets: any = [];
@@ -22,7 +22,7 @@
 
 </script>
 
-<Topbar></Topbar>
+<!--<Topbar></Topbar>-->
 <h1>Tag Sets</h1>
 
 <section>

@@ -1,7 +1,6 @@
 <script lang="ts">
   // Import components
-  import Topbar from "../../../components/Topbar.svelte";
-
+  // import Topbar from "../../../components/Topbar.svelte";
   // Instantiate variables
   let name: string = "";
   let type: string = "";
@@ -51,7 +50,7 @@
   }
 </script>
 
-<Topbar></Topbar>
+<!--<Topbar></Topbar>-->
 <h1>Create Community</h1>
 <section class="input-container">
   <p>Community Name:</p>
