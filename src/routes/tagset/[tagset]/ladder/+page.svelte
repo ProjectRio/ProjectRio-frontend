@@ -3,7 +3,14 @@
   import { page } from '$app/stores';
 
   // Import components
+<<<<<<< HEAD
   import Header from "../../../../components/Header.svelte";
+=======
+  import Topbar from "../../../../components/Topbar.svelte";
+
+  // Import apiFetch function
+  import { apiFetch } from "../../../../fetch/apiFetch";
+>>>>>>> 6dcdc06640d807c7e2dbf24747153959c9064f76
   
   // Instantiate variables
   let players: any = [];
@@ -24,7 +31,11 @@
         })
       });
       const result = await response.json();
+<<<<<<< HEAD
       // inverted to display top to bottom
+=======
+      console.log(result);
+>>>>>>> 6dcdc06640d807c7e2dbf24747153959c9064f76
       players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
     } catch (error) {
       console.log(error);
@@ -39,14 +50,18 @@
 <section>
   <table>
     <tr>
+      <th>#</th>
       <th>Glicko Rating</th>
       <th>Username</th>
+      <th>W/L/T</th>
     </tr>
     {#if players}
-      {#each players as player}
+      {#each players as player, i}
         <tr>
+          <td>{i + 1}</td>
           <td>{player.rating}</td>
           <td>{player.username}</td>
+          <td>{player.num_wins}/{player.num_losses}/{player.num_ties}</td>
         </tr>
       {/each}
     {/if}
