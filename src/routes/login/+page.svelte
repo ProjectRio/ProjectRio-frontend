@@ -43,35 +43,35 @@
     }
   }
 
-  async function handleVerifyJWT() {
-    try {
-      const options: any = {
-        method: 'get',
-        headers: {}
-      };
+  // async function handleVerifyJWT() {
+  //   try {
+  //     const options: any = {
+  //       method: 'get',
+  //       headers: {}
+  //     };
       
-      const result = await apiFetch('/validate_JWT/', options, true);      
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //     const result = await apiFetch('/validate_JWT/', options, true);      
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
-  async function handleLogout(){
-    try {
-      const options: any = {
-        method: 'get',
-        headers: {}
-      };
+  // async function handleLogout(){
+  //   try {
+  //     const options: any = {
+  //       method: 'get',
+  //       headers: {}
+  //     };
       
-      const result = await apiFetch('/logout/', options, true);
+  //     const result = await apiFetch('/logout/', options, true);
 
-      localStorage.removeItem("jwt");
+  //     localStorage.removeItem("jwt");
 
       
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 </script>
 
 <Topbar></Topbar>
@@ -97,13 +97,19 @@
   />
   <p></p>
   <button on:click={handleSubmit}>Submit</button>
-
+<!-- 
   <button on:click={handleVerifyJWT}>Verify</button>
 
-  <button on:click={handleLogout}>Logout</button>
+  <button on:click={handleLogout}>Logout</button> -->
+
+  <a href='/login/reset_password/'>Reset Password</a>
 </section>
 
 <style>
+  a {
+    text-align: center;
+  }
+
   h1{
     text-align: center;
     margin: auto;
