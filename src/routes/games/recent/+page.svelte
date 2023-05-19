@@ -1,7 +1,7 @@
 <script lang="ts">
     import { DataHandler, Datatable, Th, ThFilter } from '@vincjo/datatables';
     import { onMount, afterUpdate} from 'svelte';
-
+  
     // init variables
     let games = [];
     let handler;
@@ -11,10 +11,11 @@
     let basic;
     let detailed;
     let isVisible: boolean = false;
-    let unsubscribe;
+
 
 onMount(async () => {
   try {
+
     await fetchData(); // Fetch initial data
     setInterval(fetchData, 30000); // Schedule auto-update every 30 seconds
   } catch (error) {
@@ -25,10 +26,10 @@ onMount(async () => {
 // Function to fetch data from the API
 async function fetchData() {
   try {
-    const response = await fetch('https://api.projectrio.app/populate_db/ongoing_game');
+    const response = await fetch('https://api.projectrio.app/games');
     if (response.ok) {
       const result = await response.json();
-      games = result.ongoing_games.sort((a, b) => b.start_time - a.start_time);
+      games = result.games.sort((a, b) => b.start_time - a.start_time);
       handler = new DataHandler(games, { rowsPerPage: 10 });
       rows = handler.getRows();
 
@@ -59,28 +60,29 @@ afterUpdate(() => {
 
   </script>
   <!-- <button type="button" class="games-toggle"><a href="/games/live"></a></button> -->
-  <h1>Live Games</h1>
-  <button><a href="/games/recent">Recent</a></button>
+  <h1>Recent Games</h1>
+  <button><a href="/games/ongoing">Live</a></button>
+
   {#if handler}
     <Datatable {handler}>
       <thead>
         <!-- sortable table headers TODO figure out a way to automate this across other table implementations -->
         <tr>
-          <Th {handler} orderBy="away_player">Away Player</Th>
-          <Th {handler} orderBy="home_player">Home Player</Th>
+          <Th {handler} orderBy="away_user">Away Player</Th>
+          <Th {handler} orderBy="home_user">Home Player</Th>
           <Th {handler} orderBy="away_score">Away Score</Th>
           <Th {handler} orderBy="home_score">Home Score</Th>
-          <Th {handler} orderBy="tag_set">Game Mode</Th>
-          <Th {handler} orderBy="start_time">Start Date</Th>
+          <Th {handler} orderBy="game_mode">Game Mode</Th>
+          <Th {handler} orderBy="date_time_start">Start Date</Th>
         </tr>
         <!-- table filters-->
         <tr>
-          <ThFilter {handler} filterBy="away_player" />
-          <ThFilter {handler} filterBy="home_player" />
+          <ThFilter {handler} filterBy="away_user" />
+          <ThFilter {handler} filterBy="home_user" />
           <ThFilter {handler} filterBy="away_score" />
           <ThFilter {handler} filterBy="home_score" />
-          <ThFilter {handler} filterBy="tag_set" />
-          <ThFilter {handler} filterBy="start_time" />
+          <ThFilter {handler} filterBy="game_mode" />
+          <ThFilter {handler} filterBy="date_time_start" />
         </tr>
       </thead>
   
@@ -89,23 +91,21 @@ afterUpdate(() => {
           <!-- hide on click to display alternate information instead -->
           {#if !row.isVisible}
             <tr bind:this={basic} on:click={() => toggleVisibility(index)}>
-              <td>{row.away_player}</td>
-              <td>{row.home_player}</td>
+              <td>{row.away_user}</td>
+              <td>{row.home_user}</td>
               <td>{row.away_score}</td>
               <td>{row.home_score}</td>
               <!-- filter by names TODO - have them pull from pregenerated names to automate process -->
-              {#if row.tag_set === 10}
+              {#if row.game_mode === 10}
                 <td>Stars On Season 5</td>
-              {:else if row.tag_set === 11}
+              {:else if row.game_mode === 11}
                 <td>Stars Off Season 5</td>
-              {:else if row.tag_set === 12}
+              {:else if row.game_mode === 12}
                 <td>Big Balla Season 5</td>
-              {:else if row.tag_set === 15}
-                <td>Legacy Mode: Stars Off</td>
               {:else}
-                <td>{row.tag_set}</td>
+              <td>{row.game_mode}</td>
               {/if}
-              <td>{new Date(row.start_time * 1000).toLocaleString()}</td>
+              <td>{new Date(row.date_time_start * 1000).toLocaleString()}</td>
             </tr>
 
           <!-- display on click -->
@@ -120,7 +120,6 @@ afterUpdate(() => {
             {#each Object.values(row) as values}
             <td>{values}</td>
             {/each}
-
             </tr>
           {/if}
         {/each}
@@ -134,10 +133,6 @@ afterUpdate(() => {
     thead {
       background: #222222;
       color: #f5f5f5;
-    }
-
-    th {
-      color: #f5f5f5
     }
   
     tbody td {

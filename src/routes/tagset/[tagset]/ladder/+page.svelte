@@ -1,16 +1,10 @@
 <script lang="ts">
   // Import store
   import { page } from '$app/stores';
-
   // Import components
-<<<<<<< HEAD
-  import Header from "../../../../components/Header.svelte";
-=======
-  import Topbar from "../../../../components/Topbar.svelte";
 
   // Import apiFetch function
   import { apiFetch } from "../../../../fetch/apiFetch";
->>>>>>> 6dcdc06640d807c7e2dbf24747153959c9064f76
   
   // Instantiate variables
   let players: any = [];
@@ -31,11 +25,7 @@
         })
       });
       const result = await response.json();
-<<<<<<< HEAD
-      // inverted to display top to bottom
-=======
       console.log(result);
->>>>>>> 6dcdc06640d807c7e2dbf24747153959c9064f76
       players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
     } catch (error) {
       console.log(error);
@@ -44,7 +34,6 @@
 
 </script>
 
-<Header></Header>
 <h1>{$page.params.tagset}</h1>
 
 <section>

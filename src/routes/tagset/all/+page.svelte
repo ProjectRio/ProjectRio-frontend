@@ -1,7 +1,6 @@
 <script lang="ts">
   // Import components
   // import Topbar from "../../../components/Topbar.svelte";
-  
   // Instantiate variables
   let tagsets: any = [];
 
@@ -14,7 +13,9 @@
         method: "POST"
       });
       const result = await response.json();
-      tagsets = result['Tag Sets'];      
+      tagsets = result['Tag Sets'];
+      gameModes.set(tagsets);
+      console.log(tagsets);
     } catch (error) {
       console.log(error);
     }
