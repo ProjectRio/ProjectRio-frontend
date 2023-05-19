@@ -35,9 +35,9 @@
       };
 
       const result = await apiFetch('/login/', options, true);
-      console.log(result);
+
       localStorage.setItem("jwt", result.access_token);
-      console.log(localStorage.getItem("jwt"));
+
     } catch (error){
       console.log(error);
     }
