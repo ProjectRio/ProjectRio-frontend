@@ -34,6 +34,7 @@
         body: data
       };
 
+      // should be set to false once done debugging
       const result = await apiFetch('/login/', options, true);
 
       localStorage.setItem("jwt", result.access_token);
