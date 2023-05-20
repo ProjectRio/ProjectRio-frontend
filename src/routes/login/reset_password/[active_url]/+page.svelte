@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
 
     // Import components
-    import Topbar from "../../../../components/Topbar.svelte";
+    // import Topbar from "../../../../components/Topbar.svelte";
     import { apiFetch } from "../../../../fetch/apiFetch";
 
     let passwordInput = "";
@@ -107,7 +107,7 @@
     }
 </script>
   
-  <Topbar></Topbar>
+  <!-- <Topbar></Topbar> -->
   <h1>Request Password Reset</h1>
   <section class="input-container">
     <ul>

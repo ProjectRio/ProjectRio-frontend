@@ -19,20 +19,21 @@
             </picture>
         </span>
 
-    Welcome to RioWeb
+    RioWeb
   </h1>
 
   <h2>
-    try editing <strong>src/routes/+page.svelte</strong>
+    Welcome to the <strong>Project Rio</strong> webpage. It is currently a work in progress, but we are excited about what it will be.
   </h2>
 
   <!--    <Counter />-->
 </section>
 
 <style>
-  /*section{*/
+  /* section{*/
   /*  display: grid;*/
-  /*}*/
+  /*} */
+  
   section {
     display: flex;
     flex-direction: column;

@@ -62,8 +62,8 @@ afterUpdate(() => {
   <!-- <button type="button" class="games-toggle"><a href="/games/live"></a></button> -->
   <span><h1>Recent Games</h1>
     <h4>Last Updated at {new Date().toLocaleTimeString()}</h4></span>
-    <button><a href="/games/live">Live Games</a></button>
-  {#if handler}
+    <a href="/games/live"><button>Live Games</button></a>
+    {#if handler}
     <Datatable {handler}>
       <thead>
         <!-- sortable table headers TODO figure out a way to automate this across other table implementations -->

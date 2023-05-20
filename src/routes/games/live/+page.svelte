@@ -1,13 +1,16 @@
 <script lang="ts">
+    import type { Readable } from 'svelte/store';
     import { DataHandler, Datatable, Th, ThFilter } from '@vincjo/datatables';
     import { onMount, afterUpdate} from 'svelte';
     import { alertAction } from "svelte-legos";
-    import { stadiums } from './StadiumName';
-    import {characters} from './characterName';
-    // init variables
-    let games = [];
-    let handler;
-    let rows;
+    import { stadiums } from '../../../components/stadiumName';
+    import {characters} from '../../../components/characterName';
+    import Bases from '../../../components/Bases.svelte';
+
+   // init variables
+    let games: any[] | undefined = [];
+    let handler: DataHandler;
+    let rows: any[];
     let selected;
     let isAllSelected;
     let basic;
@@ -15,7 +18,9 @@
     let isVisible: boolean = false;
     let unsubscribe;
     let isLoading = true;
-
+    let firstBase: Number;
+    let secondBase: Number;
+    let thirdBase: Number; 
     function onClose() {
 
     }
@@ -23,14 +28,7 @@
     function onOk() {
       
     }
-// onMount(async () => {
-//   try {
-//     await fetchData(); // Fetch initial data
-//     setInterval(fetchData, 30000); // Schedule auto-update every 30 seconds
-//   } catch (error) {
-//     console.error('Error initializing the table:', error);
-//   }
-// });
+
 
 onMount(() => {
   fetchData(); // Fetch initial data
@@ -43,7 +41,11 @@ async function fetchData() {
     const response = await fetch('https://api.projectrio.app/populate_db/ongoing_game');
     if (response.ok) {
       const result = await response.json();
-      games = result.ongoing_games.sort((a, b) => b.start_time - a.start_time);
+      games = result.ongoing_games.sort((a: { start_time: number; }, b: { start_time: number; }) => b.start_time - a.start_time);
+      firstBase = Number(games.runner_on_first);
+      secondBase = Number(games.runner_on_second);
+      thirdBase = Number(games.runner_on_third);
+
       handler = new DataHandler(games, { rowsPerPage: 10 });
       rows = handler.getRows();
 
@@ -66,7 +68,7 @@ afterUpdate(() => {
 });
 
     // function to allow rows to be toggleable if clicked on for more details
-    function toggleVisibility(index) {
+    function toggleVisibility(index: number) {
       games[index].isVisible = !games[index].isVisible;
       isVisible = games[index].isVisible;
 
@@ -86,7 +88,7 @@ afterUpdate(() => {
 
   <h4>Last Updated at {new Date().toLocaleTimeString()}</h4></span>
   {/if}
-  <button><a href="/games/recent">Recent Games</a></button>
+ <a href="/games/recent"><button>Recent Games</button></a>
   {#if handler}
   <div class="container">
     <Datatable {handler}>
@@ -161,29 +163,7 @@ afterUpdate(() => {
             <td>{new Date(row.start_time * 1000).toLocaleString()}</td>
           </tr>
           <tr bind:this={detailed} on:click={() => toggleVisibility(index)}>
-            <!-- {#each Object.keys(row) as key}
-              {#if key === "away_captain"}
-                <td>Away Captain</td>
-              {/if}
-              {#if key === "home_captain"}
-              <td>Home Captain</td>
-              {/if}
-              {#if key === "away_stars"}
-              <td>Away Stars</td>
-              {/if}
-              {#if key === "home_stars"}
-              <td>Home Stars</td>
-              {/if}
-              {#if key === "pitcher"}
-              <td>Pitcher</td>
-              {/if}     
-              {#if key === "batter"}
-              <td>Batter</td>
-              {/if}                  
-              {#if key === "stadium"}
-              <td>Stadium</td>
-              {/if}        
-            {/each} -->
+
             <td>Stars</td>
             <td>Stars</td>
             {#if row.half_inning === 0}
@@ -208,12 +188,15 @@ afterUpdate(() => {
             <td>{characters[row.pitcher]}</td>
             <td>{row.outs} outs</td>
             <td><div>First: {Number(row.runner_on_first)}<div>Second: {Number(row.runner_on_second)}<div>Third: {Number(row.runner_on_third)}</div></div></div></td>
+            <!-- <td><Bases {firstBase} {secondBase} {thirdBase} /></td> -->
+
             <td>{stadiums[row.stadium_id]}</td>
           {:else if row.half_inning === 1}
-            <td>{characters[row.pitcher]}</td>
-            <td>{characters[row.batter]}</td>
+            <td>{characters[row[`away_roster_${row.pitcher}_char`]]}</td>
+            <td>{characters[row[`home_roster_${row.batter}_char`]]}</td>
             <td>{row.outs} outs</td>
             <td><div>First: {Number(row.runner_on_first)}<div>Second: {Number(row.runner_on_second)}<div>Third: {Number(row.runner_on_third)}</div></div></div></td>
+            <!-- <td><Bases {firstBase} {secondBase} {thirdBase} /></td> -->
             <td>{stadiums[row.stadium_id]}</td>
           {/if} 
             </tr>
@@ -245,7 +228,7 @@ th {
 td, th { 
   padding: 6px; 
   border: 1px solid #ccc; 
-  text-align: left; 
+  text-align: center; 
 }
 
 @media 
@@ -292,11 +275,11 @@ only screen and (max-width: 760px),
 	td:nth-of-type(2):before { content: "Home Player"; }
 	td:nth-of-type(3):before { content: "Away Score"; }
 	td:nth-of-type(4):before { content: "Home Score"; }
-	td:nth-of-type(5):before { content: "Game Mode"; }
-	td:nth-of-type(6):before { content: "Start Date"; }
-	td:nth-of-type(7):before { content: "Date of Birth"; }
-	td:nth-of-type(8):before { content: "Dream Vacation City"; }
-	td:nth-of-type(9):before { content: "GPA"; }
+	td:nth-of-type(5):before { content: "Inning"; }
+	td:nth-of-type(6):before { content: "Game Mode"; }
+	td:nth-of-type(7):before { content: "Start Date"; }
+	td:nth-of-type(8):before { content: "Away Stars"; }
+	td:nth-of-type(9):before { content: "Home Stars"; }
 	td:nth-of-type(10):before { content: "Arbitrary Data"; }
 }
 
@@ -310,76 +293,9 @@ button {
   width: 50%;
   justify-content: center;
 }
-  /* thead {
-    background: #222222;
-    color: #f5f5f5;
-  }
 
-  tr {
-    color: #f5f5f5
-  }
-
-  th {
-    color: #f5f5f5
-  }
-
-  tbody td {
-    border: 2px solid #222222;
-    padding: 4px 20px;
-    color: #222222;
-    background: #e5e5e5
-  }
-
-  tbody tr {
-    transition: all 0.2s;
-  }
-
-  tbody tr:hover {
-    background: #f5f5f5;
-  }
-
-
-  /* CSS */
-  /* .button-27 {
-    appearance: none;
-    background-color: #000000;
-    border: 2px solid #1A1A1A;
-    border-radius: 15px;
-    box-sizing: border-box;
-    color: #FFFFFF;
-    cursor: pointer;
-    display: inline-block;
-    font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-    font-size: 16px;
-    font-weight: 600;
-    line-height: normal;
-    margin: 0;
-    min-height: 60px;
-    min-width: 0;
-    outline: none;
-    padding: 16px 24px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    width: 50%;
-    will-change: transform;
-  }
-
-  .button-27:disabled {
-    pointer-events: none;
-  }
-
-  .button-27:hover {
-    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-    transform: translateY(-2px);
-  }
-
-  .button-27:active {
-    box-shadow: none;
-    transform: translateY(0);
-  } */ 
+.filter {
+  color: red;
+}
 </style>
   

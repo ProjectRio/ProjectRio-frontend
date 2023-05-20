@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   
   // Import components
-  import Topbar from "../../../../components/Topbar.svelte";
+  // import Header from "../../../../components/Header.svelte";
 
   // Instantiate variables
   let tagName: string = "";
@@ -40,7 +40,7 @@
   }
 </script>
 
-<Topbar></Topbar>
+<!-- <Header></Header> -->
 <h1>Create Tag for {$page.params.community}</h1>
 <section class="input-container">
   <p>Community Name:</p>

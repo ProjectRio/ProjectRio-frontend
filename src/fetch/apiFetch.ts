@@ -17,8 +17,8 @@ export async function apiFetch(route: string, options: any, debug=false) {
       console.log(options)
     };
     
-    const response = await fetch('https://api.projectrio.app' + route, options);
-    // const response = await fetch('http://127.0.0.1:5000' + route, options);
+    // const response = await fetch('https://api.projectrio.app' + route, options);
+    const response = await fetch('http://127.0.0.1:5000' + route, options);
 
     if (debug) {
       console.log(response);

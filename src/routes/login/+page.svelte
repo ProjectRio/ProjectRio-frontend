@@ -1,6 +1,6 @@
 <script lang="ts">
   // Import components
-  import Topbar from "../../components/Topbar.svelte";
+  // import Topbar from "../../components/Topbar.svelte";
   import { apiFetch } from "../../fetch/apiFetch";
   
 
@@ -75,7 +75,7 @@
   // }
 </script>
 
-<Topbar></Topbar>
+<!-- <Topbar></Topbar> -->
 <h1>Log in</h1>
 <section class="input-container">
   <p>Username:</p>
