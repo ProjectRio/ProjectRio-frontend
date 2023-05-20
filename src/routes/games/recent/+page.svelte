@@ -17,7 +17,7 @@ onMount(async () => {
   try {
 
     await fetchData(); // Fetch initial data
-    setInterval(fetchData, 30000); // Schedule auto-update every 30 seconds
+    setInterval(fetchData, 60000); // Schedule auto-update every minute
   } catch (error) {
     console.error('Error initializing the table:', error);
   }
@@ -60,9 +60,9 @@ afterUpdate(() => {
 
   </script>
   <!-- <button type="button" class="games-toggle"><a href="/games/live"></a></button> -->
-  <h1>Recent Games</h1>
-  <button><a href="/games/ongoing">Live</a></button>
-
+  <span><h1>Recent Games</h1>
+    <h4>Last Updated at {new Date().toLocaleTimeString()}</h4></span>
+    <button><a href="/games/live">Live Games</a></button>
   {#if handler}
     <Datatable {handler}>
       <thead>
@@ -130,9 +130,98 @@ afterUpdate(() => {
   {/if}
   
   <style>
-    thead {
+    table { 
+    width: 100%; 
+    border-collapse: collapse; 
+  }
+  /* Zebra striping */
+  tr:nth-of-type(odd) { 
+    background: #eee; 
+  }
+  th { 
+    background: #333; 
+    color: white; 
+    font-weight: bold; 
+  }
+  td, th { 
+    padding: 6px; 
+    border: 1px solid #ccc; 
+    text-align: left; 
+  }
+  
+  @media 
+  only screen and (max-width: 760px),
+  (min-device-width: 768px) and (max-device-width: 1024px)  {
+  
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr { 
+      display: block; 
+    }
+    
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr { 
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    tr { border: 1px solid #ccc; }
+    
+    td { 
+      /* Behave  like a "row" */
+      border: none;
+      border-bottom: 1px solid #eee; 
+      position: relative;
+      padding-left: 50%; 
+    }
+    
+    td:before { 
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      width: 45%; 
+      padding-right: 10px; 
+      white-space: nowrap;
+    }
+    
+    /*
+    Label the data
+    */
+    td:nth-of-type(1):before { content: "Away Player"; }
+    td:nth-of-type(2):before { content: "Home Player"; }
+    td:nth-of-type(3):before { content: "Away Score"; }
+    td:nth-of-type(4):before { content: "Home Score"; }
+    td:nth-of-type(5):before { content: "Game Mode"; }
+    td:nth-of-type(6):before { content: "Start Date"; }
+    td:nth-of-type(7):before { content: "Date of Birth"; }
+    td:nth-of-type(8):before { content: "Dream Vacation City"; }
+    td:nth-of-type(9):before { content: "GPA"; }
+    td:nth-of-type(10):before { content: "Arbitrary Data"; }
+  }
+  
+  button a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  button {
+    width: 50%;
+    justify-content: center;
+  }
+    /* thead {
       background: #222222;
       color: #f5f5f5;
+    }
+  
+    tr {
+      color: #f5f5f5
+    }
+  
+    th {
+      color: #f5f5f5
     }
   
     tbody td {
@@ -149,9 +238,49 @@ afterUpdate(() => {
     tbody tr:hover {
       background: #f5f5f5;
     }
-
-    .ThFilter {
-      color: #f5f5f5;
-    }
-  </style>
   
+  
+    /* CSS */
+    /* .button-27 {
+      appearance: none;
+      background-color: #000000;
+      border: 2px solid #1A1A1A;
+      border-radius: 15px;
+      box-sizing: border-box;
+      color: #FFFFFF;
+      cursor: pointer;
+      display: inline-block;
+      font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      font-size: 16px;
+      font-weight: 600;
+      line-height: normal;
+      margin: 0;
+      min-height: 60px;
+      min-width: 0;
+      outline: none;
+      padding: 16px 24px;
+      text-align: center;
+      text-decoration: none;
+      transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      width: 50%;
+      will-change: transform;
+    }
+  
+    .button-27:disabled {
+      pointer-events: none;
+    }
+  
+    .button-27:hover {
+      box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+      transform: translateY(-2px);
+    }
+  
+    .button-27:active {
+      box-shadow: none;
+      transform: translateY(0);
+    } */ 
+  </style>
+    

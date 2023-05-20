@@ -29,6 +29,7 @@
 		"animejs": "^3.2.1",
 		"fs": "^0.0.1-security",
 		"jquery": "^3.6.4",
+		"svelte-legos": "^0.2.1",
 		"svelte-table": "^0.5.11",
 		"tablesorter": "^2.31.3"
 	}

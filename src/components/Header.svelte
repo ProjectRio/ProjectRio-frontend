@@ -27,7 +27,7 @@
                 <a href="/community/create">Community</a>
             </li>
             <li aria-current={$page.url.pathname === '/games' ? 'page' : undefined}>
-                <a href="/games/ongoing">Games</a>
+                <a href="/games/live">Games</a>
             </li>
             <li aria-current={$page.url.pathname.startsWith('/tagset') ? 'page' : undefined}>
                 <a href="/tagset/all">Tagset</a>

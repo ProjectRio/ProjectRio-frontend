@@ -1,4 +1,5 @@
 <script lang="ts">
+
     // Import components
     import Topbar from "../../../components/Topbar.svelte";
     import { apiFetch } from "../../../fetch/apiFetch";
@@ -27,9 +28,12 @@
         };
   
         await apiFetch('/request_password_change/', options, true);
+        window.location.href = "/login/reset_password/confirmation";
+
       } catch (error){
         console.log(error);
       }
+
     }
   </script>
   
