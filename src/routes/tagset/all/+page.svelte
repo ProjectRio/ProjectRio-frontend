@@ -14,7 +14,7 @@
       });
       const result = await response.json();
       tagsets = result['Tag Sets'];
-      gameModes.set(tagsets);
+      // gameModes.set(tagsets);
       console.log(tagsets);
     } catch (error) {
       console.log(error);

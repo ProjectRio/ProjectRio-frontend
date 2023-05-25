@@ -21,10 +21,10 @@
   */
   async function getTags() {
     try {
-      const response = await fetch('https://api.projectrio.app/tag/list');
+      const response = await fetch('https://api.projectrio.app/tag/list', {method: 'GET'});
       console.log(response);
       const json = await response.json();
-      const result = json.stringify()
+      const result = JSON.stringify(json)
       console.log(result);
 
     } catch (error){

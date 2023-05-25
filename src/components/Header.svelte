@@ -20,9 +20,6 @@
             <li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
                 <a href="/">Home</a>
             </li>
-            <li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
-                <a href="/about">About</a>
-            </li>
             <li aria-current={$page.url.pathname.startsWith('/community') ? 'page' : undefined}>
                 <a href="/community/create">Community</a>
             </li>
