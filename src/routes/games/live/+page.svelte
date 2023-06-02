@@ -171,9 +171,14 @@ afterUpdate(() => {
 
             
             {#if row.half_inning === 0}
-            <td>🏓{characters[row.batter]}</td>
-            
-            <td>⚾{characters[row.pitcher]}</td>
+              {#if characters[row.batter] === "DK"}
+              
+                <td>🥊{characters[row[`away_roster_${row.batter}_char`]]}</td>
+
+              {:else}
+                <td>🏓{characters[row[`away_roster_${row.batter}_char`]]}</td>
+              {/if}
+            <td>⚾{characters[row[`home_roster_${row.pitcher}_char`]]}</td>
             <!-- <td>{row.outs} outs<br></td> -->
             <td class="mobile-hide" style="font-weight: bolder">
               {'★ '.repeat(row.home_stars) + '☆ '.repeat(5 - row.home_stars)}
