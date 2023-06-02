@@ -3,7 +3,7 @@ export async function apiFetch(route: string, options: any, debug=false) {
   try {    
     // stringify JSON body
     options.body = JSON.stringify(options.body)
-
+    options.headers = options.headers || {}
     // get jwt
     const jwt = localStorage.getItem("jwt");
 

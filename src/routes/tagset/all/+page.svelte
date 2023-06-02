@@ -14,7 +14,6 @@
       });
       const result = await response.json();
       tagsets = result['Tag Sets'];
-      // gameModes.set(tagsets);
       console.log(tagsets);
     } catch (error) {
       console.log(error);
@@ -23,14 +22,13 @@
 
 </script>
 
-<!--<Topbar></Topbar>-->
-<h1>Tag Sets</h1>
+<h1>Game Modes</h1>
 
 <section>
   <table>
     <tr>
       <th>Community Id</th>
-      <th>Tagset ID</th>
+      <th>Game Mode ID</th>
       <th>Name</th>
       <th>Type</th>
       <th>Start Date</th>
@@ -41,7 +39,9 @@
         <tr>
           <td>{tagset.comm_id}</td>
           <td>{tagset.id}</td>
-          <td><a href="{tagset.name}/ladder">{tagset.name}</a></td>
+          <a class="link-text" href="{tagset.name}/ladder">
+            <td class="link-cell">{tagset.name}</td>
+          </a>
           <td>{tagset.comm_type}</td>
           <td>{new Date(tagset.start_date * 1000).toLocaleString("US", {year:"numeric", month:"numeric", day:"numeric"})}</td>
           <td>{new Date(tagset.end_date * 1000).toLocaleString("US", {year:"numeric", month:"numeric", day:"numeric"})}</td>
@@ -63,6 +63,15 @@
     width: 90vw;
     text-align: center;
   }
+
+  a {
+    text-decoration: none;
+    color: inherit
+  }
+
+  /* .link-cell:hover {
+    background-color:powderblue;
+  } */
 
 </style>
 

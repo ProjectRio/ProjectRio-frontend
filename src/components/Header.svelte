@@ -20,21 +20,25 @@
             <li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
                 <a href="/">Home</a>
             </li>
-            <li aria-current={$page.url.pathname.startsWith('/community') ? 'page' : undefined}>
+
+            <!-- <li aria-current={$page.url.pathname.startsWith('/community') ? 'page' : undefined}>
                 <a href="/community/create">Community</a>
-            </li>
+            </li> -->
             <li aria-current={$page.url.pathname === '/games' ? 'page' : undefined}>
                 <a href="/games/live">Games</a>
             </li>
             <li aria-current={$page.url.pathname.startsWith('/tagset') ? 'page' : undefined}>
-                <a href="/tagset/all">Tagset</a>
+                <a href="/tagset/all">Game Modes</a>
             </li>
-            <li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
+            <li aria-current={$page.url.pathname.startsWith('/slice') ? 'page' : undefined}>
+                <a href="/slice">Slice</a>
+            </li>
+            <!-- <li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
                 <a href="/login">Login</a>
-            </li>
-            <li aria-current={$page.url.pathname === '/tagset/ladder' ? 'page' : undefined}>
+            </li> -->
+            <!-- <li aria-current={$page.url.pathname === '/tagset/ladder' ? 'page' : undefined}>
                 <a href="/tagset/ladder">Ladder</a>
-            </li>
+            </li> -->
 
         </ul>
         <svg viewBox="0 0 2 3" aria-hidden="true">

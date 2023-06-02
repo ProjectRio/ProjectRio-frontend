@@ -44,18 +44,19 @@
     }
   }
 
-  // async function handleVerifyJWT() {
-  //   try {
-  //     const options: any = {
-  //       method: 'get',
-  //       headers: {}
-  //     };
+  async function handleVerifyJWT() {
+    try {
+      const options: any = {
+        method: 'get',
+        headers: {}
+      };
       
-  //     const result = await apiFetch('/validate_JWT/', options, true);      
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+      const result = await apiFetch('/validate_JWT/', options, true);
+      console.log(result)      
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   // async function handleLogout(){
   //   try {
@@ -98,9 +99,9 @@
   />
   <p></p>
   <button on:click={handleSubmit}>Submit</button>
-<!-- 
-  <button on:click={handleVerifyJWT}>Verify</button>
 
+  <button on:click={handleVerifyJWT}>Verify</button>
+<!-- 
   <button on:click={handleLogout}>Logout</button> -->
 
   <a href='/login/reset_password/'>Reset Password</a>
