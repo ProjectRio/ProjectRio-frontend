@@ -7,7 +7,7 @@ async function getAllTagSets() {
     });
     const result = await response.json();
     tagsets.set(result['Tag Sets']);
-    console.log(result['Tag Sets']);
+    // console.log(result['Tag Sets']);
   } catch (error) {
     console.log(error);
   }
