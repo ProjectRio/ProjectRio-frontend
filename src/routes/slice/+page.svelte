@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import {characters} from '../../components/characterName';
     import { Body } from 'svelte-body';
-
+    import slice from '../../lib/images/slice.png'
     // Access the tagsets data in your component
     let tagsetsData: any[] = []
     $: {
@@ -30,7 +30,7 @@
   <Body style="background-color:#333;color:#f5f5f5;display:flex;justify-content:center;align-items:center;margin:0;" />
   <div class="head">
     <h4 style="display:flex;justify-content:center;align-items:center;font-size:x-small;margin-top:0px;margin-bottom:10px;">Click Game Mode/Player for more detailed stats.</h4>
-  <h1 style="display:flex;justify-content:center;align-items:center;">  <img src="./src/lib/images/slice.png" alt=""></h1>
+  <h1 style="display:flex;justify-content:center;align-items:center;">  <img src={slice} alt=""></h1>
 </div>
   {#if data.live}
   <h2 style="display:flex;justify-content:center;align-items:center;">Live Games</h2>
