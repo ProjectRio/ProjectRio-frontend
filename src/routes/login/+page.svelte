@@ -1,6 +1,6 @@
 <script lang="ts">
   // Import components
-  import Topbar from "../../components/Topbar.svelte";
+  // import Topbar from "../../components/Topbar.svelte";
   import { apiFetch } from "../../fetch/apiFetch";
   
 
@@ -34,6 +34,7 @@
         body: data
       };
 
+      // should be set to false once done debugging
       const result = await apiFetch('/login/', options, true);
 
       localStorage.setItem("jwt", result.access_token);
@@ -43,18 +44,19 @@
     }
   }
 
-  // async function handleVerifyJWT() {
-  //   try {
-  //     const options: any = {
-  //       method: 'get',
-  //       headers: {}
-  //     };
+  async function handleVerifyJWT() {
+    try {
+      const options: any = {
+        method: 'get',
+        headers: {}
+      };
       
-  //     const result = await apiFetch('/validate_JWT/', options, true);      
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+      const result = await apiFetch('/validate_JWT/', options, true);
+      console.log(result)      
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   // async function handleLogout(){
   //   try {
@@ -74,7 +76,7 @@
   // }
 </script>
 
-<Topbar></Topbar>
+<!-- <Topbar></Topbar> -->
 <h1>Log in</h1>
 <section class="input-container">
   <p>Username:</p>
@@ -97,9 +99,9 @@
   />
   <p></p>
   <button on:click={handleSubmit}>Submit</button>
-<!-- 
-  <button on:click={handleVerifyJWT}>Verify</button>
 
+  <button on:click={handleVerifyJWT}>Verify</button>
+<!-- 
   <button on:click={handleLogout}>Logout</button> -->
 
   <a href='/login/reset_password/'>Reset Password</a>
@@ -121,4 +123,3 @@
     display: grid;
   }
 </style>
-

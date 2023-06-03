@@ -1,6 +1,7 @@
 <script lang="ts">
+
     // Import components
-    import Topbar from "../../../components/Topbar.svelte";
+    // import Topbar from "../../../components/Topbar.svelte";
     import { apiFetch } from "../../../fetch/apiFetch";
 
     let username_or_email = "";
@@ -27,13 +28,16 @@
         };
   
         await apiFetch('/request_password_change/', options, true);
+        window.location.href = "/login/reset_password/confirmation";
+
       } catch (error){
         console.log(error);
       }
+
     }
   </script>
   
-  <Topbar></Topbar>
+  <!-- <Topbar></Topbar> -->
   <h1>Request Password Reset</h1>
   <section class="input-container">
     <p>Username or Email:</p>

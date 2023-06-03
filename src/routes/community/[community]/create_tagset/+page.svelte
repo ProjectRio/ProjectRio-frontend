@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   
   // Import components
-  import Topbar from "../../../../components/Topbar.svelte";
+  // import Header from "../../../../components/Header.svelte";
 
   // Instantiate variables
   let tagName: string = "";
@@ -17,14 +17,14 @@
 
 
   /*
-    Used to get a list of availabe tags on page load
+    Used to get a list of available tags on page load
   */
   async function getTags() {
     try {
-      const response = await fetch('https://api.projectrio.app/tag/list');
+      const response = await fetch('https://api.projectrio.app/tag/list', {method: 'GET'});
       console.log(response);
       const json = await response.json();
-      const result = json.stringify()
+      const result = JSON.stringify(json)
       console.log(result);
 
     } catch (error){
@@ -40,7 +40,7 @@
   }
 </script>
 
-<Topbar></Topbar>
+<!-- <Header></Header> -->
 <h1>Create Tag for {$page.params.community}</h1>
 <section class="input-container">
   <p>Community Name:</p>

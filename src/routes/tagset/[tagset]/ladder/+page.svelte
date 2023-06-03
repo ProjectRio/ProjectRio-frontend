@@ -1,9 +1,7 @@
 <script lang="ts">
   // Import store
   import { page } from '$app/stores';
-
   // Import components
-  import Topbar from "../../../../components/Topbar.svelte";
 
   // Import apiFetch function
   import { apiFetch } from "../../../../fetch/apiFetch";
@@ -35,8 +33,9 @@
   }
 
 </script>
+<button class="game-mode"><a href="/games/recent">Go to Recent Games List</a></button>
+<button class="recent-game"><a href="/tagset/all">Go to Game Modes List</a></button>
 
-<Topbar></Topbar>
 <h1>{$page.params.tagset}</h1>
 
 <section>
@@ -63,6 +62,8 @@
 
 
 <style>
+  @import "../../../games/table.css";
+
   h1{
     text-align: center;
     margin: auto;
@@ -72,7 +73,32 @@
     margin: auto;
     width: 40vw;
     text-align: center;
+
   }
+
+  a {
+    text-decoration: none;
+    color: inherit
+  }
+
+  .game-mode {
+    width: 20%;
+    /* align-self: left; */
+    justify-content: center;
+    position: sticky;
+    top: 50%;
+    left: 10%;
+  }
+
+  .recent-game {
+    width: 20%;
+    /* align-self: left; */
+    justify-content: center;
+    position: sticky;
+    top: 40%;
+    left: 10%;
+  }
+  
 
 </style>
 
