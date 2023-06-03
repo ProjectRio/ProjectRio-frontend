@@ -47,7 +47,7 @@ async function fetchData() {
         game.new_start_time = new Date(game.date_time_start * 1000).toLocaleString();
         game.new_game_mode = tagsetsData.find(tagset => tagset.id === game.game_mode)?.name || '';
         game.new_stadium = stadiums[game.stadium]
-        // console.log(game.new_stadium)
+        console.log(game.new_game_mode)
       })
     } else {
       console.error('Error fetching data from API:', response.status);

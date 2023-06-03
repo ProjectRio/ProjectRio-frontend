@@ -7,6 +7,7 @@
     import {characters} from '../../../components/characterName';
     import { tagsets } from '$lib/tagsets';
     import { getAllTagSets } from '../../../components/tagNames';
+    import { Body } from 'svelte-body';
 
    // init variables
     let games: any[] | undefined = [];

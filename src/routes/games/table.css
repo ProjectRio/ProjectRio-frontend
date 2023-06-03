@@ -5,9 +5,9 @@
   }
 
   /* Zebra striping */
-  tr:nth-of-type(odd) { 
+  /* tr:nth-of-type(odd) { 
     background: #eee; 
-  }
+  } */
   /* th { 
     background: #ccc; 
     color: black; 

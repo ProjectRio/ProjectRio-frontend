@@ -33,8 +33,8 @@
   }
 
 </script>
-<button class="game-mode"><a href="/games/recent">Go to Game Modes List</a></button>
-<button class="recent-game"><a href="/tagset/all">Go to Recent Games List</a></button>
+<button class="game-mode"><a href="/games/recent">Go to Recent Games List</a></button>
+<button class="recent-game"><a href="/tagset/all">Go to Game Modes List</a></button>
 
 <h1>{$page.params.tagset}</h1>
 
@@ -73,6 +73,7 @@
     margin: auto;
     width: 40vw;
     text-align: center;
+
   }
 
   a {

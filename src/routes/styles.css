@@ -21,8 +21,10 @@
     --column-margin-top: 4rem;
     font-family: var(--font-body);
     /* color: var(--color-text); */
-    background-color: #dbdbdb;
+    /* background-color: #dbdbdb; */
 }
+
+
 
 body {
     /* background-color: #222222; */

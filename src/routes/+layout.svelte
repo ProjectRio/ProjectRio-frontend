@@ -11,7 +11,7 @@
     </main>
 
     <footer>
-        <p>visit <a href="https://www.projectrio.online/">projectrio.online</a> for more information about the Rio Client.</p>
+        <!-- <p>visit <a href="https://www.projectrio.online/">projectrio.online</a> for more information about the Rio Client.</p> -->
     </footer>
 </div>
 
@@ -20,12 +20,16 @@
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        justify-content: center;
+        align-items: center;
     }
 
     main {
         flex: 1;
         display: flex;
         flex-direction: column;
+        /* justify-content: center; */
+        /* align-items: center; */
         padding: 1rem;
         width: 100%;
         max-width: 64rem;
