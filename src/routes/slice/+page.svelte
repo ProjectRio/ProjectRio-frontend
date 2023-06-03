@@ -11,6 +11,7 @@
     let tagsetsData: any[] = []
     $: {
     tagsetsData = $tagsets; // Get the current value of the tagsets store
+    // console.log($tagsets)
     }
 
     onMount(() => {
@@ -49,7 +50,10 @@
     </thead>
     <tbody>
         {#each data.live as live}
+        <!-- filter by being a game mode with slice in name -->
+          {#if String(tagsetsData.find(tagset => tagset.id === live.tag_set)?.name).includes("SLICE")}
             {#if withinLastHour(live.start_time)}
+     
                 <tr>
                   <td class="player-link"><a class="player" href={`/slice/player/${live.away_player}`}>{live.away_player}</a></td>
                     <td>{live.away_score}</td>
@@ -119,6 +123,7 @@
                   {/if}
                 </tr>
                 <br>
+            {/if}
             {/if}
         {/each}
     </tbody>
