@@ -1,13 +1,3 @@
-@font-face {
-    font-family: 'Mario-Baseball-Regular';
-    src:url('$lib/fonts/Mario-Baseball-Regular/Mario-Baseball-Regular.ttf.woff') format('woff'),
-    url('../lib/fonts/Mario-Baseball-Regular/Mario-Baseball-Regular.ttf.svg#Mario-Baseball-Regular') format('svg'),
-    url('$lib/fonts/Mario-Baseball-Regular/Mario-Baseball-Regular.ttf.eot'),
-    url('../lib/fonts/Mario-Baseball-Regular/Mario-Baseball-Regular.ttf.eot?#iefix') format('embedded-opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 :root {
     --font-body: sans-serif; /* Mario-Baseball-Regular, */
     --font-mono: sans-serif; /*Mario-Baseball-Regular, */

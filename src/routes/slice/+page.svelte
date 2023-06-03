@@ -6,11 +6,12 @@
     import { onMount } from 'svelte';
     import {characters} from '../../components/characterName';
     import { Body } from 'svelte-body';
-
+    import slice from '../../lib/images/slice.png'
     // Access the tagsets data in your component
     let tagsetsData: any[] = []
     $: {
     tagsetsData = $tagsets; // Get the current value of the tagsets store
+    // console.log($tagsets)
     }
 
     onMount(() => {
@@ -30,7 +31,7 @@
   <Body style="background-color:#333;color:#f5f5f5;display:flex;justify-content:center;align-items:center;margin:0;" />
   <div class="head">
     <h4 style="display:flex;justify-content:center;align-items:center;font-size:x-small;margin-top:0px;margin-bottom:10px;">Click Game Mode/Player for more detailed stats.</h4>
-  <h1 style="display:flex;justify-content:center;align-items:center;">  <img src="src\lib\images\slice.png" alt=""></h1>
+  <h1 style="display:flex;justify-content:center;align-items:center;">  <img src={slice} alt=""></h1>
 </div>
   {#if data.live}
   <h2 style="display:flex;justify-content:center;align-items:center;">Live Games</h2>
@@ -49,7 +50,10 @@
     </thead>
     <tbody>
         {#each data.live as live}
+        <!-- filter by being a game mode with slice in name -->
+          {#if String(tagsetsData.find(tagset => tagset.id === live.tag_set)?.name).includes("SLICE")}
             {#if withinLastHour(live.start_time)}
+     
                 <tr>
                   <td class="player-link"><a class="player" href={`/slice/player/${live.away_player}`}>{live.away_player}</a></td>
                     <td>{live.away_score}</td>
@@ -119,6 +123,7 @@
                   {/if}
                 </tr>
                 <br>
+            {/if}
             {/if}
         {/each}
     </tbody>
