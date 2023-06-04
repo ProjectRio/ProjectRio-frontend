@@ -1,4 +1,3 @@
-import { setInterval } from 'timers/promises';
 import type { PageServerLoad } from './$types';
 // import { Actions } from './$types';
 export const load: PageServerLoad = async ({ params, fetch, depends }) => {
