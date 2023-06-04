@@ -25,7 +25,7 @@
           })
         });
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
         players = Object.values(result).sort((a: any, b: any) => b.rating - a.rating);
       } catch (error) {
         console.log(error);

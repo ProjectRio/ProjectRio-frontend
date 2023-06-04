@@ -42,8 +42,8 @@ onMount(() => {
                 <td>{games.away_score}</td>
                   <td>{games.home_score}</td>
                   <td class="player-link"><a class="player" href={`/slice/player/${games.home_user}`}>{games.home_user}</a></td>
-                    <td>{stadiums[games.stadium]}</td>
-                  <a href={`/slice/${tagsetsData.find(tagset => tagset.id === games.game_mode)?.name}`}/ladder><td>{tagsetsData.find(tagset => tagset.id === games.game_mode)?.name || ''}</td></a>
+                  <td>{stadiums[games.stadium]}</td>
+                  <td class="mode"><a href={`/slice/${tagsetsData.find(tagset => tagset.id === games.game_mode)?.name}`}/ladder>{tagsetsData.find(tagset => tagset.id === games.game_mode)?.name || ''}</a></td>
 
                   <td>{new Date(games.date_time_start * 1000).toLocaleString()}</td>
               </tr>
@@ -137,19 +137,26 @@ button:hover {
   color: #F367D0ff;
 
 }
+.mode:hover {
+  background: #F367D0ff;
+}
 
 a {
     text-decoration: none;
 }
 
-.player {
+.player, .mode a {
   text-decoration: none;
   color: inherit;
   justify-content: center;
 }
 
-.player-link:hover {
+.player-link:hover, .game-mode:hover {
   background-color: #F367D0ff;
+}
+
+a {
+  color: inherit;
 }
 
 th {
