@@ -7,7 +7,6 @@
     import {characters} from '../../components/characterName';
     import { Body } from 'svelte-body';
     import slice from '../../lib/images/slice.png'
-    import { page } from '$app/stores';
     import { invalidate } from '$app/navigation';
 
     // Access the tagsets data in your component
