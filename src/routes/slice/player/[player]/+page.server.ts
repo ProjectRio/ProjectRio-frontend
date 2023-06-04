@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params, fetch }) => {
   try {
     const { player } = params;
-    console.log(player)
+    // console.log(player)
     const url = `https://api.projectrio.app/games/?tag=slice2023&username=${player}`;
     const response = await fetch(url);
 
