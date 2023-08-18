@@ -9,9 +9,7 @@
 		"test": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test:unit": "vitest",
-		"lint": "prettier --plugin-search-dir ../../../Downloads/ProjectRio-frontend-merge --check . && eslint .",
-		"format": "prettier --plugin-search-dir ../../../Downloads/ProjectRio-frontend-merge --write ."
+		"test:unit": "vitest"
 	},
 	"devDependencies": {
 		"@floating-ui/dom": "^1.4.5",
