@@ -5,7 +5,7 @@
     import { titleCase } from '$lib/utils.js';
 
     // right now this isn't working ...?
-    import { sortableTableAction } from 'svelte-legos';
+    // import { sortableTableAction } from 'svelte-legos';
 
     // Instantiate variables
 
@@ -90,7 +90,9 @@
   <h1>{titleCase($page.params.gamemode)} - ELO Peaks</h1>
   {#if data}
   <section class="table-container">
-    <table class="table table-hover table-interactive" use:sortableTableAction>
+<!--    <table class="table table-hover table-interactive" use:sortableTableAction>-->
+      <table class="table table-hover table-interactive" >
+
       <thead>
       <tr class="table-cell-fit">
         <th>#</th>

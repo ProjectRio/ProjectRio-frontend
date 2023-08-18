@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import {characters} from '$lib/helpers/characterName';
     import { invalidate } from '$app/navigation';
-    import { sortableTableAction } from 'svelte-legos';
+    // import { sortableTableAction } from 'svelte-legos';
     import { BACKEND, STAT_ENDPOINTS } from '$lib/constants'
 
     // Access the tagsets data in your component
@@ -47,8 +47,10 @@
 <div class="flex justify-center items-center mx-auto transition-[width] duration-200 w-full ">
   <div class="table-container text-token">
     <h2 class="h2">Recent Games</h2>
-    <table class="table table-hover" use:sortableTableAction>
-      <thead>
+<!--    <table class="table table-hover" use:sortableTableAction>-->
+    <table class="table table-hover">
+
+    <thead>
         <tr>
           <th>Away Player</th>
           <th>Away Score</th>

@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
 	import { BACKEND, UNCATEGORIZED_ENDPOINTS } from '$lib/constants';
   import { titleCase } from '$lib/utils';
-  import {sortableTableAction} from "svelte-legos";
+  // import {sortableTableAction} from "svelte-legos";
     // right now this isn't working ...?
     // Import components
 
@@ -55,7 +55,9 @@
   </div>
   <h1>{titleCase($page.params.gamemode)} Ladder</h1>
   <section class="table-container">
-    <table class="table table-hover table-interactive table-compact" use:sortableTableAction>
+<!--    <table class="table table-hover table-interactive table-compact" use:sortableTableAction>-->
+    <table class="table table-hover table-interactive table-compact">
+
       <thead>
       <tr>
         <th>#</th>

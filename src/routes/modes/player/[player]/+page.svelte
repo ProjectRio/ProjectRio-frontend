@@ -1,7 +1,7 @@
 <script lang="ts">
     import { stadiums } from '$lib/helpers/stadiumName';
     import { getAllTagSets } from '$lib/helpers/tagNames';
-    import { sortableTableAction} from "svelte-legos";
+    // import { sortableTableAction} from "svelte-legos";
 
     export let data;
     import { tagsets } from '$lib/stores/tagsets';
@@ -23,7 +23,7 @@ onMount(() => {
 {#if data.games}
 <h2 style="display:flex;justify-content:center;align-items:center;">{$page.params.player}</h2>
 <div class="table-container">
-<table  class="table table-hover table-interactive" use:sortableTableAction>
+<table  class="table table-hover table-interactive">
   <thead>
       <tr>
           <th>Away Player</th>
