@@ -67,9 +67,8 @@
 				>
 			</li>
 			<li>
-				<a href="/signup" on:click={drawerClose}>
-					<span></span><span class="flex-auto">{'signup'}</span></a
-				>
+<!--				<a href="/signup" on:click={drawerClose}>-->
+<!--					<span></span><span class="flex-auto">{'signup'}</span></a>-->
 			</li>
 		{/if}
 	</ul>
