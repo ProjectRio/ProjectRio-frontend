@@ -37,7 +37,7 @@
 		</li>
 		{#if user}
 			<li>
-				<a href="/modes" on:click={drawerClose}>
+				<a href="/modes/all" on:click={drawerClose}>
 					<span></span><span class="flex-auto">{'modes'}</span></a
 				>
 			</li>
