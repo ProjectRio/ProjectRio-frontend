@@ -1,0 +1,430 @@
+{
+  "Tags": [
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677633618,
+      "desc": "Both teams always have 5 stars",
+      "gecko_code": "00892ad6 000100ff\n",
+      "gecko_code_desc": "Both teams always have 5 stars.",
+      "id": 7,
+      "name": "Unlimited Stars",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677633618,
+      "desc": "Super Duper Jump",
+      "gecko_code": "047b5e98 3ba3d70a\n",
+      "gecko_code_desc": "Characters with super jump jump much higher.",
+      "id": 8,
+      "name": "Super Duper Jump",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677901511,
+      "desc": "Superstars not unlocked",
+      "id": 10,
+      "name": "Disable Superstars",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677901511,
+      "desc": "Star skills forced off",
+      "id": 11,
+      "name": "Disable Star Skills",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677901512,
+      "desc": "Turn off stadium hazards",
+      "id": 12,
+      "name": "Enable Hazardless",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677901512,
+      "desc": "Fielders will no longer bobble when fielding ground balls",
+      "gecko_code": "087b5d14 00000000\n00030006 00000000\n087b5d15 00000000\n00030006 00000000\n087b5d16 00000000\n00030006 00000000\n",
+      "gecko_code_desc": "Fielders will no longer bobble when fielding ground balls",
+      "id": 13,
+      "name": "Remove grounder bobbles",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677901512,
+      "desc": "Removes both frames of the slice mechanic",
+      "gecko_code": "207b63d8 00000000\n047b63d8 fda8fda8\n047b63f8 02580258\n047b6450 fda8fda8\n047b6470 02bc02bc\n047b64c8 fddafdda\n047b64e8 028a028a\n047b64ac 02bc02bc\ne2000001 00000000\n",
+      "gecko_code_desc": "Slice is when non-line drive star swings when hit on frame 2 (latest possible swing) or frame 10 (earliest possioble swing) result in a hit directly up the middle of the field. This code removes slicing by replacing them with foul balls.",
+      "id": 14,
+      "name": "Remove slice",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262056,
+      "desc": "Both players will use the random teams with random captains",
+      "id": 16,
+      "name": "Draft Randoms",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262056,
+      "desc": "First pick selects 1 character, second pick selects 2. Alternate picks, 2 at a time. Any character can be selected first and second, does not have to be a captain. Captains are chosen at the end of the draft. Bowser must be captain if chosen.",
+      "id": 17,
+      "name": "Draft Nolan",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262056,
+      "desc": "First pick selects 1 character, second pick selects 2. Alternate picks, 2 at a time. Any character can be selected first and second, does not have to be a captain. Captains are chosen at the end of the draft",
+      "id": 18,
+      "name": "Draft Snake 1222",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "First pick selects 1 character, second pick selects 2. Alternate picks, 1 at a time. Any character can be selected first and second, does not have to be a captain. Captains are chosen at the end of the draft",
+      "id": 19,
+      "name": "Draft Snake 1211",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Any draft method can be used",
+      "id": 20,
+      "name": "Draft Any",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Flip a coin, winner gets choice Home/Away or 1st/2nd pick. Loser gets choice of remaining, unresolved option",
+      "id": 21,
+      "name": "Pick Order Standard Coin Flip",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Enables pitch clock and restricts batter pausing",
+      "id": 22,
+      "name": "Enable Game Moderation",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Defaults rules to select game length of 9 innings",
+      "id": 23,
+      "name": "Default Nine Innings",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Disables drop spots by default",
+      "id": 24,
+      "name": "Default Drop Spots Off",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Fielding player can pause the game twice per inning to make any fielding adjustments. If the pitcher becomes tired, no additional swap is not permitted.",
+      "id": 25,
+      "name": "Fielder Swap Limit 2",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Fielding player can pause the game once per inning to make any fielding adjustments. If the pitcher becomes tired, one additional swap is permitted.",
+      "id": 26,
+      "name": "Fielder Swap Limit 1 Plus 1",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679262057,
+      "desc": "Fielding player can pause the game once per inning to make any fielding adjustments. If the pitcher becomes tired, no additional swap is permitted.",
+      "id": 27,
+      "name": "Fielder Swap Limit 1",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679282177,
+      "desc": "Game must be played on a random stadium",
+      "id": 28,
+      "name": "Random Stadium",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679357979,
+      "desc": "Home and away teams are randomly assigned to players",
+      "id": 30,
+      "name": "Random Home/Away",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679357979,
+      "desc": "Game length of five innings",
+      "id": 31,
+      "name": "Five Innings",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679358491,
+      "desc": "Away team bans stadium, home team then picks stadium from the remaining options",
+      "id": 33,
+      "name": "Away Bans Stadium Home Selects",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679890287,
+      "desc": "Controls: Y pitcher, X catcher, R closest to the ball; 15 frame lockout",
+      "gecko_code": "20678F8C 88061BD1\nC2678F8C 0000003D\n7C6E1B78 7C0802A6\n90010004 9421FF00\nBC610008 3D20802E\n6129BF97 3C808089\n6084269E A0840000\n2C04000F 40810178\n3C808089 60842973\n88840000 2C040003\n40800024 3C808089\n60842701 88840000\n2C040000 41820010\n2C040003 41820008\n48000144 3D008089\n61082898 A1080000\n88890000 71050010\n2C050010 4082000C\n38800000 98890000\n71050800 2C050800\n4082000C 38800001\n98890000 71050400\n2C050400 4082000C\n38800002 98890000\n71050020 2C050020\n4082000C 38800003\n98890000 2C040004\n408000DC 2C040000\n418200D4 2C040003\n4182000C 3884FFFF\n48000074 3CE08089\n60E70B38 39000008\n38A00000 38800000\n3CC08088 60C6F368\nC3870000 C3A60000\nFFDCE828 FFDEF02A\nFFC0F210 7F883C2E\nC3A60008 FF9CE828\nFF9CE02A FF80E210\nFFDEE02A 2C050000\n4182000C FC0AF040\n4180000C FD40F090\n7CA42B78 38A50001\n38C60268 2C050009\n4082FFB0 3CC08088\n60C6F53B 39000000\n1D280268 7CA930AE\n2C05000F 4082000C\n38A00002 7CA931AE\n39080001 2C080009\n4180FFE0 1CA40268\n38E0000F 7CE531AE\n3CC08089 60C62800\n98860001 98860007\n48000028 38800000\n98890000 B8610008\n80010104 38210100\n7C0803A6 7DC37378\n88061BD1 4800001C\nB8610008 80010104\n38210100 7C0803A6\n7DC37378 38000001\n60000000 00000000\nE2000001 00000000\n",
+      "gecko_code_desc": "Controls: Y pitcher, X catcher, R closest to the ball; 15 frame lockout",
+      "id": 38,
+      "name": "Manual Fielder Select 4.1",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1679890869,
+      "desc": "Disables the built in manual fielder select code. Can be overriden by a gecko code version of MFS",
+      "id": 39,
+      "name": "Disable Manual Fielder Select",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1680911182,
+      "desc": "Random Stadium. If Yoshi Park is rolled either user can veto the stadium and a new stadium will be rolled until Yoshi Park is not selected",
+      "id": 41,
+      "name": "Random Stadium with option to veto Yoshi Park",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677630366,
+      "desc": "Allows you to draft any character as many times as you want.",
+      "id": 3,
+      "name": "Duplicate characters",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1677630773,
+      "desc": "Characters have chemistry with themselves and variants",
+      "id": 4,
+      "name": "Dup chars and variants have chem",
+      "type": "Client Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1681176464,
+      "desc": "Reduces the 30 frame lockout period after a hit down to 1 frame. Allows runners to be controlled right away after a hit.",
+      "gecko_code": "027b625a 00000001\n",
+      "gecko_code_desc": "Reduces the 30 frame lockout period after a hit down to 1 frame. Allows runners to be controlled right away after a hit.",
+      "id": 44,
+      "name": "Remove Baserunner Lockout",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1683515468,
+      "desc": "Sets Monty Mole's speed to 70",
+      "gecko_code": "0034F50F 00000046\n",
+      "gecko_code_desc": "Sets Monty Mole's speed to 70",
+      "id": 49,
+      "name": "Monty Mole 70 Speed",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1683515468,
+      "desc": "Game length of seven innings",
+      "id": 50,
+      "name": "Seven Innings",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 4,
+      "date_created": 1683515468,
+      "desc": "Users can mutually agree to use a different draft ruleset",
+      "id": 51,
+      "name": "Draft: Users' Choice",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 4,
+      "date_created": 1683515468,
+      "desc": "Users can mutually agree to use a different number of innings",
+      "id": 52,
+      "name": "Innings: Users' Choice",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 4,
+      "date_created": 1683515468,
+      "desc": "Users can mutually agree to use a different stadium",
+      "id": 53,
+      "name": "Stadium: Users' Choice",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 4,
+      "date_created": 1683515468,
+      "desc": "Random roll for a stadium. Can opt to re-roll for stadium to avoid back-to-back games at one stadium",
+      "id": 54,
+      "name": "Random Stadium with optional re-roll",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685072069,
+      "desc": "Both teams start with 5 stars at the beginning of the game",
+      "gecko_code": "207230a8 3c608087\n003530af 00010005\ne2000001 00000000\n",
+      "gecko_code_desc": "Both teams start with 5 stars at the beginning of the game",
+      "id": 57,
+      "name": "5-Star teams",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685072069,
+      "desc": "Star swings always cost 1 star regardless of original cost",
+      "gecko_code": "007b76f6 00000001\n",
+      "gecko_code_desc": "Star swings always cost 1 star regardless of original cost",
+      "id": 58,
+      "name": "Star Swing always 1 star",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685072069,
+      "desc": "Drop spot follows the ball shadow rather than the landing spot",
+      "gecko_code": "206a85d4 c005034c\n046a85b8 c01d0000\n046a85d4 c0050008\ne2000001 00000000\n",
+      "gecko_code_desc": "Star swings always cost 1 star regardless of original cost",
+      "id": 59,
+      "name": "Drop Spot on Ball Shadow (Coaks spot)",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685072069,
+      "desc": "Adjusts Bowser's lefty contact to make it mirror his smaller righty contact",
+      "gecko_code": "2065115c 60000000\n0465115c fd204850\n2065115d fd204850\n28890972 00000009\n0465115c 60000000\ne2000002 00000000\n",
+      "gecko_code_desc": "Adjusts Bowser's lefty contact to make it mirror his smaller righty contact",
+      "id": 60,
+      "name": "'Fixed' Bowser Contact (Lefty->Righty)",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685072070,
+      "desc": "Pitcher never gets tired regardless of runs given up or star pitches thrown",
+      "gecko_code": "003535d9 0000000a\n003535F7 0000000a\n00353615 0000000a\n00353633 0000000a\n00353651 0000000a\n0035366F 0000000a\n0035368D 0000000a\n003536AB 0000000a\n003536C9 0000000a\n003536E7 0000000a\n00353705 0000000a\n00353723 0000000a\n00353741 0000000a\n0035375F 0000000a\n0035377D 0000000a\n0035379B 0000000a\n003537B9 0000000a\n003537D7 0000000a\n",
+      "gecko_code_desc": "Pitcher never gets tired regardless of runs given up or star pitches thrown. Sets all stamina values to 10",
+      "id": 61,
+      "name": "Pitcher never gets tired",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 6,
+      "date_created": 1685073039,
+      "desc": "Patch Notes:\nMario & Luigi: Have stars on charge hit stats\nYoshi: Can now wall jump\nBirdo: Remembered her schnoz is a literal cannon (Laser)\nWario: Moved muscle from his dumpy to his arm (Laser) & learned to push his hit\nWaluigi: Has gone back to his LDSS roots\nBowser Jr.: Learned how to slide in the field (Sliding Catch) & how to pull balls (but not chicks)\nToadette: Has toad arm and slap hit (plus mid traj)\nToadsworth: Turning back the clock (Toad arm and speed)\nDixie: Learned LDSS from Green Para\nKing Boo: Inspired by winning the fan vote on the back of all the Boos, gains Boomer power & learned high traj\nPiantas: Combined to get Blob speed, PM power, & learned sliding catch from Nokis\nNokis: Combined to get Blue Noki speed, Green contact multiplier, and learned Wall Jump from the Mario Bros.\nBros: Combined to become the ultimate Giga Chad Bro, all have high, pull, curve traj, Fire Power, Boomer/Hammer speed, Boomer slap stats, & learned laser from Bowser\n",
+      "gecko_code": "0034e9c9 00000055\n0034e9cb 00000064\n0034ea69 0000005a\n0034ea6b 00000064\n0034ed83 00000002\n0034f002 00000000\n0034f003 00000019\n0034f00d 00000002\n0034f0b4 00000000\n0034f32a 0000002d\n0034f32e 00000000\n0034f330 00000032\n0034f462 00000002\n0034f463 00000011\n0034f5a2 00000000\n0034f5ad 00000001\n0034f6e3 00000019\n0034f6eb 00000046\n0034f783 00000019\n0034f78f 00000014\n0034f823 00000019\n0034f82b 00000046\n0034f82f 00000014\n0034f8c3 0000000a\n0034f8c8 0000002d\n0034f963 0000000a\n0034f968 0000002d\n0034f96f 00000046\n0034fa03 0000000a\n0034fa0f 00000046\n0034faa2 00000030\n0034faa3 00000011\n0034faaa 00000014\n0034faab 0000005a\n0034fb4f 0000003c\n0034fb50 00000032\n003500e9 00000014\n003500eb 00000050\n003500ee 00000001\n00350235 00000003\n00350a42 00000030\n00350a43 00000011\n00350a4a 00000014\n00350a4e 00000001\n00350a4f 0000001e\n00350ae3 00000011\n00350aeb 0000005a\n00350aed 00000001\n00350aee 00000001\n",
+      "gecko_code_desc": "Balance patch",
+      "id": 63,
+      "name": "Balance Patch: THE Stars Off All-Star Game 2",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685073356,
+      "desc": "Peach Garden Banned",
+      "id": 64,
+      "name": "Peach Garden Banned",
+      "type": "Component"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685228368,
+      "desc": "Allows you to draft any character as many times as you want",
+      "gecko_code": "003530f7 00350000\n003c6050 002300ff\n04067bac 60000000\n04067bc8 60000000\n04067be4 60000000\n04067c00 60000000\n04067c1c 60000000\n0464ece8 60000000\n0464ec38 60000000\n0464ec28 60000000\nc264f394 0000000a\n88030002 3c40803c\n60426726 88420000\n3ce08035 60e730f7\n7f023a14 38400001\n98580000 3c40803c\n6042672f 88420000\n7f023a14 38400001\n98580000 3c40803d\n60424400 38e00000\n3b000000 00000000\n0404e548 60000000\n046553f8 60000000\n0404e6b0 2C0000FF\n046553d4 2C0000FF\n",
+      "gecko_code_desc": "Temporary Gecko Code implementation for dupe chars",
+      "id": 66,
+      "name": "Duplicate Characters Gecko Code",
+      "type": "Gecko Code"
+    },
+    {
+      "active": true,
+      "comm_id": 1,
+      "date_created": 1685797872,
+      "desc": "Star swings are randomized.",
+      "gecko_code": "c26ad0b8 00000008\n39e0000d 3e000003\n39d043fd 7e0c42e6\n7e1071d6 3e100027\n39d09ec3 55ce843e\n7dcf71d6 7dcf8670\n7def0194 99e40087\n39c00000 39e00000\n3a000000 00000000\n",
+      "gecko_code_desc": "Star swings are randomized.",
+      "id": 75,
+      "name": "Random Star Swings",
+      "type": "Gecko Code"
+    }
+  ]
+}
