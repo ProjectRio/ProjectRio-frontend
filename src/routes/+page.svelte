@@ -7,9 +7,9 @@
 		<h1 class="h1">Project Rio</h1>
 		<ul class="list-nav flex">
 			<li><button class="btn variant-filled-primary m-2"><a href="/community">community</a></button></li>
-			<li><button class="btn variant-filled-primary m-2"><a href="/stats">stats</a></button></li>
-			<li><button class="btn variant-filled-primary m-2"><a href="/modes">modes</a></button></li>
-			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/create">create tagset</a></button></li>
+<!--			<li><button class="btn variant-filled-primary m-2"><a href="/stats">stats</a></button></li>-->
+			<li><button class="btn variant-filled-primary m-2"><a href="/modes/all">modes</a></button></li>
+<!--			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/create">create tagset</a></button></li>-->
 		</ul>
 	</div>
 </div>

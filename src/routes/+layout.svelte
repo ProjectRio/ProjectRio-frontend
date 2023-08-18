@@ -60,6 +60,7 @@
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				{#if $username}
+					{$username}
 <!--					<Avatar {$username} width="w-10" background="bg-primary-500" />-->
 				{/if}
 			</svelte:fragment>
