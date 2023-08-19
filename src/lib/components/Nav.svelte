@@ -8,7 +8,7 @@
 		drawerStore.close();
 	}
 	export let user: any;
-	user = $username;
+	$: user = $username;
     // const unsubscribe = username.subscribe((name) => {
     //     user = name;
     // })
@@ -35,12 +35,13 @@
 <!--			<a href="/stats" on:click={drawerClose}>-->
 <!--				<span></span><span class="flex-auto">{'stats'}</span></a>-->
 		</li>
-		{#if user}
 			<li>
 				<a href="/modes/all" on:click={drawerClose}>
 					<span></span><span class="flex-auto">{'modes'}</span></a
 				>
 			</li>
+		{#if user}
+
 <!--			<li>-->
 <!--				<form-->
 <!--					use:enhance-->
