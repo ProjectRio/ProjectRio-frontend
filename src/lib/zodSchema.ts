@@ -120,3 +120,26 @@ export const communitySponsor = z.object({
         .trim(),
   })
 
+export const ResetPassword = z.object({
+    username_or_email: z
+        .string({ required_error: 'Email is required' })
+        .email({ message: 'Please enter a valid email address' })
+        .max(EMAIL_CHARACTER_LIMIT, { message: 'Email is too long' })
+        .trim(),
+})
+
+type ResetPassword = z.infer<typeof ResetPassword>
+
+
+export const ChangePassword = z.object({
+    active_url: z
+        .string()
+        .trim(),
+    password: z
+        .string({ required_error: 'Password is required' })
+        .min(1, { message: 'Please enter a valid password' })
+        .max(PASSWORD_CHARACTER_LIMIT, { message: 'Password is too long' })
+        .trim(),
+})
+
+type ChangePassword = z.infer<typeof ChangePassword>

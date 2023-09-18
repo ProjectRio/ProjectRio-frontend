@@ -14,7 +14,7 @@
 	];
   import { username } from "$lib/stores/user";
 
-  $: if (form) {
+  $: if (form?.success) {
     $username = form.username;
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('username', form.username);
@@ -24,7 +24,7 @@
 </script>
 
 
-{#if form}
+{#if form?.success}
   <div>Welcome back, {$username}!</div>
   <!-- <SuperDebug data={$form} /> -->
   <!-- <h2 class="h2">Header</h2> -->
@@ -57,10 +57,14 @@
         {#if $errors.Password}<span class="invalid">{$errors.Password}</span>{/if}
       </div>
 
-      <div class="flex flex-col p-4 m-2 text-token space-y-4  w-[70%] h-[20%]">
-        <button class="flex  btn variant-filled-warning shadow-2xl ">Submit</button>
-      </div>
+      <ul class="flex flex-col p-4 m-2 text-token space-y-4  w-[70%] h-[20%]">
+<!--        <ul class="list-nav">-->
+       <li> <button class="flex btn variant-filled-warning shadow-2xl ">Submit</button></li>
+        <li><a href="/login/reset_password"><button class="flex btn variant-filled-warning shadow-2xl">Reset Password</button></a></li>
+<!--        </ul>-->
+      </ul>
     </form>
+
   </div>
 </div>
 <!-- </div> -->
