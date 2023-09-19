@@ -19,7 +19,7 @@
     <div>Your password has been successfully changed.</div>
     <!-- <h2 class="h2">Header</h2> -->
 {:else}
-     <SuperDebug data={$formData} />
+<!--     <SuperDebug data={$formData} />-->
 
     <div class="flex items-center justify-center h-screen ">
         <div class="p-4 md:p-10 flex bg-gradient-to-br variant-gradient-primary-secondary w-[60%] h-[70%] rounded-container-token shadow-2xl space-y-10">

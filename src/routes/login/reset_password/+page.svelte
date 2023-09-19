@@ -13,7 +13,7 @@
   <div>Reset link sent. Check your email for the link.</div>
   <!-- <h2 class="h2">Header</h2> -->
 {:else}
-    <SuperDebug data={$formData} />
+<!--    <SuperDebug data={$formData} />-->
 
     <h1 class="h1 flex items-center justify-center">Password Reset</h1>
   <div class="flex items-center justify-center h-screen ">
