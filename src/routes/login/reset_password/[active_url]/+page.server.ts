@@ -3,10 +3,13 @@ import { superValidate } from 'sveltekit-superforms/server'
 import {ChangePassword} from '$lib/zodSchema'
 import { fail, redirect } from '@sveltejs/kit';
 import {BACKEND, EMAIL_CHARACTER_LIMIT, USER_ENDPOINTS} from '$lib/constants';
-import type { Actions } from './$types'
+import type {Actions, PageServerLoad} from './$types'
 import { username } from '$lib/stores/user'
 
-const ChangePass = ChangePassword
+const ChangePass = ChangePassword.pick({
+    active_url: true,
+    password: true,
+})
 
 // extract the inferred type
 type ChangePass = z.infer<typeof ChangePass>
@@ -15,13 +18,14 @@ type ChangePass = z.infer<typeof ChangePass>
 // on page load, check for jwt and redirect if jwt present
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const load = async (event) => {
+export const load = async ({ event, params }) => {
     // const jwt = event.cookies.get('jwt')
     // if (jwt) throw redirect(302, '/');
     //
     const form = await superValidate(event, ChangePass);
     return {
-        form
+        form,
+        params,
     };
 };
 

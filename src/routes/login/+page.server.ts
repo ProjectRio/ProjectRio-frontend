@@ -84,9 +84,10 @@ export const actions = {
                 username.set(res.username)
             }
             return {
+                success: true,
                 form: form,
                 msg: res.msg,
-                username: res.username
+                username: res.username,
             }
         }
         /* Yep, return { form } here too (apparently superforms really wants you to return forms)
