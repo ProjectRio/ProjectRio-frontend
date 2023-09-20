@@ -9,7 +9,7 @@
     // import { sortableTableAction } from 'svelte-legos';
     import { BACKEND, STAT_ENDPOINTS } from '$lib/constants'
 
-    let gamesToDisplay = false;
+    // let gamesToDisplay = false;
     // Access the tagsets data in your component
     let tagsetsData: any[] = []
     $: {
@@ -34,7 +34,7 @@
         const currentTime = Date.now() / 1000; // Convert milliseconds to seconds
         const oneHourAgo: number = currentTime - (60 * 60); // Subtract one hour in seconds
         if (timestamp >= oneHourAgo) {
-          gamesToDisplay = true;
+          // gamesToDisplay = true;
           return true;
         }
         return false;
@@ -48,7 +48,7 @@
   <!-- <h1 style="display:flex;justify-content:center;align-items:center;">  <img src={slice} alt=""></h1> -->
 </div>
 {#if data.live}
-  {#if gamesToDisplay}
+  <!--{#if gamesToDisplay}-->
 <div class="flex justify-center items-center mx-auto transition-[width] duration-200 w-full ">
   <div class="table-container text-token">
     <h2 class="h2">Live Games</h2>
@@ -72,12 +72,12 @@
           {#if withinLastHour(live.start_time)}
             <tr>
               <td class="player-link">
-                <a class="player" href={`/modes/player/${live.away_player}`}>{live.away_player}</a>
+                <a class="player link-text decoration-transparent" href={`/modes/player/${live.away_player}`}>{live.away_player}</a>
               </td>
               <td>{live.away_score}</td>
               <td>{live.home_score}</td>
               <td class="player-link">
-                <a class="player" href={`/modes/player/${live.home_player}`}>{live.home_player}</a>
+                <a class="player link-text decoration-transparent" href={`/modes/player/${live.home_player}`}>{live.home_player}</a>
               </td>
               <!-- convert stadium id num to string -->
               <td>{stadiums[live.stadium_id]}</td>
@@ -89,7 +89,7 @@
               {/if}
 
               <!-- convert tag id num to string -->
-              <td class="game-mode"><a href={`/modes/${tagsetsData.find(tagset => tagset.id === live.tag_set)?.name}`}/ladder>{tagsetsData.find(tagset => tagset.id === live.tag_set)?.name || ''}</a></td>
+              <td class="game-mode link-text decoration-transparent"><a href={`/modes/${tagsetsData.find(tagset => tagset.id === live.tag_set)?.name}`}/ladder>{tagsetsData.find(tagset => tagset.id === live.tag_set)?.name || ''}</a></td>
 
             </tr>
             <tr>
@@ -171,4 +171,10 @@
 {:else}
   <h1 class="h1">No games are being played right now. The page will refresh automatically and update when there are active games.</h1>
     {/if}
-  {/if}
+  <!--{/if}-->
+
+<style>
+  td a, a {
+    color: rgba(var(--text-neutral-500) / 1) !important;
+  }
+</style>

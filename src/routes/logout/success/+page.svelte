@@ -8,9 +8,13 @@
         if (typeof localStorage !== 'undefined') {
             localStorage.removeItem('username')
         }
+        // const interval = setInterval(() => {
+        //     invalidateAll('/logout'
+        // , 1000)
+        // }
         const interval = setInterval(() => {
-            invalidateAll('/logout')
-        }, 1000)
+            invalidateAll();
+        }, 1000);
 
         return () => {
             clearInterval(interval)

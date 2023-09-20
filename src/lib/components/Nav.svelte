@@ -31,15 +31,21 @@
 				<span></span><span class="flex-auto">{'home'}</span></a
 			>
 		</li>
-		<li>
+<!--		<li>-->
 <!--			<a href="/stats" on:click={drawerClose}>-->
 <!--				<span></span><span class="flex-auto">{'stats'}</span></a>-->
-		</li>
+<!--		</li>-->
 			<li>
 				<a href="/modes/all" on:click={drawerClose}>
 					<span></span><span class="flex-auto">{'modes'}</span></a
 				>
 			</li>
+<!--		<li>-->
+<!--			<a href="/tag_set/create" on:click={drawerClose}>-->
+<!--				<span></span><span class="flex-auto">{'Create Game Mode'}</span></a-->
+<!--			>-->
+<!--		</li>-->
+
 		{#if user}
 
 <!--			<li>-->

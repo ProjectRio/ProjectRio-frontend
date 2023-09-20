@@ -14,7 +14,8 @@
 	];
   import { username } from "$lib/stores/user";
 
-  $: if (form) {
+  // $: if (form?.success) {
+    $: if (form?.username) {
     $username = form.username;
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('username', form.username);
@@ -23,13 +24,18 @@
   }
 </script>
 
-
-{#if form}
-  <div>Welcome back, {$username}!</div>
-  <!-- <SuperDebug data={$form} /> -->
+<!--if there is a successful login-->
+{#if form?.success}
+    {#if form?.username}
+        <div>Welcome back, {$username}!</div>
   <!-- <h2 class="h2">Header</h2> -->
+    {/if}
+<!--was having trouble getting it to read the fail being thrown, so this checks for if the submission went through but didn't produce a success for now-->
+{:else if form?.form}
+    <div>Login error. Please try again.</div>
 {:else}
-<div class="flex items-center justify-center h-screen ">
+<!--    <SuperDebug data={$formData} />-->
+    <div class="flex items-center justify-center h-screen ">
   <div class="p-4 md:p-10 flex bg-gradient-to-br variant-gradient-primary-secondary w-[60%] h-[70%] rounded-container-token shadow-2xl space-y-10">
     <form class="flex card flex-col justify-center items-center mx-auto transition-[width] duration-200 w-[90%] h-full shadow-2xl" method="POST" use:enhance>
       <div class="card flex flex-col p-4 m-2 text-token space-y-4 shadow-2xl w-[70%] h-[20%]">
@@ -57,10 +63,14 @@
         {#if $errors.Password}<span class="invalid">{$errors.Password}</span>{/if}
       </div>
 
-      <div class="flex flex-col p-4 m-2 text-token space-y-4  w-[70%] h-[20%]">
-        <button class="flex  btn variant-filled-warning shadow-2xl ">Submit</button>
-      </div>
+      <ul class="flex flex-col p-4 m-2 text-token space-y-4  w-[70%] h-[20%]">
+<!--        <ul class="list-nav">-->
+       <li> <button class="flex btn variant-filled-warning shadow-2xl ">Submit</button></li>
+        <li><a href="/login/reset_password"><button class="flex btn variant-filled-warning shadow-2xl">Reset Password</button></a></li>
+<!--        </ul>-->
+      </ul>
     </form>
+
   </div>
 </div>
 <!-- </div> -->
