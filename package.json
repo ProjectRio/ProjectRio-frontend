@@ -8,10 +8,18 @@
 		"preview": "vite preview",
 		"test": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test:unit": "vitest"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+		"vitest": "^0.25.3",
+		"prettier": "^2.8.0"
+	},
+	"type": "module",
+	"dependencies": {
+		"flowbite": "^1.7.0",
+		"flowbite-svelte": "^0.40.1",
+		"lucide-svelte": "^0.261.0",
+		"tailwind-merge": "^1.14.0",
 		"@floating-ui/dom": "^1.4.5",
 		"@playwright/test": "^1.28.1",
 		"@skeletonlabs/skeleton": "^1.8.0",
@@ -27,7 +35,6 @@
 		"eslint-plugin-svelte": "^2.26.0",
 		"highlight.js": "^11.8.0",
 		"postcss": "^8.4.24",
-		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^4.0.5",
 		"svelte-check": "^3.0.1",
@@ -36,14 +43,6 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^4.3.0",
-		"vitest": "^0.25.3",
 		"zod": "^3.21.4"
-	},
-	"type": "module",
-	"dependencies": {
-		"flowbite": "^1.7.0",
-		"flowbite-svelte": "^0.40.1",
-		"lucide-svelte": "^0.261.0",
-		"tailwind-merge": "^1.14.0"
 	}
 }

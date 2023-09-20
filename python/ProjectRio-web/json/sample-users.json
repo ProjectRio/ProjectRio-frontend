@@ -1,0 +1,24 @@
+{
+  "Users": [
+    {
+      "Username": "GenericHomeUser",
+      "Email": "GenericHomeUser@fakeemail",
+      "Password": "password"
+    },
+    {
+      "Username": "GenericAwayUser",
+      "Email": "GenericAwayUser@fakeemail",
+      "Password": "password"
+    },
+    {
+      "Username": "PeacockSlayer",
+      "Email": "PeacockSlayer@fakeemail",
+      "Password": "password"
+    },
+    {
+      "Username": "PeacockSavior",
+      "Email": "PeacockSavior@fakeemail",
+      "Password": "password"
+    }
+  ]
+}
