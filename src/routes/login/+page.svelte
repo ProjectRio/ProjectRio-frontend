@@ -24,15 +24,17 @@
   }
 </script>
 
+<!--if there is a successful login-->
 {#if form?.success}
     {#if form?.username}
         <div>Welcome back, {$username}!</div>
   <!-- <h2 class="h2">Header</h2> -->
-        {/if}
+    {/if}
+<!--was having trouble getting it to read the fail being thrown, so this checks for if the submission went through but didn't produce a success for now-->
 {:else if form?.form}
     <div>Login error. Please try again.</div>
 {:else}
-    <SuperDebug data={$formData} />
+<!--    <SuperDebug data={$formData} />-->
     <div class="flex items-center justify-center h-screen ">
   <div class="p-4 md:p-10 flex bg-gradient-to-br variant-gradient-primary-secondary w-[60%] h-[70%] rounded-container-token shadow-2xl space-y-10">
     <form class="flex card flex-col justify-center items-center mx-auto transition-[width] duration-200 w-[90%] h-full shadow-2xl" method="POST" use:enhance>
