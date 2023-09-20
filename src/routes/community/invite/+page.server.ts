@@ -49,20 +49,20 @@ export const actions = {
         console.log(response.status)
         // if community creation unsuccessful
         if (response.status !== 200) {
-            {
-                // this is all just a way to parse the html error received. I'm still not certain if I intend to do anything with it or not yet, since a generic error might be all that's needed.
-                const reader = response.body?.getReader()
-                const reading = true;
-                const errorObj = {}
-                while (reading) {
-                    const { done, value } = await reader?.read()
-                    if (done) break
-                    const val = new TextDecoder().decode(value)
-                    errorObj[val] = val
-                }
+            // {
+            //     // this is all just a way to parse the html error received. I'm still not certain if I intend to do anything with it or not yet, since a generic error might be all that's needed.
+            //     const reader = response.body?.getReader()
+            //     const reading = true;
+            //     const errorObj = {}
+            //     while (reading) {
+            //         const { done, value } = await reader?.read()
+            //         if (done) break
+            //         const val = new TextDecoder().decode(value)
+            //         errorObj[val] = val
+            //     }
                 // return error
                 return fail(response.status, { form })
-            }
+            // }
         }
         const res = await response.json();
 

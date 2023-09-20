@@ -5,16 +5,18 @@
     import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
   
     export let data: PageData;
+    export let form;
     // export let actionDat: ActionData
     // Client API:
-    const { form, errors, constraints, enhance } = superForm(data.form);
+    const { form:formData, errors, constraints, enhance } = superForm(data.form);
     
   </script>
-  
-  <!-- {#if data?.fail}
-  <div>{actionDat.res}</div>
-  {/if} -->
-  <SuperDebug data={$form} />
+{#if form?.success}
+  <p>You have been added to the community.</p>
+{:else if form}
+  <p>There was an error adding you to the community.</p>
+{:else}
+  <SuperDebug data={$formData} />
   <div class="flex items-center justify-center h-screen ">
     <div class="p-4 md:p-10 flex bg-gradient-to-br variant-gradient-primary-secondary w-[80%] h-[80%] rounded-container-token shadow-2xl space-y-10">
   <form method="POST" class="flex card flex-col justify-center items-center mx-auto transition-[width] duration-200 w-[80%] h-full shadow-2xl" use:enhance>
@@ -27,7 +29,7 @@
     name="community_name"
 
     aria-invalid={$errors.community_name ? 'true' : undefined}
-    bind:value={$form.community_name}
+    bind:value={$formData.community_name}
     {...$constraints.community_name} />
     {#if $errors.community_name}<span class="invalid">{$errors.community_name}</span>{/if}
 </div>
@@ -40,7 +42,7 @@
               name="URL"
 
               aria-invalid={$errors.URL ? 'true' : undefined}
-              bind:value={$form.URL}
+              bind:value={$formData.URL}
               {...$constraints.URL} />
       {#if $errors.URL}<span class="invalid">{$errors.URL}</span>{/if}
     </div>
@@ -50,4 +52,4 @@
   </form>
   </div>
   </div>
-  
+{/if}

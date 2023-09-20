@@ -14,13 +14,15 @@ const joinCommunity = z.object({
 type joinCommunity = z.infer<typeof joinCommunity>
 
 // on page load, check for jwt and redirect if jwt present
-export const load = async ({ event, cookies }) => {
-    const jwt = cookies.get('jwt')
-    if (!jwt) throw redirect(302, '/login');
 
+export const load = async ({ event, params }) => {
+    // const jwt = event.cookies.get('jwt')
+    // if (jwt) throw redirect(302, '/');
+    //
     const form = await superValidate(event, joinCommunity);
     return {
-        form
+        form,
+        params,
     };
 };
 
@@ -47,7 +49,7 @@ export const actions = {
             method: "POST",
             body: JSON.stringify(form.data),
         })
-        
+
         console.log(response.status)
         // console.log('response', request.headers)
         // if community creation unsuccessful

@@ -63,20 +63,20 @@ export const actions = {
         // console.log('response', request.headers)
         // if community creation unsuccessful
         if (response.status !== 200) {
-            {
-                // this is all just a way to parse the html error received. I'm still not certain if I intend to do anything with it or not yet, since a generic error might be all that's needed.
-                const reader = response.body?.getReader()
-                const reading = true;
-                const errorObj = {}
-                while (reading) {
-                    const { done, value } = await reader?.read()
-                    if (done) break
-                    const val = new TextDecoder().decode(value)
-                    errorObj[val] = val
-                }
+            // {
+            //     // this is all just a way to parse the html error received. I'm still not certain if I intend to do anything with it or not yet, since a generic error might be all that's needed.
+            //     const reader = response.body?.getReader()
+            //     const reading = true;
+            //     const errorObj = {}
+            //     while (reading) {
+            //         const { done, value } = await reader?.read()
+            //         if (done) break
+            //         const val = new TextDecoder().decode(value)
+            //         errorObj[val] = val
+            //     }
                 // return error
                 return fail(response.status, { form })
-            }
+            // }
         }
         const res = await response.json();
 
@@ -84,15 +84,13 @@ export const actions = {
         if (response.status === 200) {
             // Handle the response as needed
             console.log(res)
-        }
-
         /* Yep, return { form } here too (apparently superforms really wants you to return forms)
         return form and any other relevant data
         TODO: Add any additional data you want to return */
         return {
+            success: true,
             form: form,
-            msg: res.msg,
-            username: res.username
         }
+    }
     }
 } satisfies Actions;
