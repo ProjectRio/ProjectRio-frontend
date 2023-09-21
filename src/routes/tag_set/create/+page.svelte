@@ -16,7 +16,7 @@
     import {username} from "$lib/stores/user";
 
     // Client API:
-    const {form: formData, errors, constraints, enhance, delayed} = superForm(data?.form);
+    const { form: formData, errors, constraints, enhance, delayed } = superForm(data?.form);
     const conicStops: ConicStop[] = [
         {color: 'transparent', start: 0, end: 25},
         {color: 'rgb(var(--color-primary-900))', start: 75, end: 100}
@@ -79,7 +79,7 @@
     {/each}
     <button class="variant-ghost-secondary"><a class="btn btn-primary" href="/tag_set/list">Click here to view a current list of game modes.</a></button>
 {:else if form?.failed}
-<p>There was an error creating your game mode. Make sure that you are creating it in a community that meets the requirements and let us know if you continue to have problems.</p>
+<p>There was an error creating your game mode. Make sure that you are creating it in a community that meets the requirements, and let us know if you continue to have problems.</p>
     {:else}
     {#if tags}
         <form method="POST" class="card flex-col" use:enhance>
