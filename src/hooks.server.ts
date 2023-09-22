@@ -23,7 +23,7 @@ export const handleFetch: HandleFetch = async ({ event, request, fetch }) => {
         // if login, redirect if JWT exists
         if (event.url.pathname.startsWith('/login')) {
             if (jwt) {
-                // throw redirect(303, '/')
+                throw redirect(303, '/')
 
             }
             // return fetch(request)
@@ -34,6 +34,8 @@ export const handleFetch: HandleFetch = async ({ event, request, fetch }) => {
                     request.headers.set('Authorization', `Bearer ${jwt}`)
                     console.log(request.headers)
 
+                } else {
+                    throw redirect(303, '/login')
                 }
             // }
         }

@@ -59,9 +59,34 @@
 				<strong class="text-xl uppercase">{APP_NAME}</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
+
+					<a
+							class="btn btn-sm variant-ghost-surface"
+							href="https://discord.gg/c3r9PabfRU"
+							target="_blank"
+							rel="noreferrer"
+					>
+						Discord
+					</a>
+					<a
+							class="btn btn-sm variant-ghost-surface"
+							href="https://www.patreon.com/projectrio/posts"
+							target="_blank"
+							rel="noreferrer"
+					>
+						Patreon
+					</a>
+					<a
+							class="btn btn-sm variant-ghost-surface"
+							href="https://github.com/ProjectRio?tab=repositories"
+							target="_blank"
+							rel="noreferrer"
+					>
+						GitHub
+					</a>
 				{#if $username}
-					{$username}
-<!--					<Avatar {$username} width="w-10" background="bg-primary-500" />-->
+					<!--{$username}-->
+					<Avatar initials={$username} width="w-10" background="bg-primary-500" />
 				{/if}
 			</svelte:fragment>
 		</AppBar>
@@ -69,6 +94,7 @@
 	<svelte:fragment slot="sidebarLeft">
 		<Nav user={$username} />
 	</svelte:fragment>
+
 	<!-- Main Content -->
 	<div class="container lg:p-10 mx-auto">
 		<slot />
