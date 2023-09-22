@@ -19,9 +19,9 @@ type communityCreate = z.infer<typeof communityCreate>
 
 // on page load, check for jwt and redirect if jwt present
 export const load = async ({ event, cookies, fetch }) => {
-    // const jwt = cookies.get('jwt')
-    // console.log(jwt)
-    // if (!jwt) throw redirect(302, '/login');
+    const jwt = cookies.get('jwt')
+    console.log(jwt)
+    if (!jwt) throw redirect(302, '/login');
 
     const form = await superValidate(event, communityCreate);
     return {
