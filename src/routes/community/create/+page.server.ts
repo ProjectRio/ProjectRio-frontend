@@ -43,6 +43,7 @@ export const actions = {
         // console.log(form.data)
         if (!form.data.private) {
             form.data.private = false
+            form.data.global_link = false;
             console.log(form.data)
         }
 
@@ -75,7 +76,7 @@ export const actions = {
             //         errorObj[val] = val
             //     }
                 // return error
-                return fail(response.status, { form })
+                return fail(response.status, { failed: true, form: form })
             // }
         }
         const res = await response.json();

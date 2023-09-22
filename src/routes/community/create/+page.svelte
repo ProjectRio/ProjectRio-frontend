@@ -58,7 +58,7 @@
     {#if $errors.type}<span class="invalid">{$errors.type}</span>{/if}
 </div>
     <div class="card flex flex-col p-4 m-2 text-token space-y-4 shadow-2xl w-[80%] h-[15%]">
-    <label for="private">private</label>
+    <label for="private">Make your community private?</label>
     <input
       type="checkbox"
       name="private"
@@ -67,9 +67,10 @@
       {...$constraints.private} />
     {#if $errors.private}<span class="invalid">{$errors.private}</span>{/if}
   </div>
+      {#if $formData.private == true}
   <div class="card flex flex-col p-4 m-2 text-token space-y-4 shadow-2xl w-[80%] h-[15%]">
 
-    <label for="global_link">global link</label>
+    <label for="global_link">Global link? If your community is private, you can invite users to your community using a link with this option.</label>
     <input
       type="checkbox"
       name="global_link"
@@ -78,6 +79,7 @@
       {...$constraints.global_link} />
     {#if $errors.global_link}<span class="invalid">{$errors.global_link}</span>{/if}
 </div>
+          {/if}
 <div class="card flex flex-col p-4 m-2 text-token space-y-4 shadow-2xl w-[80%] h-[20%]">
 
     <label for="desc">description</label>
