@@ -10,10 +10,6 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
-	"devDependencies": {
-		"prettier": "^2.8.0",
-		"vitest": "^0.25.3"
-	},
 	"type": "module",
 	"dependencies": {
 		"@floating-ui/dom": "^1.4.5",
