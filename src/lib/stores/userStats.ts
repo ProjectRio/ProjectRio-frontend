@@ -1,4 +1,6 @@
 import { writable } from 'svelte/store';
 
-export const userStats = writable({});
-export const userStatsByChar = writable({});
+export const userBattingStats = writable({});
+export const userBattingStatsByChar = writable({});
+export const userPitchingStats = writable({});
+export const userPitchingStatsByChar = writable({});

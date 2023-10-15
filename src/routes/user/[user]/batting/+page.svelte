@@ -3,7 +3,7 @@
     // import { sortableTableAction} from "svelte-legos";
 
     import { tagsets } from '$lib/stores/tagsets';
-    import { userStats, userStatsByChar } from '$lib/stores/userStats';
+    import { userBattingStats, userBattingStatsByChar } from '$lib/stores/userStats';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
 	import { getUserOstat } from '$lib/helpers/getUserStats';
@@ -16,8 +16,8 @@
     let statData: any;
     let statDataByChar: any;
     $: {
-        statData = $userStats?.Batting;
-        statDataByChar = $userStatsByChar;
+        statData = $userBattingStats?.Batting;
+        statDataByChar = $userBattingStatsByChar;
     }
 
     let selectedMode = "Stars Off, Season 7"
