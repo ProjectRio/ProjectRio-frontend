@@ -63,6 +63,9 @@
             <th>RBI</th>
             <th>BB</th>
             <th>SO</th>
+            <th>Perfect</th>
+            <th>Nice</th>
+            <th>Sour</th>
             <th>AVG</th>
             <th>OBP</th>
             <th>SLG</th>
@@ -81,6 +84,9 @@
                 <td>{statData?.summary_rbi}</td>
                 <td>{statData?.summary_walks_bb + statData?.summary_walks_hbp}</td>
                 <td>{statData?.summary_strikeouts}</td>
+                <td>{statData?.perfect_hits}</td>
+                <td>{statData?.nice_hits}</td>
+                <td>{statData?.sour_hits}</td>
                 <td>{getAvg(statData)?.toFixed(3)}</td>
                 <td>{getObp(statData)?.toFixed(3)}</td>
                 <td>{getSlg(statData)?.toFixed(3)}</td>
@@ -99,6 +105,9 @@
                     <td>{statDataByChar[char]?.Batting?.summary_rbi}</td>
                     <td>{statDataByChar[char]?.Batting?.summary_walks_bb + statData?.summary_walks_hbp}</td>
                     <td>{statDataByChar[char]?.Batting?.summary_strikeouts}</td>
+                    <td>{statDataByChar[char]?.Batting?.perfect_hits}</td>
+                    <td>{statDataByChar[char]?.Batting?.nice_hits}</td>
+                    <td>{statDataByChar[char]?.Batting?.sour_hits}</td>
                     <td>{getAvg(statDataByChar[char]?.Batting)?.toFixed(3)}</td>
                     <td>{getObp(statDataByChar[char]?.Batting)?.toFixed(3)}</td>
                     <td>{getSlg(statDataByChar[char]?.Batting)?.toFixed(3)}</td>
