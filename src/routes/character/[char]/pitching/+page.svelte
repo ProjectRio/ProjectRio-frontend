@@ -43,7 +43,7 @@
     {/each}
 </select>
 
-<h2 style="display:flex;justify-content:center;align-items:center;">{$page.params.user}</h2>
+<h2 style="display:flex;justify-content:center;align-items:center;">{$page.params.char}</h2>
 <br/>
 <table class="table table-hover table-interactive">
     <PitchingStatTableHeader title="Character" />
