@@ -9,6 +9,7 @@
     import PitchingStatTableRow from '$lib/components/PitchingStatTableRow.svelte';
 	import { charPitchingStats, charPitchingStatsByUser } from '$lib/stores/charStats';
 	import { getCharPstat } from '$lib/helpers/getCharStats';
+	import { getERA } from '$lib/helpers/statCalcs';
     // Access the tagsets data in your component
 
     let tagsetsData: any[] = []
@@ -26,7 +27,7 @@
 
     const sortedUsers = (statsByUser: any) => Object.keys(statsByUser)
     ?.filter(u => statsByUser[u]?.Pitching?.outs_pitched > charData?.outs_pitched / 100)
-    .sort((a: any, b: any) => statsByUser[b]?.Pitching?.outs_pitched - statsByUser[a]?.Pitching?.outs_pitched);
+    .sort((a: any, b: any) => parseFloat(getERA(statsByUser[a]?.Pitching)) - parseFloat(getERA(statsByUser[b]?.Pitching)));
 
     onMount(async () => {
         await getAllTagSets();
