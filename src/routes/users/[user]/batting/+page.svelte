@@ -1,13 +1,13 @@
 <script lang="ts">
     import { getAllTagSets } from '$lib/helpers/tagNames';
-    // import { sortableTableAction} from "svelte-legos";
+    import { sortableTableAction } from 'svelte-legos';
 
     import { tagsets } from '$lib/stores/tagsets';
     import { userBattingStats, userBattingStatsByChar } from '$lib/stores/userStats';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
 	import { getUserOstat } from '$lib/helpers/getUserStats';
-	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
+	import { getPa } from '$lib/helpers/statCalcs';
 	import OffensiveStatTableHeader from '$lib/components/OffensiveStatTableHeader.svelte';
 	import OffensiveStatTableRow from '$lib/components/OffensiveStatTableRow.svelte';
     // Access the tagsets data in your component
@@ -48,7 +48,7 @@
 
 <h2 style="display:flex;justify-content:center;align-items:center;">{$page.params.user}</h2>
 <br/>
-<table class="table table-hover table-interactive">
+<table class="table table-hover table-compact" use:sortableTableAction>
     <OffensiveStatTableHeader title="Character" />
     <tbody>
         {#if statData}
