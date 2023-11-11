@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { getAllUsers } from "$lib/helpers/allUsers";
+	import { onMount } from "svelte";
     import { sortableTableAction } from "svelte-legos";
 
-    const allUsers = getAllUsers();
-    console.log({allUsers});
+    let allUsers: [];
+    onMount(async () => {
+        allUsers = await getAllUsers();
+    })
 </script>
 
-        { #await allUsers }
-            <p>Loading</p>
-        { :then users }
+        { #if allUsers }
             <table class="table table-hover table-compact" use:sortableTableAction>
                 <thead>
                     <tr>
@@ -17,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    { #each Object.values(users) as user }
+                    { #each Object.values(allUsers) as user }
                     <tr>
                         <td><a href={`/users/${user}/batting`}>{user} Batting</a></td>
                         <td><a href={`/users/${user}/pitching`}>{user} Pitching</a></td>
@@ -25,6 +26,4 @@
                     { /each }
                 </tbody>
             </table>
-        { :catch e }
-            <p>{e.message}</p>
-        { /await }
+        { /if }
