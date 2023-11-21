@@ -1,0 +1,17 @@
+<script lang="ts">
+    export let batterInfo: any = undefined;
+    export let batterName: string = "Unknown";
+	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
+
+    
+</script>
+
+<tr>
+    <td>{batterName} </td>
+    <td>{batterInfo.summary_at_bats} </td>
+    <td>{batterInfo.summary_hits} </td>
+    <td>{batterInfo.summary_rbi} </td>
+    <td>{batterInfo.summary_walks_bb + batterInfo.summary_walks_hbp} </td>
+    <td>{getAvg(batterInfo).toFixed(3)} </td>
+    <td>{getOps(batterInfo).toFixed(3)} </td>
+</tr>

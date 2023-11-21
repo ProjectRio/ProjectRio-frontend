@@ -10,7 +10,6 @@
     <tr>
         <th>Batters</th>
         <th>AB</th>
-        <th>R</th>
         <th>H</th>
         <th>RBI</th>
         <th>BB</th>
