@@ -206,13 +206,13 @@
     }
     
     .userAndScoreHome {
-        grid-column: 2/8;
+        grid-column: 2/9;
         font-size: 1.5em;
         padding-block: 5%;
     }    
 
     .userAndScoreAway {
-        grid-column: 15/21;
+        grid-column: 14/21;
         font-size: 1.5em;
         padding-block: 5%;
     }
