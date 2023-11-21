@@ -6,6 +6,9 @@
 	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
     import BatterGameTableHeader from '$lib/components/batterGameTableHeader.svelte';
     import BatterGameTableRow from '$lib/components/batterGameTableRow.svelte';
+    import PitcherGameTableHeader from '$lib/components/pitcherGameTableHeader.svelte';
+    import PitcherGameTableRow from '$lib/components/pitcherGameTableRow.svelte';
+	//import PitchingStatTableHeader from '$lib/components/PitchingStatTableHeader.svelte';
 	//import { object } from 'zod';
 	//import type { list } from 'postcss';
 
@@ -41,11 +44,12 @@
     class player {
         name: string = "Unknown";
         battingStats: any = undefined;
+        pitchingStats: any = undefined;
 
-        constructor (player_name: string, player_gameStats: any) {
+        constructor (player_name: string, player_battingStats: any, player_pitchingStats: any) {
             this.name = player_name;
-            this.battingStats = player_gameStats;
-            //this.pitchingStats = player_pitchingStats;
+            this.battingStats = player_battingStats;
+            this.pitchingStats = player_pitchingStats;
         }
     }
     
@@ -60,19 +64,23 @@
     $: console.log("home game stats: ", homeGameStats)
 
     $: {
+        homeRoster = [];
+        awayRoster = [];
         for (const character in homeGameStats) {
             const batterStats = homeGameStats[character].Batting;
+            const pitcherStats = homeGameStats[character].Pitching;
             console.log(character)
             console.log(batterStats)
-            homeRoster.push(new player(character, batterStats))
+            homeRoster.push(new player(character, batterStats, pitcherStats))
         }
         console.log("home roster: ", homeRoster)
 
         for (const character in awayGameStats) {
             const batterStats = awayGameStats[character].Batting;
+            const pitcherStats = awayGameStats[character].Pitching;
             console.log(character)
             console.log(batterStats)
-            awayRoster.push(new player(character, batterStats))
+            awayRoster.push(new player(character, batterStats, pitcherStats))
         }
         console.log("away roster: ", awayRoster)
     }
@@ -83,7 +91,9 @@
 
 {#if homeGameStats !== undefined}
     <div class="scoreBox">
-        <h2>{userHome} <span class="score">{scoreHome}</span> Final {scoreAway} {userAway}</h2>
+        <span class="scoreBox-home-alignment">{userHome} <span class="score">{scoreHome}</span> </span>
+        <span class="scoreBox-Final-alignment">Final</span>
+        <span class="scoreBox-away-alignment"><span class="score">{scoreAway}</span> {userAway}</span>
     </div>
 
     <div class="row">
@@ -98,6 +108,27 @@
             <BatterGameTableHeader />
             {#each awayRoster as { name, battingStats}, i}
                 <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
+            {/each}
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="column">
+            <PitcherGameTableHeader />
+            {#each homeRoster as { name, pitchingStats}, i}
+                {#if pitchingStats.batters_faced !== 0}
+                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
+                {/if}
+            {/each}
+        </div>
+        <div class="column">
+            <PitcherGameTableHeader />
+            {#each awayRoster as { name, pitchingStats}, i}
+                {#if pitchingStats.batters_faced !== 0}
+                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
+                {/if}
             {/each}
         </div>
     </div>
@@ -119,13 +150,32 @@
     }
 
     .scoreBox {
-        border-radius: 10px;
+        border-radius: 30px;
         background: purple;
-        margin: 2% auto;
+        margin-inline: 1% auto;
+        margin-bottom: 1%;
         width: 100%;
+        display: flex;
+        text-transform:uppercase;
+        font-size: 2em;
+        padding-block: 1em;
+        padding-inline: 1em;
     }
 
-    .score {
-        font-size: 2em;
+    .scoreBox-Final-alignment {
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        padding-inline: 20%;
     }
+    .scoreBox-home-alignment {
+        float:left;
+    }
+    .scoreBox-away-alignment {
+        float:right;
+        text-align: right;
+    }
+
+
+
 </style>
