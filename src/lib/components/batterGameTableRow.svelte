@@ -7,7 +7,7 @@
 </script>
 
 <tr>
-    <td>{batterName} </td>
+    <td>{batterName} </td> <!-- to do: add link to player-character stat page-->
     <td>{batterInfo.summary_at_bats} </td>
     <td>{batterInfo.summary_hits} </td>
     <td>{batterInfo.summary_rbi} </td>
