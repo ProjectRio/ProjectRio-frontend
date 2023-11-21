@@ -1,4 +1,14 @@
 <script lang="ts">
+    /* Improvements to do
+    Add season record beside player names
+    Add fielding and misc batting stats below the main tables (eg big plays: Mario 2, Wario 1)
+    Add links where it makes sense - player stat pages, mode page.
+    Improve styling
+    Add team logos based on team composition
+    Add win probability
+    Add marker for captain
+    Add event-by-event breakdown
+    */
     import { gameStats, gameInformation } from '$lib/stores/gameStats';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
@@ -8,6 +18,10 @@
     import BatterGameTableRow from '$lib/components/batterGameTableRow.svelte';
     import PitcherGameTableHeader from '$lib/components/pitcherGameTableHeader.svelte';
     import PitcherGameTableRow from '$lib/components/pitcherGameTableRow.svelte';
+    import { tagsets } from '$lib/stores/tagsets';
+    import { getAllTagSets } from '$lib/helpers/tagNames';
+    import { msToTime } from '$lib/helpers/convertTime';
+    import { stadiums } from '$lib/helpers/stadiumName';
 	//import PitchingStatTableHeader from '$lib/components/PitchingStatTableHeader.svelte';
 	//import { object } from 'zod';
 	//import type { list } from 'postcss';
@@ -19,13 +33,16 @@
     let gameInfo: any = $gameInformation;
     let user1: string;
     let user2: string;
-    let inningsSelected: number;
-    let inningsPlayed: number;
     let homeRoster: any[] = [];
     let awayRoster: any[] = [];
+    let tagsetsData: any[] = []
+    let loadingInd: boolean = true;
+    let homeElo: number = 0;
+    let awayElo: number = 0;
 
     
     onMount(async () => {
+        loadingInd = true;
         console.log("on mount started")
         console.log("Game ID sent to stat APIs: ", gameID)
         await getGameStats(gameID);
@@ -38,8 +55,17 @@
         await getMatchups(user1, user2, gameID)
         gameInfo = $gameInformation
         console.log("game info returned to main page: ", gameInfo)
+        console.log("Calling tagset API")
+        getAllTagSets();
         console.log("On mount finished")
+        loadingInd = false;
     })
+
+    // Access the tagsets data in your component
+    $: {
+    tagsetsData = $tagsets; // Get the current value of the tagsets store
+    console.log("tagsets: ", $tagsets)
+    }
 
     class player {
         name: string = "Unknown";
@@ -58,64 +84,83 @@
     $: userAway = gameInfo.away_user;
     $: scoreHome = gameInfo.home_score;
     $: scoreAway = gameInfo.away_score;
+    $: gameLength = msToTime((gameInfo.date_time_end - gameInfo.date_time_start)*1000);
+    $: inningsPlayed = gameInfo.innings_played;
+    $: inningsSelected = gameInfo.innings_selected;
     $: console.log("home user", userHome)
     $: homeGameStats = gameAllStats[userHome]
     $: awayGameStats = gameAllStats[userAway]
     $: console.log("home game stats: ", homeGameStats)
 
+    //create roster structures
     $: {
         homeRoster = [];
         awayRoster = [];
         for (const character in homeGameStats) {
             const batterStats = homeGameStats[character].Batting;
             const pitcherStats = homeGameStats[character].Pitching;
-            console.log(character)
-            console.log(batterStats)
+            //console.log(character)
+            //console.log(batterStats)
             homeRoster.push(new player(character, batterStats, pitcherStats))
         }
-        console.log("home roster: ", homeRoster)
+        console.log("home roster: ", homeRoster[0])
 
         for (const character in awayGameStats) {
             const batterStats = awayGameStats[character].Batting;
             const pitcherStats = awayGameStats[character].Pitching;
-            console.log(character)
-            console.log(batterStats)
+            //console.log(character)
+            //console.log(batterStats)
             awayRoster.push(new player(character, batterStats, pitcherStats))
         }
-        console.log("away roster: ", awayRoster)
+        console.log("away roster: ", awayRoster[0])
+    }
+
+    //determine Elo's
+    $: {
+        if (scoreHome > scoreAway) {
+            homeElo = gameInfo.winner_result_elo;
+            awayElo = gameInfo.loser_result_elo;
+        } else {
+            homeElo = gameInfo.loser_result_elo;
+            awayElo = gameInfo.winner_result_elo;
+        }
     }
 
 
 </script>
 
 
-{#if homeGameStats !== undefined}
-    <div class="scoreBox">
-        <span class="scoreBox-home-alignment">{userHome} <span class="score">{scoreHome}</span> </span>
-        <span class="scoreBox-Final-alignment">Final</span>
-        <span class="scoreBox-away-alignment"><span class="score">{scoreAway}</span> {userAway}</span>
+{#if !loadingInd}
+    <div class="headerBox">
+        <div>
+            <div class="elo">Elo {homeElo}</div>
+        </div>
+        <div class="userAndScoreHome">
+            {userHome} <br>
+            {scoreHome}
+        </div>
+        <div class="finalAndMode"> 
+            Final
+            {#if inningsPlayed!==inningsSelected} <span class="inningInfo">({inningsPlayed}/{inningsSelected})</span> {/if} <br>
+            <span class=gameTag>{tagsetsData.find(tagset => tagset.id === gameInfo.game_mode)?.name || ''}</span>
+        </div>
+        <div class="userAndScoreAway">
+            {userAway} <br> 
+            <span class="score">{scoreAway}</span>
+        </div>
+        <div>
+            <div class="elo">Elo {awayElo}</div>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="column">
+    <div class="statColumn">
+        <div class="statTable">
             <BatterGameTableHeader />
 
             {#each homeRoster as { name, battingStats}, i}
                 <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
             {/each}
-        </div>
-        <div class="column">
-            <BatterGameTableHeader />
-            {#each awayRoster as { name, battingStats}, i}
-                <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
-            {/each}
-        </div>
-    </div>
-
-    <br>
-
-    <div class="row">
-        <div class="column">
+            <br>
             <PitcherGameTableHeader />
             {#each homeRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
@@ -123,7 +168,13 @@
                 {/if}
             {/each}
         </div>
-        <div class="column">
+
+        <div class="statTable">
+            <BatterGameTableHeader />
+            {#each awayRoster as { name, battingStats}, i}
+                <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
+            {/each}
+            <br>
             <PitcherGameTableHeader />
             {#each awayRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
@@ -132,50 +183,79 @@
             {/each}
         </div>
     </div>
+    <br>
+    <div class="miscInfo">
+        <strong>First pitch:</strong> {new Date(gameInfo.date_time_start * 1000).toLocaleString()} <br>
+        <strong>Game Time:</strong> {gameLength} <br>
+        <strong>Stadium:</strong> {stadiums[gameInfo.stadium]}
+    </div>
 {:else}
     <p>Loading</p>
 {/if}
 
 
 <style>
-    .column {
-        float: left;
-        width: 50%;
-    }
-
-    .row:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
-
-    .scoreBox {
+    .headerBox {
+        display: grid;
+        grid-template-columns: repeat(21, 1fr);
         border-radius: 30px;
-        background: purple;
-        margin-inline: 1% auto;
-        margin-bottom: 1%;
-        width: 100%;
-        display: flex;
-        text-transform:uppercase;
-        font-size: 2em;
-        padding-block: 1em;
-        padding-inline: 1em;
-    }
-
-    .scoreBox-Final-alignment {
+        background: red;
         text-align: center;
-        justify-content: center;
-        align-items: center;
-        padding-inline: 20%;
+        font-size: 2em;
+        padding: 1%;
     }
-    .scoreBox-home-alignment {
-        float:left;
-    }
-    .scoreBox-away-alignment {
-        float:right;
-        text-align: right;
+    
+    .userAndScoreHome {
+        grid-column: 2/8;
+        font-size: 1.5em;
+        padding-block: 5%;
+    }    
+
+    .userAndScoreAway {
+        grid-column: 15/21;
+        font-size: 1.5em;
+        padding-block: 5%;
     }
 
+    .gameTag {
+        font-size: 0.5em;
+        font-style: italic;
+    }
+
+    .finalAndMode {
+        grid-column: 9/14;
+        padding-block: 5%;
+    }
+
+    .score {
+        font-size: 1.25;
+    }
+
+    .elo {
+        padding-block: 40%;
+        font-size: 0.5em;
+    }
+
+    .inningInfo {
+        font-size: 0.5em;
+    }
+
+    .statColumn {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statTable {
+        margin: 0 auto;
+    }
+
+    .headerBox br {
+        content: "";
+        margin: 2em;
+        display: block;
+        font-size: 24%;
+        outline: red;
+    }
 
 
 </style>
