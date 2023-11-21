@@ -5,9 +5,14 @@
     Add links where it makes sense - player stat pages, mode page.
     Improve styling
     Add team logos based on team composition
-    Add win probability
     Add marker for captain
-    Add event-by-event breakdown
+    Add total stats rows
+    Get season stats for average, OPS, ERA
+    When events get added back to the API:
+    -Add event-by-event breakdown
+    -Add box score
+    -Add win probability
+    -Order by batting order
     */
     import { gameStats, gameInformation } from '$lib/stores/gameStats';
     import { onMount } from 'svelte';
