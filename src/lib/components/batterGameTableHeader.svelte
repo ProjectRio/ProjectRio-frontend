@@ -12,8 +12,19 @@
         <th>AB</th>
         <th>H</th>
         <th>RBI</th>
+        <th>HR</th>
         <th>BB</th>
         <th>AVG</th>
         <th>OPS</th>
     </tr>
 </thead>
+
+<style>
+    tr {
+        text-align: left;
+    }
+
+    th {
+        padding-inline: 5px;
+    }
+</style>

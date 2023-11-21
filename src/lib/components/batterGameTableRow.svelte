@@ -11,7 +11,14 @@
     <td>{batterInfo.summary_at_bats} </td>
     <td>{batterInfo.summary_hits} </td>
     <td>{batterInfo.summary_rbi} </td>
+    <td>{batterInfo.summary_homeruns}</td>
     <td>{batterInfo.summary_walks_bb + batterInfo.summary_walks_hbp} </td>
     <td>{getAvg(batterInfo).toFixed(3)} </td>
     <td>{getOps(batterInfo).toFixed(3)} </td>
 </tr>
+
+<style>
+    td {
+        padding-inline: 5px;
+    }
+</style>
