@@ -2,11 +2,11 @@
     import { GET, USER_ENDPOINTS } from "$lib/constants";
     import { Accordion, AccordionItem } from "@skeletonlabs/skeleton";
     import {titleCase} from "$lib/utils";
-    let data;
+    let data: any;
     let user = '';
     import {username} from "$lib/stores/user";
     async function handleClick() {
-        const response = await GET(USER_ENDPOINTS.USER_COMMUNITY, `?username=${$username}`)
+        const response = await GET(USER_ENDPOINTS.USER_COMMUNITY, `?username=${user}`)
         const res = await response;
         console.log(res)
         data = res.communities;
@@ -19,15 +19,19 @@
     }
     // $: data;
 </script>
+
+<!-- Nuche17: commented out since logged in username functionality not working
 {#if $username}
     <div>{$username}</div>
 {/if}
+-->
+
 {#if !(data)}
 
     <h3 class="h3 flex flex-auto justify-center align-middle text-center">Enter username to view user communities.</h3>
     <div class="input-group flex m-2 justify-center align-middle w-[25%]">
         <span class="p-2 justify-center align-middle">
-            <input class="input justify-center align-middle" type="text" placeholder="Enter username." bind:value={user} />
+            <input class="input justify-center align-middle" type="text" placeholder="Enter Username" bind:value={user} />
         </span>
         <span class="p-2 justify-center align-middle">
             <button class="btn variant-filled-success justify-center align-middle" on:click={handleClick}><span class="label">Submit</span></button>
