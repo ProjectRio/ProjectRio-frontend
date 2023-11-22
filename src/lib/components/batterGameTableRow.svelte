@@ -1,13 +1,14 @@
 <script lang="ts">
     export let batterInfo: any = undefined;
     export let batterName: string = "Unknown";
+    export let isCaptain: boolean = false;
 	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
 
     
 </script>
 
 <tr>
-    <td>{batterName} </td> <!-- to do: add link to player-character stat page-->
+    <td>{batterName}{#if isCaptain}-✪{/if}</td> <!-- to do: add link to player-character stat page-->
     <td>{batterInfo.summary_at_bats} </td>
     <td>{batterInfo.summary_hits} </td>
     <td>{batterInfo.summary_rbi} </td>

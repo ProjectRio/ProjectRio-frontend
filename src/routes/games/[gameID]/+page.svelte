@@ -5,8 +5,6 @@
     Add links where it makes sense - player stat pages, mode page.
     Improve styling
     Add team logos based on team composition
-    Add marker for captain
-    Add total stats rows
     Get season stats for average, OPS, ERA
     When events get added back to the API:
     -Add event-by-event breakdown
@@ -29,9 +27,6 @@
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { msToTime } from '$lib/helpers/convertTime';
     import { stadiums } from '$lib/helpers/stadiumName';
-	//import PitchingStatTableHeader from '$lib/components/PitchingStatTableHeader.svelte';
-	//import { object } from 'zod';
-	//import type { list } from 'postcss';
 
     console.log("Started script")
 
@@ -98,6 +93,8 @@
     $: homeGameStats = gameAllStats[userHome]
     $: awayGameStats = gameAllStats[userAway]
     $: console.log("home game stats: ", homeGameStats)
+    $: homeCaptain = gameInfo.home_captain;
+    $: awayCaptain = gameInfo.away_captain;
 
     //create roster structures
     $: {
@@ -165,7 +162,7 @@
             <BatterGameTableHeader />
 
             {#each homeRoster as { name, battingStats}, i}
-                <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
+                <BatterGameTableRow batterName = {name} batterInfo={battingStats} isCaptain={homeCaptain===name}/>
             {/each}
 
             <BatterGameTableTotalRow teamStats={homeRoster} />
@@ -175,7 +172,7 @@
             <PitcherGameTableHeader />
             {#each homeRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
-                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
+                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} isCaptain={homeCaptain===name}/>
                 {/if}
             {/each}
 
@@ -185,7 +182,7 @@
         <div class="statTable">
             <BatterGameTableHeader />
             {#each awayRoster as { name, battingStats}, i}
-                <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
+                <BatterGameTableRow batterName = {name} batterInfo={battingStats} isCaptain={awayCaptain===name} />
             {/each}
 
             <BatterGameTableTotalRow teamStats={awayRoster} />
@@ -195,7 +192,7 @@
             <PitcherGameTableHeader />
             {#each awayRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
-                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
+                    <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} isCaptain={awayCaptain===name} />
                 {/if}
             {/each}
 
