@@ -6,7 +6,7 @@
 </script>
 
 <tr>
-    <th>{title}</th>
+    <td>{title}</td>
     <td>{getIpString(statData)}</td>
     <td>{statData?.hits_allowed}</td>
     <td>{statData?.runs_allowed}</td>

@@ -28,7 +28,7 @@
 	<ul class="list mt-8">
 		<li>
 			<a href="/" on:click={drawerClose}>
-				<span class="flex-auto">home</span></a
+				<span></span><span class="flex-auto">{'home'}</span></a
 			>
 		</li>
 <!--		<li>-->
@@ -37,17 +37,7 @@
 <!--		</li>-->
 			<li>
 				<a href="/modes/all" on:click={drawerClose}>
-					<span class="flex-auto">modes</span></a
-				>
-			</li>
-			<li>
-				<a href="/characters" on:click={drawerClose}>
-					<span class="flex-auto">character stats</span></a
-				>
-			</li>
-			<li>
-				<a href="/users" on:click={drawerClose}>
-					<span class="flex-auto">user stats</span></a
+					<span></span><span class="flex-auto">{'modes'}</span></a
 				>
 			</li>
 <!--		<li>-->
@@ -73,14 +63,14 @@
 <!--			</li>-->
 			<li>
 			<a href="/logout" on:click={drawerClose}>
-				<span class="flex-auto">logout</span></a
+				<span></span><span class="flex-auto">{'logout'}</span></a
 			>
 			</li>
 		{/if}
 		{#if !user}
 			<li>
 				<a href="/login" on:click={drawerClose}>
-					<span class="flex-auto">login</span></a
+					<span></span><span class="flex-auto">{'login'}</span></a
 				>
 			</li>
 			<li>
