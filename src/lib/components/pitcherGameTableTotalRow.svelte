@@ -6,11 +6,9 @@
     console.log("team stats component input: ", teamStats)
     function sumStats (statName: string) {
         let total: number = 0;
-        console.log("statname: ", statName)
         teamStats.forEach(character => {
             total += character.pitchingStats[statName];
         }); 
-        console.log("total returned: ", total)
         return total
     }
 
