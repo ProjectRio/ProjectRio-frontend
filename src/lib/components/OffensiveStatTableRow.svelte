@@ -6,7 +6,7 @@
 </script>
 
 <tr>
-    <td>{title}</td>
+    <th>{title}</th>
     <td>{getPa(statData)}</td>
     <td>{statData?.summary_hits}</td>
     <td>{statData?.summary_doubles}</td>

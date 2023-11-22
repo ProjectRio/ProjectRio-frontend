@@ -9,10 +9,10 @@
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/community">community</a></button></li>-->
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/stats">stats</a></button></li>-->
 			<li><button class="btn variant-filled-primary m-2"><a href="/modes/all">games</a></button></li>
-			<li><button class="btn variant-filled-primary m-2"><a href="/user/all">users</a></button></li>
+			<li><button class="btn variant-filled-primary m-2"><a href="/users/all">users</a></button></li>
 			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/list">view game modes</a></button></li>
 			<li><button class="btn variant-filled-primary m-2"><a href="/tag/list">view game tags</a></button></li>
-			<li><button class="btn variant-filled-primary m-2"><a href="/user/community">view communities by user</a></button></li>
+			<li><button class="btn variant-filled-primary m-2"><a href="/users/community">view communities by user</a></button></li>
 
 
 
@@ -25,11 +25,11 @@
 			<li><button class="btn variant-filled-secondary m-2"><a href="/community/create">create a community</a></button></li>
 			<li><button class="btn variant-filled-secondary m-2"><a href="/tag_set/create">create a game mode for your community</a></button></li>
 
-			<!--			<li><button class="btn variant-filled-primary m-2"><a href="/user/all">users</a></button></li>-->
+			<!--			<li><button class="btn variant-filled-primary m-2"><a href="/users/all">users</a></button></li>-->
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/create">create a game mode for your community</a></button></li>-->
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/list">view game modes</a></button></li>-->
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/tag/list">view game tags</a></button></li>-->
-<!--			<li><button class="btn variant-filled-primary m-2"><a href="/user/community">view communities by user</a></button></li>-->
+<!--			<li><button class="btn variant-filled-primary m-2"><a href="/users/community">view communities by user</a></button></li>-->
 
 
 
