@@ -21,8 +21,10 @@
 	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
     import BatterGameTableHeader from '$lib/components/batterGameTableHeader.svelte';
     import BatterGameTableRow from '$lib/components/batterGameTableRow.svelte';
+    import BatterGameTableTotalRow from '$lib/components/batterGameTableTotalRow.svelte';
     import PitcherGameTableHeader from '$lib/components/pitcherGameTableHeader.svelte';
     import PitcherGameTableRow from '$lib/components/pitcherGameTableRow.svelte';
+    import PitcherGameTableTotalRow from '$lib/components/pitcherGameTableTotalRow.svelte';
     import { tagsets } from '$lib/stores/tagsets';
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { msToTime } from '$lib/helpers/convertTime';
@@ -165,13 +167,19 @@
             {#each homeRoster as { name, battingStats}, i}
                 <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
             {/each}
+
+            <BatterGameTableTotalRow teamStats={homeRoster} />
+
             <br>
+
             <PitcherGameTableHeader />
             {#each homeRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
                     <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
                 {/if}
             {/each}
+
+            <PitcherGameTableTotalRow teamStats={homeRoster} />
         </div>
 
         <div class="statTable">
@@ -179,13 +187,19 @@
             {#each awayRoster as { name, battingStats}, i}
                 <BatterGameTableRow batterName = {name} batterInfo={battingStats} />
             {/each}
+
+            <BatterGameTableTotalRow teamStats={awayRoster} />
+
             <br>
+
             <PitcherGameTableHeader />
             {#each awayRoster as { name, pitchingStats}, i}
                 {#if pitchingStats.batters_faced !== 0}
                     <PitcherGameTableRow pitcherName = {name} pitcherInfo={pitchingStats} />
                 {/if}
             {/each}
+
+            <PitcherGameTableTotalRow teamStats={awayRoster} />
         </div>
     </div>
     <br>
