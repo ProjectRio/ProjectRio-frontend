@@ -27,6 +27,7 @@
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { msToTime } from '$lib/helpers/convertTime';
     import { stadiums } from '$lib/helpers/stadiumName';
+    import { Team_Name } from '$lib/helpers/teamNames';
 
     console.log("Started script")
 
@@ -41,6 +42,8 @@
     let loadingInd: boolean = true;
     let homeElo: number = 0;
     let awayElo: number = 0;
+    let homeLogo: string = "";
+    let awayLogo: string = "";
 
     
     onMount(async () => {
@@ -95,6 +98,10 @@
     $: console.log("home game stats: ", homeGameStats)
     $: homeCaptain = gameInfo.home_captain;
     $: awayCaptain = gameInfo.away_captain;
+    $: {
+        homeLogo = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
+        awayLogo = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
+    }
 
     //create roster structures
     $: {
@@ -134,9 +141,11 @@
 </script>
 
 
+
 {#if !loadingInd}
     <div class="headerBox">
         <div>
+            <img src={`/src/lib/images/Teams/${homeLogo}.png`}>
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
@@ -153,6 +162,7 @@
             <span class="score">{scoreAway}</span>
         </div>
         <div>
+            <img src={`/src/lib/images/Teams/${awayLogo}.png`}>
             <div class="elo">Elo {awayElo}</div>
         </div>
     </div>
