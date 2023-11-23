@@ -120,33 +120,30 @@ const In_Game_Team_Names: any = {
 }
 
 export function Team_Name(roster: string[], captain: string) {
+    if (roster.length === 0) {return}
+
     let simplifiedRoster: string[] = [];
     roster.forEach(character => {
         simplifiedRoster.push(char_class_dict[character].SimplifiedName)
     })
-    console.log("simiplified roster: ", simplifiedRoster)
     
     let runningTotal: number = 0;
-    console.log("team comp 1 checked: ", In_Game_Team_Names[captain][2].Characters);
     (In_Game_Team_Names[captain][2].Characters).forEach((character: any) => {
         runningTotal += simplifiedRoster.filter((rosterChar) => rosterChar === character).length;
     })
-    console.log("matching characters: ", runningTotal);
 
     if (runningTotal >= 4) {
-        console.log("returned team comp team 1: ", In_Game_Team_Names[captain][2].Name)
+        console.log("Returned team comp team 1: ", In_Game_Team_Names[captain][2].Name)
         return In_Game_Team_Names[captain][2].Name
     }
 
     runningTotal = 0;
-    console.log("team comp 2 checked: ", In_Game_Team_Names[captain][3].Characters);
     (In_Game_Team_Names[captain][3].Characters).forEach((character: any) => {
         runningTotal += simplifiedRoster.filter((rosterChar) => rosterChar === character).length;
     })
-    console.log("matching characters: ", runningTotal);
 
     if (runningTotal >= 4) {
-        console.log("returned team comp team 2: ", In_Game_Team_Names[captain][3].Name)
+        console.log("Returned team comp team 2: ", In_Game_Team_Names[captain][3].Name)
         return In_Game_Team_Names[captain][3].Name
     }
 
@@ -154,7 +151,6 @@ export function Team_Name(roster: string[], captain: string) {
     roster.forEach(character => {
         class_roster.push(char_class_dict[character].Class)
     });
-    console.log("class roster: ", class_roster)
 
     const class_count_dict: any = {
         'Balance': class_roster.filter((charClass) => charClass === 'Balance').length,
@@ -162,13 +158,10 @@ export function Team_Name(roster: string[], captain: string) {
         'Power': class_roster.filter((charClass) => charClass === 'Power').length,
         'Speed': class_roster.filter((charClass) => charClass === 'Speed').length
     }
-    console.log(class_count_dict)
 
     let captain_class: string = char_class_dict[captain].Class
-    console.log(captain_class)
     let class_list: string[] = ['Balance', 'Technique', 'Power', 'Speed'];
     class_list = class_list.filter((classes) => classes !== captain_class);
-    console.log(class_list)
 
     if ((class_count_dict[captain_class] > class_count_dict[class_list[0]]) &&
         (class_count_dict[captain_class] > class_count_dict[class_list[1]]) &&
