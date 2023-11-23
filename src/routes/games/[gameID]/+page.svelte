@@ -23,6 +23,7 @@
     import PitcherGameTableHeader from '$lib/components/pitcherGameTableHeader.svelte';
     import PitcherGameTableRow from '$lib/components/pitcherGameTableRow.svelte';
     import PitcherGameTableTotalRow from '$lib/components/pitcherGameTableTotalRow.svelte';
+    import GameMiscStats from '$lib/components/gameMiscStats.svelte';
     import { tagsets } from '$lib/stores/tagsets';
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { msToTime } from '$lib/helpers/convertTime';
@@ -68,19 +69,22 @@
 
     // Access the tagsets data in your component
     $: {
-    tagsetsData = $tagsets; // Get the current value of the tagsets store
-    console.log("tagsets: ", $tagsets)
+        tagsetsData = $tagsets; 
     }
 
     class player {
         name: string = "Unknown";
         battingStats: any = undefined;
         pitchingStats: any = undefined;
+        fieldingStats: any = undefined;
+        miscStats: any = undefined;
 
-        constructor (player_name: string, player_battingStats: any, player_pitchingStats: any) {
+        constructor (player_name: string, player_battingStats: any, player_pitchingStats: any, player_fieldingStats: any, player_miscStats: any) {
             this.name = player_name;
             this.battingStats = player_battingStats;
             this.pitchingStats = player_pitchingStats;
+            this.fieldingStats = player_fieldingStats;
+            this.miscStats = player_miscStats;
         }
     }
     
@@ -92,16 +96,11 @@
     $: gameLength = msToTime((gameInfo.date_time_end - gameInfo.date_time_start)*1000);
     $: inningsPlayed = gameInfo.innings_played;
     $: inningsSelected = gameInfo.innings_selected;
-    $: console.log("home user", userHome)
     $: homeGameStats = gameAllStats[userHome]
     $: awayGameStats = gameAllStats[userAway]
-    $: console.log("home game stats: ", homeGameStats)
     $: homeCaptain = gameInfo.home_captain;
     $: awayCaptain = gameInfo.away_captain;
-    $: {
-        homeLogo = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
-        awayLogo = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
-    }
+
 
     //create roster structures
     $: {
@@ -110,21 +109,24 @@
         for (const character in homeGameStats) {
             const batterStats = homeGameStats[character].Batting;
             const pitcherStats = homeGameStats[character].Pitching;
-            //console.log(character)
-            //console.log(batterStats)
-            homeRoster.push(new player(character, batterStats, pitcherStats))
+            const fielderStats = homeGameStats[character].Fielding;
+            const miscStats = homeGameStats[character].Misc;
+            homeRoster.push(new player(character, batterStats, pitcherStats, fielderStats, miscStats))
         }
         console.log("home roster: ", homeRoster[0])
 
         for (const character in awayGameStats) {
             const batterStats = awayGameStats[character].Batting;
             const pitcherStats = awayGameStats[character].Pitching;
-            //console.log(character)
-            //console.log(batterStats)
-            awayRoster.push(new player(character, batterStats, pitcherStats))
+            const fielderStats = awayGameStats[character].Fielding;
+            const miscStats = awayGameStats[character].Misc;
+            awayRoster.push(new player(character, batterStats, pitcherStats, fielderStats, miscStats))
         }
         console.log("away roster: ", awayRoster[0])
     }
+
+    $: homeLogo = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
+    $: awayLogo = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
 
     //determine Elo's
     $: {
@@ -187,6 +189,8 @@
             {/each}
 
             <PitcherGameTableTotalRow teamStats={homeRoster} />
+
+            <GameMiscStats roster={homeRoster} />
         </div>
 
         <div class="statTable">
@@ -207,6 +211,8 @@
             {/each}
 
             <PitcherGameTableTotalRow teamStats={awayRoster} />
+            
+            <GameMiscStats roster={awayRoster} />
         </div>
     </div>
     <br>
