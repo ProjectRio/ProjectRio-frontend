@@ -3,10 +3,9 @@
 	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
 	import type { object } from 'zod';
     
-    console.log("team stats component input: ", teamStats)
     function sumStats (statName: string) {
         let total: number = 0;
-        teamStats.forEach(character => {
+        teamStats.forEach((character:any) => {
             total += character.battingStats[statName];
         }); 
         return total
