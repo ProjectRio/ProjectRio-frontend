@@ -93,7 +93,7 @@ const In_Game_Team_Names: any = {
             {'Name': 'Wario Greats', 'Characters':['Waluigi', 'King Boo', 'Magikoopa', 'Petey']},
             {'Name': 'Wario Beasts', 'Characters':['DK', 'Bowser', 'Bowser Jr', 'Bro']}],
 
-    'Waluigi':[{'Name': 'Waluigi Mystuques'},
+    'Waluigi':[{'Name': 'Waluigi Mystiques'},
             {'Name': 'Waluigi Smart Alecks'},
             {'Name': 'Waluigi Flankers', 'Characters':['King Boo', 'Wario', 'Magikoopa', 'Dry Bones']},
             {'Name': 'Waluigi Mashers', 'Characters':['Mario', 'Luigi', 'Toadsworth', 'Wario']}],
