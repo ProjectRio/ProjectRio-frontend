@@ -1,10 +1,8 @@
 <script lang="ts">
     /* Improvements to do
     Add season record beside player names
-    Add fielding and misc batting stats below the main tables (eg big plays: Mario 2, Wario 1)
     Add links where it makes sense - player stat pages, mode page.
     Improve styling
-    Add team logos based on team composition
     Get season stats for average, OPS, ERA
     When events get added back to the API:
     -Add event-by-event breakdown
