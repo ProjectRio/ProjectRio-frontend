@@ -2,8 +2,11 @@
 	import { GET, STAT_ENDPOINTS, BACKEND } from "$lib/constants";
 	import LiveScoreboard from "$lib/components/LiveScoreboard.svelte";
 	import RecentScoreboard from "$lib/components/RecentScoreboard.svelte";
+    import { getAllTagSets } from '$lib/helpers/tagNames';
+    import { tagsets } from '$lib/stores/tagsets';
+	import { onMount } from "svelte";
 
-    
+    let loadingInd: boolean = true
 
     // functions for calling live games and recent games
     async function getLiveGames() {
@@ -33,16 +36,44 @@
             return { error: 'Error fetching recent game data from API' };
         }
     }
-    getLiveGames()
-    console.log("recent games: ", getRecentGames(10,))
+
+    // Access the tagsets data in your component
+    let tagsetsData: any[] = []
+    $: {
+        tagsetsData = $tagsets; // Get the current value of the tagsets store
+    // console.log($tagsets)
+    }
+
+    let recentGameList: any
+    let liveGameList: any 
+    let shownRecentGame: any
+
+    onMount(async () => {
+        loadingInd = true;
+        getAllTagSets();
+        console.log("on mount started")
+        liveGameList = await getLiveGames();
+        recentGameList = await getRecentGames(10, );
+        shownRecentGame = recentGameList[0]
+        console.log("recent game list: ", recentGameList)
+        console.log("shown game: ", shownRecentGame)
+        loadingInd = false;
+    })
+
+    
+
+    //$: shownRecentGame = recentGameList[0]
     
     // function to determine when to call api's
 
     //function to decide what to display
 </script>
 
-<div>
-    Testing
-</div>
-<RecentScoreboard /><br>
-<LiveScoreboard /> <br>
+
+{#if !loadingInd}
+    <RecentScoreboard recentGame = {shownRecentGame} 
+        gameMode = {tagsetsData.find(tagset => tagset.id === shownRecentGame.game_mode)?.name || ''}/><br>
+    <LiveScoreboard /> <br>
+{:else}
+    <p>Loading</p>
+{/if}

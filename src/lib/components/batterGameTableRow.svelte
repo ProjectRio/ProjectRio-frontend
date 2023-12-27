@@ -5,6 +5,7 @@
 	import { getAvg, getObp, getOps, getPa, getSlg } from '$lib/helpers/statCalcs';
 
     
+    
 </script>
 
 <tr>
