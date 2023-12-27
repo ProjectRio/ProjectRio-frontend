@@ -5,37 +5,10 @@
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { tagsets } from '$lib/stores/tagsets';
 	import { onMount } from "svelte";
+    import { getLiveGames, getRecentGames } from "$lib/helpers/getGameLists";
+    import { liveGameList, recentGameList } from "$lib/stores/gameLists";
 
     let loadingInd: boolean = true
-
-    // functions for calling live games and recent games
-    async function getLiveGames() {
-        try {
-            console.log("Called live games at " + new Date())
-            const liveGamesResponse = await GET(STAT_ENDPOINTS.LIVE_GAMES)
-            console.log("Live games: ", liveGamesResponse)
-            return liveGamesResponse.ongoing_games
-        } catch (error) {
-            console.error('Error fetching live game data from API:', error);
-            return { error: 'Error fetching live game data from API' };
-        }
-    }
-
-    async function getRecentGames(nGames: number, mode?: string) {
-        try {
-            const gameFilters = "?&limit_games=" + nGames + 
-                            ((mode !== undefined) ? "&gamemode=" + mode : "")
-
-            console.log("Called recent games at " + new Date(), STAT_ENDPOINTS.GAMES, gameFilters)
-            const recentGamesResponse = await GET(STAT_ENDPOINTS.GAMES, gameFilters)
-
-            console.log("Recent games", recentGamesResponse)
-            return recentGamesResponse.games
-        } catch (error) {
-            console.error('Error fetching recent game data from API:', error);
-            return { error: 'Error fetching recent game data from API' };
-        }
-    }
 
     // Access the tagsets data in your component
     let tagsetsData: any[] = []
@@ -44,25 +17,44 @@
     // console.log($tagsets)
     }
 
-    let recentGameList: any
-    let liveGameList: any 
-    let shownRecentGame: any
+    let recentGames: any
+    let liveGames: any 
+    let shownGameIndex: number = 0
+    let nRecentGames: number = 5
+    $: shownRecentGame = $recentGameList[shownGameIndex]
+    
+    setTimeout(() => {
+        console.log("Timeout expired")
+        getRecentGames(nRecentGames)
+        shownGameIndex += 1;
+    }, 1000*60);
+
+    setInterval(() => {
+        shownGameIndex = (shownGameIndex + 1 === nRecentGames) ? 0 : shownGameIndex + 1
+        console.log("shown game index", shownGameIndex)
+    }, 5*1000)
 
     onMount(async () => {
-        loadingInd = true;
-        getAllTagSets();
         console.log("on mount started")
-        liveGameList = await getLiveGames();
-        recentGameList = await getRecentGames(10, );
-        shownRecentGame = recentGameList[0]
-        console.log("recent game list: ", recentGameList)
+        loadingInd = true;
+
+        getAllTagSets();
+
+        await getLiveGames();
+        await getRecentGames(nRecentGames, );
+
+        liveGames = $liveGameList
+        recentGames = $recentGameList
+
+        //shownRecentGame = recentGames[0]
+
+        console.log("recent game list: ", recentGames)
         console.log("shown game: ", shownRecentGame)
+        
         loadingInd = false;
+        console.log("on mount ended")
     })
 
-    
-
-    //$: shownRecentGame = recentGameList[0]
     
     // function to determine when to call api's
 
