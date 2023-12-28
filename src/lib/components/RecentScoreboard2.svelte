@@ -17,7 +17,7 @@
     let recentGameOptions: object = {
         greenscreen: false,
         nGames: 5,
-        displayInterval: 5,
+        displayInterval: 20,
         includeLogo: false
     }
 
@@ -48,7 +48,7 @@
             if ($recentGameList.length !== 0) {
                 displayedGameIndex = (displayedGameIndex >= $recentGameList.length - 1) ? 0 : displayedGameIndex + 1
             }
-            console.log("Index", displayedGameIndex)
+            console.log("Recent Index", displayedGameIndex)
             recentGame = $recentGameList[displayedGameIndex]
         }, recentGameOptions.displayInterval*1000)
 
