@@ -13,9 +13,10 @@ export async function getLiveGames() {
     }
 }
 
-export async function getRecentGames(nGames: number, mode?: string) {
+export async function getRecentGames(nGames: number, mode?: string, rosters?: boolean = false) {
     const api_call = STAT_ENDPOINTS.GAMES
-    const gameFilters = "?&limit_games=" + nGames + "&include_teams=1" +
+    const gameFilters = "?&limit_games=" + nGames + 
+                    ((rosters) ? "&include_teams=1" : "") +
                     ((mode !== undefined) ? "&gamemode=" + mode : "")
     try {
         console.log("Called recent games at " + new Date(), api_call, gameFilters)

@@ -1,11 +1,19 @@
 <script lang='ts'>
     import { Team_Name } from "$lib/helpers/teamNames";
     import { characters } from "$lib/helpers/characterName";
+	import { boolean } from "zod";
 
     export let recentGame: any = undefined;
     export let gameMode: string = "";
     console.log("Game passed to scoreboard component: ", recentGame)
     console.log("Gamemode passed to scoreboard component: ", gameMode)
+
+    export let recentGameOptions: object = {
+        greenscreen: false,
+        nGames: 5,
+        displayInterval: 5
+    }
+
 
     function didHomeWin(game: any) {return game.home_score > game.away_score};
 
@@ -37,34 +45,55 @@
     function getAwayTeamName(game: any) {
         return Team_Name(Array.from(Object.values(game.away_roster), (charIndex) => characters[charIndex]), game.away_captain)
     }
+
+    function toggleGreenScreen() {
+        recentGameOptions.greenscreen = !recentGameOptions.greenscreen
+        console.log("toggle greenscreen called", recentGameOptions)
+        if (recentGameOptions.greenscreen) {
+            document.getElementById('game-container')?.style.setProperty("background-color", '#00b140')
+        } else {
+            document.getElementById('game-container')?.style.setProperty("background-color", "")        
+        }
+    }
 </script>
 
-<div class="game-container">
-    <div class="header-row">
-        <div class="header-gameStatus">Final {getInningDisplay(recentGame)}</div>
-        <div class="header-timestamp">{getTimeSinceGame(recentGame)}</div>
-    </div>
-    <div class="team-row">
-        <div class="row-logo"><img src={`/src/lib/images/Teams/${getAwayTeamName(recentGame)}.png`}></div>
-        <div class="row-player-and-elo">
-            <div class="row-player">{recentGame.away_user}</div>
-            <div class="row-elo">ELO: {getAwayEloOld(recentGame)} → {getAwayEloNew(recentGame)}</div>
+<div class="main-container">
+    <div id="game-container">
+        <div class="header-row">
+            <div class="header-gameStatus">Final {getInningDisplay(recentGame)}</div>
+            <div class="header-timestamp">{getTimeSinceGame(recentGame)}</div>
         </div>
-        <div class="row-score">{recentGame.away_score}</div>
-    </div>
-    <div class="team-row">
-        <div class="row-logo"><img src={`/src/lib/images/Teams/${getHomeTeamName(recentGame)}.png`}></div>
-        <div class="row-player-and-elo">
-            <div class="row-player">{recentGame.home_user}</div>
-            <div class="row-elo">ELO: {getHomeEloOld(recentGame)} → {getHomeEloNew(recentGame)}</div>
+        <div class="team-row">
+            <div class="row-logo"><!--img src={`/src/lib/images/Teams/${getAwayTeamName(recentGame)}.png`}--></div>
+            <div class="row-player-and-elo">
+                <div class="row-player">{recentGame.away_user}</div>
+                <div class="row-elo">ELO: {getAwayEloOld(recentGame)} → {getAwayEloNew(recentGame)}</div>
+            </div>
+            <div class="row-score">{recentGame.away_score}</div>
         </div>
-        <div class="row-score">{recentGame.home_score}</div>
+        <div class="team-row">
+            <div class="row-logo"><!--img src={`/src/lib/images/Teams/${getHomeTeamName(recentGame)}.png`}--></div>
+            <div class="row-player-and-elo">
+                <div class="row-player">{recentGame.home_user}</div>
+                <div class="row-elo">ELO: {getHomeEloOld(recentGame)} → {getHomeEloNew(recentGame)}</div>
+            </div>
+            <div class="row-score">{recentGame.home_score}</div>
+        </div>
+        <div class="gameMode">{gameMode}</div>
     </div>
-    <div class="gameMode">{gameMode}</div>
+    <div class='recent-options'>
+        Recent Game Options<br>
+        <input class="checkbox" type="checkbox" checked={recentGameOptions.greenscreen} on:change={toggleGreenScreen}/> Greenscreen Mode <br>
+        <input class="numberbox" type="number" bind:value={recentGameOptions.nGames} min="1" max="20"/> # Games <br>
+    </div>
 </div>
 
 <style>
-    .game-container {
+    .main-container {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+    #game-container {
         display: grid;
         grid-template-rows: 1.5em 3em 3em 1.5em;
         max-width: 20em;
@@ -100,5 +129,8 @@
     }
     .gameMode {
         text-align: center;
+    }
+    .numberbox{
+        color: black;
     }
 </style>
