@@ -1,4 +1,7 @@
 <script lang='ts'>
+    /* to do
+    -somehow add connnection to live games so this refreshes once a live game finishes
+    */
     import { Team_Name } from "$lib/helpers/teamNames";
     import { characters } from "$lib/helpers/characterName";
 	import { onDestroy, onMount } from "svelte";
