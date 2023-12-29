@@ -30,9 +30,9 @@
     async function startIntervals () {
         dataRefreshInterval = setInterval(async () => {
             console.log("Data interval ran")
-            await getRecentGames(recentGameOptions.nGames, ...[,], false)
+            await getRecentGames(recentGameOptions.nGames, ...[,], recentGameOptions.includeLogo)
         }, 2*60*1000);
-        await getRecentGames(recentGameOptions.nGames, ...[,], false);
+        await getRecentGames(recentGameOptions.nGames, ...[,], recentGameOptions.includeLogo);
         console.log("Initial got recent games finished", $recentGameList)
         recentGame = $recentGameList[0]
         loadingInd = false
@@ -52,22 +52,6 @@
         getAllTagSets();
 
         startIntervals()
-        /*dataRefreshInterval = setInterval(async () => {
-            console.log("Data interval ran")
-            await getRecentGames(recentGameOptions.nGames, ...[,], false)
-        }, 2*60*1000);
-        await getRecentGames(recentGameOptions.nGames, ...[,], false);
-        console.log("Initial got recent games finished", $recentGameList)
-        recentGame = $recentGameList[0]
-        loadingInd = false
-        
-        displayInterval = setInterval(() => {
-            if ($recentGameList.length !== 0) {
-                displayedGameIndex = (displayedGameIndex >= $recentGameList.length - 1) ? 0 : displayedGameIndex + 1
-            }
-            console.log("Recent Index", displayedGameIndex)
-            recentGame = $recentGameList[displayedGameIndex]
-        }, recentGameOptions.displayInterval*1000)*/
     })
 
     onDestroy(() => {
