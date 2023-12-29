@@ -6,10 +6,6 @@ export async function getLiveGames(timeFilter: number) {
     try {
         console.log("Called live games at " + new Date(), api_call)
         const response = await GET(api_call)
-        console.log("Live games: ", response)
-        console.log("Now", Math.floor(Date.now() / 1000))
-        console.log("Hour ago", Math.floor(Date.now() / 1000) - 60*60)
-        console.log("Game time", response.ongoing_games[0].start_time)
         liveGameList.set(response.ongoing_games.filter((game) => game.start_time > Math.floor(Date.now() / 1000) - timeFilter));
     } catch (error) {
         console.error('Error fetching live game data from API:', error);
@@ -24,7 +20,6 @@ export async function getRecentGames(nGames: number, mode?: string, rosters?: bo
     try {
         console.log("Called recent games at " + new Date(), api_call, gameFilters)
         const response = await GET(api_call, gameFilters)
-        console.log("Recent games: ", response)
         recentGameList.set(response.games);
     } catch (error) {
         console.error('Error fetching recent game data from API:', error);
