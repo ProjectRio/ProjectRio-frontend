@@ -30,7 +30,8 @@ Improvements
     let suspectedCrashedGameIndexes: number[] = []
     let confirmedCrashedGameIndexes: number[] = []
     var dataRefreshInterval: any;
-    var displayInterval: any
+    var displayInterval: any;
+    var greenscreenOn: boolean = false;
 
     
     //Check for possible crashes
@@ -126,34 +127,49 @@ Improvements
         return `/src/lib/images/Teams/${team}.png`
     } 
 
+    function toggleGreenScreen() {
+        greenscreenOn = !greenscreenOn
+        if (greenscreenOn) {
+            document.getElementById('live-container')?.style.setProperty("background-color", '#00b140')
+        } else {
+            document.getElementById('live-container')?.style.setProperty("background-color", "")        
+        }
+    }
+
 </script>
 
 {#if !loadingInd}
     {#if currentLiveGame}
-        <div class='live-container'>
-            <div class='row-username'>
-                <div class='username-home'>{liveGame.home_player}</div>
-                <div class='username-away'>{liveGame.away_player}</div>
-            </div>
-            <div class='row-score-logos'>
-                <div class="logo"><img src={getTeamImage(liveGame, "home")} alt="Home logo"></div>
-                <div class="score">{liveGame.home_score}</div>
-                <div class="inning">{(liveGame.half_inning === 0) ? "Top" : "Bottom"} {liveGame.inning}</div>
-                <div class="score">{liveGame.away_score}</div>
-                <div class="logo"><img src={getTeamImage(liveGame, "away")} alt="Away logo"></div>
-            </div>
-            <div class='row-situation'>
-                <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 0) ? "Baseball" : "Baseball_bat"}.png`} alt="Offense or defence"></div>
-                <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 0) ? characters[liveGame[`home_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`home_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
-                <div class="bases-count">
-                    <div class="bases"><img src={`/src/lib/images/Bases/R${((liveGame.runner_on_first) ? "1" : "") + ((liveGame.runner_on_second) ? "2" : "") + ((liveGame.runner_on_third) ? "3" : "")}.png`} alt="current runners on base"></div>
-                    <div class="count">{(displayedGameIndex in suspectedCrashedGameIndexes) ? "(Crashed?)" : (liveGame.outs===0) ? "○○○" : (liveGame.outs===1) ? "●○○" : "●●○"}</div>
+        <div class="main-container">
+            <div id='live-container'>
+                <div class='row-username'>
+                    <div class='username-home'>{liveGame.home_player}</div>
+                    <div class='username-away'>{liveGame.away_player}</div>
                 </div>
-                <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 1) ? characters[liveGame[`away_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`away_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
-                <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 1) ? "Baseball" : "Baseball_bat"}.png`} alt="offence or defence"></div>
+                <div class='row-score-logos'>
+                    <div class="logo"><img src={getTeamImage(liveGame, "home")} alt="Home logo"></div>
+                    <div class="score">{liveGame.home_score}</div>
+                    <div class="inning">{(liveGame.half_inning === 0) ? "Top" : "Bottom"} {liveGame.inning}</div>
+                    <div class="score">{liveGame.away_score}</div>
+                    <div class="logo"><img src={getTeamImage(liveGame, "away")} alt="Away logo"></div>
+                </div>
+                <div class='row-situation'>
+                    <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 0) ? "Baseball" : "Baseball_bat"}.png`} alt="Offense or defence"></div>
+                    <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 0) ? characters[liveGame[`home_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`home_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
+                    <div class="bases-count">
+                        <div class="bases"><img src={`/src/lib/images/Bases/R${((liveGame.runner_on_first) ? "1" : "") + ((liveGame.runner_on_second) ? "2" : "") + ((liveGame.runner_on_third) ? "3" : "")}.png`} alt="current runners on base"></div>
+                        <div class="count">{(displayedGameIndex in suspectedCrashedGameIndexes) ? "(Crashed?)" : (liveGame.outs===0) ? "○○○" : (liveGame.outs===1) ? "●○○" : "●●○"}</div>
+                    </div>
+                    <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 1) ? characters[liveGame[`away_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`away_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
+                    <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 1) ? "Baseball" : "Baseball_bat"}.png`} alt="offence or defence"></div>
+                </div>
+                <div class="game-mode">{tagsetsData.find(tagset => tagset.id === liveGame.tag_set)?.name || ''}</div>
             </div>
-            <div class="game-mode">{tagsetsData.find(tagset => tagset.id === liveGame.tag_set)?.name || ''}</div>
-        </div>
+            <div class='live-options'>
+                Live Game Options <br>
+                <input class="checkbox" type="checkbox" checked={greenscreenOn} on:change={toggleGreenScreen}/> Greenscreen Mode <br>
+            </div>
+        </div>  
     {:else}
         <p>No current live games</p>
     {/if}
@@ -162,7 +178,11 @@ Improvements
 {/if}
 
 <style>
-    .live-container {
+    .main-container {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+    #live-container {
         display: grid;
         grid-template-rows: 2em 3em 3em 2em;
         row-gap: .1em;
