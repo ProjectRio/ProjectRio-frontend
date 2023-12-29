@@ -3,6 +3,7 @@
 /*
 Improvements
 - hide confirmed crashed games
+- change crash handling to look at starttimes as an ID instead of using indicies that change when new games start
 */
 	import { onDestroy, onMount } from "svelte";
     import { getAllTagSets } from '$lib/helpers/tagNames';
@@ -47,7 +48,14 @@ Improvements
 
     function crashHandling() {
         newLiveList.forEach((game: { start_time: number; inning: number; half_inning: number; batter: number; pitcher: number;}, newGameIndex: number) => {
-            // fund matching old game
+            // if a game just started or ended, the indicies won't match, so reset crash handling and skip this time.
+            if (currentLiveList.length !== newLiveList.length) {
+                suspectedCrashedGameIndexes = []
+                confirmedCrashedGameIndexes = []
+                return
+            }
+
+            // find matching old game
             var matchingOldGameIndex = currentLiveList.findIndex((oldGame: { start_time: any; }) => {
                 return game.start_time === oldGame.start_time
             })
@@ -81,7 +89,15 @@ Improvements
                 await getLiveGames(liveGameOptions.liveGameTimeframe_m*60)
                 lastAPICall = Date.now()
                 newLiveList = $liveGameList
-                currentLiveGame = (<any>$liveGameList).length > 0; //check if any live games were returned.
+                console.log("current live game check", $liveGameList)
+                if ((<any>$liveGameList).length > 0) {
+                    if (!currentLiveGame) {liveGame = (<any>$liveGameList)[0]} // if live game ind was false, then it means a new game just appeared and that needs to be set as the game to display
+                    currentLiveGame = true
+                } else {
+                    currentLiveGame = false
+                }
+                // add check if first list game just appeared, then set live game
+                //currentLiveGame = (<any>$liveGameList).length > 0; //check if any live games were returned.
 
                 crashHandling()
             }
@@ -174,7 +190,7 @@ Improvements
                     <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 0) ? characters[liveGame[`home_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`home_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
                     <div class="bases-count">
                         <div class="bases"><img src={`/src/lib/images/Bases/R${((liveGame.runner_on_first) ? "1" : "") + ((liveGame.runner_on_second) ? "2" : "") + ((liveGame.runner_on_third) ? "3" : "")}.png`} alt="current runners on base"></div>
-                        <div class="count">{(displayedGameIndex in suspectedCrashedGameIndexes) ? "(Crashed?)" : (liveGame.outs===0) ? "○○○" : (liveGame.outs===1) ? "●○○" : "●●○"}</div>
+                        <div class="count">{(displayedGameIndex in confirmedCrashedGameIndexes) ? "(Crashed?)" : (liveGame.outs===0) ? "○○○" : (liveGame.outs===1) ? "●○○" : "●●○"}</div>
                     </div>
                     <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 1) ? characters[liveGame[`away_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`away_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
                     <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 1) ? "Baseball" : "Baseball_bat"}.png`} alt="offence or defence"></div>
