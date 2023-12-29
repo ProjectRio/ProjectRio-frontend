@@ -6,9 +6,14 @@
 import RecentScoreboard from "$lib/components/RecentScoreboard.svelte";
 </script>
 
+<div class="set-rows">
     <RecentScoreboard />
     <LiveScoreboard />
+</div>
 
 <style>
-
+    .set-rows {
+        display: grid;
+        grid-template-rows: 15em 15em;
+    }
 </style>

@@ -133,7 +133,7 @@ export function Team_Name(roster: string[], captain: string) {
     })
 
     if (runningTotal >= 4) {
-        console.log("Returned team comp team 1: ", In_Game_Team_Names[captain][2].Name)
+        //console.log("Returned team comp team 1: ", In_Game_Team_Names[captain][2].Name)
         return In_Game_Team_Names[captain][2].Name
     }
 
@@ -143,7 +143,7 @@ export function Team_Name(roster: string[], captain: string) {
     })
 
     if (runningTotal >= 4) {
-        console.log("Returned team comp team 2: ", In_Game_Team_Names[captain][3].Name)
+        //console.log("Returned team comp team 2: ", In_Game_Team_Names[captain][3].Name)
         return In_Game_Team_Names[captain][3].Name
     }
 
@@ -166,11 +166,11 @@ export function Team_Name(roster: string[], captain: string) {
     if ((class_count_dict[captain_class] > class_count_dict[class_list[0]]) &&
         (class_count_dict[captain_class] > class_count_dict[class_list[1]]) &&
         (class_count_dict[captain_class] > class_count_dict[class_list[2]])) {
-            console.log("Returned class team: ", In_Game_Team_Names[captain][1].Name)
+            //console.log("Returned class team: ", In_Game_Team_Names[captain][1].Name)
             return In_Game_Team_Names[captain][1].Name
     }
 
-    console.log("Returned general team: ", In_Game_Team_Names[captain][0].Name)
+    //console.log("Returned general team: ", In_Game_Team_Names[captain][0].Name)
     return In_Game_Team_Names[captain][0].Name
     
 };

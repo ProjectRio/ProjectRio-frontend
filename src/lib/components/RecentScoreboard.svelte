@@ -11,17 +11,14 @@
     let tagsetsData: any[] = []
     $: {
         tagsetsData = $tagsets; // Get the current value of the tagsets store
-    // console.log($tagsets)
     }
 
     let recentGameOptions: any = {
         greenscreen: false,
         nGames: 5,
-        displayInterval: 20,
+        displayInterval: 10,
         includeLogo: false
     }
-
-    console.log("Scoreboard script started")
 
     let loadingInd: boolean = true;
     let recentGame: any;
@@ -30,15 +27,10 @@
     var dataRefreshInterval: any;
     var displayInterval: any
 
-    onMount(async () => {
-        console.log("Onmount started")
-        
-        getAllTagSets();
-
+    async function startIntervals () {
         dataRefreshInterval = setInterval(async () => {
             console.log("Data interval ran")
             await getRecentGames(recentGameOptions.nGames, ...[,], false)
-            console.log("Data interval finished")
         }, 2*60*1000);
         await getRecentGames(recentGameOptions.nGames, ...[,], false);
         console.log("Initial got recent games finished", $recentGameList)
@@ -46,22 +38,40 @@
         loadingInd = false
         
         displayInterval = setInterval(() => {
-            console.log("Display interval ran")
             if ($recentGameList.length !== 0) {
                 displayedGameIndex = (displayedGameIndex >= $recentGameList.length - 1) ? 0 : displayedGameIndex + 1
             }
             console.log("Recent Index", displayedGameIndex)
             recentGame = $recentGameList[displayedGameIndex]
         }, recentGameOptions.displayInterval*1000)
+    }
 
-        /*return () => {
-            clearInterval(dataRefreshInterval)
-            clearInterval(displayInterval)
-        }*/
+    onMount(async () => {
+        console.log("Recent OnMount started")
+        
+        getAllTagSets();
+
+        startIntervals()
+        /*dataRefreshInterval = setInterval(async () => {
+            console.log("Data interval ran")
+            await getRecentGames(recentGameOptions.nGames, ...[,], false)
+        }, 2*60*1000);
+        await getRecentGames(recentGameOptions.nGames, ...[,], false);
+        console.log("Initial got recent games finished", $recentGameList)
+        recentGame = $recentGameList[0]
+        loadingInd = false
+        
+        displayInterval = setInterval(() => {
+            if ($recentGameList.length !== 0) {
+                displayedGameIndex = (displayedGameIndex >= $recentGameList.length - 1) ? 0 : displayedGameIndex + 1
+            }
+            console.log("Recent Index", displayedGameIndex)
+            recentGame = $recentGameList[displayedGameIndex]
+        }, recentGameOptions.displayInterval*1000)*/
     })
 
     onDestroy(() => {
-        console.log("Live OnDestroy ran")
+        console.log("Recent OnDestroy ran")
         clearInterval(dataRefreshInterval)
         clearInterval(displayInterval)
     })
@@ -74,7 +84,6 @@
     function getAwayEloNew(game:any) {return (didHomeWin(game)) ? game.loser_result_elo : game.winner_result_elo};
 
     function getInningDisplay(game:any) {
-        console.log(game)
         return (game.innings_played === game.innings_selected) ? "" : `(${game.innings_played}/${game.innings_selected})`}
 
     function getTimeSinceGame(game: any) {
@@ -103,7 +112,6 @@
 
     function toggleGreenScreen() {
         recentGameOptions.greenscreen = !recentGameOptions.greenscreen
-        console.log("toggle greenscreen called", recentGameOptions)
         if (recentGameOptions.greenscreen) {
             document.getElementById('game-container')?.style.setProperty("background-color", '#00b140')
         } else {
@@ -116,10 +124,17 @@
     }
 
     async function manualRefresh() {
+        //destroy intervals to avoid data leaks
+        clearInterval(dataRefreshInterval)
+        clearInterval(displayInterval)
+
         loadingInd = true;
         await getRecentGames(recentGameOptions.nGames, ...[,], recentGameOptions.includeLogo)
         displayedGameIndex = 0
         loadingInd = false
+
+        //start intervals again
+        startIntervals()
     }
 
 

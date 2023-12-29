@@ -16,13 +16,12 @@ Improvements
     let tagsetsData: any[] = []
     $: {
         tagsetsData = $tagsets; // Get the current value of the tagsets store
-    // console.log($tagsets)
     }
 
     let loadingInd: boolean = true;
     let liveGame: any;
     let displayedGameIndex: number = 0;
-    let display_s: number = 5;
+    let display_s: number = 10;
     let lastAPICall: number;
     let currentLiveGame: boolean = false;
     let liveGameTimeframe: number = 24*60*60
@@ -33,82 +32,78 @@ Improvements
     var dataRefreshInterval: any;
     var displayInterval: any
 
+    
+    //Check for possible crashes
+    function isCrash (oldImage: any, newImage: any) {
+        return (oldImage.inning === newImage.inning &&
+            oldImage.half_inning === newImage.half_inning &&
+            oldImage.batter === newImage.batter &&
+            oldImage.pitcher === newImage.pitcher)
+    }
+
+    function crashHandling() {
+        newLiveList.forEach((game: { start_time: number; inning: number; half_inning: number; batter: number; pitcher: number;}, newGameIndex: number) => {
+            // fund matching old game
+            var matchingOldGameIndex = currentLiveList.findIndex((oldGame: { start_time: any; }) => {
+                return game.start_time === oldGame.start_time
+            })
+
+            if (isCrash(currentLiveList[matchingOldGameIndex], game)) {
+                //if index is already a suspected crash, then mark as confirmed crash
+                if (suspectedCrashedGameIndexes.includes(newGameIndex)) {
+                    confirmedCrashedGameIndexes.indexOf(newGameIndex) === -1 ? confirmedCrashedGameIndexes.push(newGameIndex) : void(0);
+                } else { //if not already suspected, then add to suspected list
+                    suspectedCrashedGameIndexes.indexOf(newGameIndex) === -1 ? suspectedCrashedGameIndexes.push(newGameIndex) : void(0);
+                }
+            } else { // if not a crash, the remove index from crashed lists if found
+                var indexToRemove = suspectedCrashedGameIndexes.indexOf(newGameIndex);
+                if (indexToRemove > -1) {
+                    suspectedCrashedGameIndexes.splice(indexToRemove, 1);
+                }
+                indexToRemove = confirmedCrashedGameIndexes.indexOf(newGameIndex);
+                if (indexToRemove > -1) {
+                    suspectedCrashedGameIndexes.splice(indexToRemove, 1);
+                }
+            }
+        }); 
+    }
+
     onMount(async () => {
-        console.log("Onmount started")
+        console.log("Live OnMount started")
         
         getAllTagSets();
 
+        //Periodically refresh API call.
         dataRefreshInterval = setInterval(async () => {
             console.log("Data interval ran")
-            if ((currentLiveGame && Date.now() - 5*1000 > lastAPICall) || //if there is a current live game, refresh it periodically, or
-                (!currentLiveGame && Date.now() - 10*60*1000 > lastAPICall)) { //if there isn't a live game, then check for new ones less frequently
-                currentLiveList = $liveGameList
+            if ((currentLiveGame && Date.now() - 20*1000 > lastAPICall) || //if there is a current live game, refresh it periodically, or
+                (!currentLiveGame && Date.now() - 5*60*1000 > lastAPICall)) { //if there isn't a live game, then check for new ones less frequently
+                currentLiveList = $liveGameList // store current games list before API is called for crash checking reasons.
                 await getLiveGames(liveGameTimeframe)
                 lastAPICall = Date.now()
                 newLiveList = $liveGameList
-                currentLiveGame = $liveGameList.length > 0; //check if any live games were returned.
+                currentLiveGame = (<any>$liveGameList).length > 0; //check if any live games were returned.
 
-                function isCrash (oldImage: any, newImage: any) {
-                    return (oldImage.inning === newImage.inning &&
-                        oldImage.half_inning === newImage.half_inning &&
-                        oldImage.batter === newImage.batter &&
-                        oldImage.pitcher === newImage.pitcher)
-                }
-
-                //Check for possible crashes
-                newLiveList.forEach((game: { start_time: number; inning: number; half_inning: number; batter: number; pitcher: number;}, newGameIndex: number) => {
-                    // fund matching old game
-                    var matchingOldGameIndex = currentLiveList.findIndex((oldGame: { start_time: any; }) => {
-                        return game.start_time === oldGame.start_time
-                    })
-                    console.log("Match", matchingOldGameIndex)
-
-                    if (isCrash(currentLiveList[matchingOldGameIndex], game)) {
-                        //if index is already a suspected crash, then mark as confirmed crash
-                        console.log("markec as crashed", suspectedCrashedGameIndexes,suspectedCrashedGameIndexes.includes(newGameIndex))
-                        if (suspectedCrashedGameIndexes.includes(newGameIndex)) {
-                            console.log("Went to confirmed crash logic")
-                            confirmedCrashedGameIndexes.indexOf(newGameIndex) === -1 ? confirmedCrashedGameIndexes.push(newGameIndex) : void(0);
-                        } else { //if not already suspected, then add to suspected list
-                            console.log("Went to suspected crash logic")
-                            suspectedCrashedGameIndexes.indexOf(newGameIndex) === -1 ? suspectedCrashedGameIndexes.push(newGameIndex) : void(0);
-                        }
-                    } else { // if not a crash, the remove index from crashed lists if found
-                        var indexToRemove = suspectedCrashedGameIndexes.indexOf(newGameIndex);
-                        if (indexToRemove > -1) {
-                            suspectedCrashedGameIndexes.splice(indexToRemove, 1);
-                        }
-                        indexToRemove = confirmedCrashedGameIndexes.indexOf(newGameIndex);
-                        if (indexToRemove > -1) {
-                            suspectedCrashedGameIndexes.splice(indexToRemove, 1);
-                        }
-                    }
-                }); 
-                console.log(suspectedCrashedGameIndexes, confirmedCrashedGameIndexes)
+                crashHandling()
             }
-            console.log("Data interval finished")
         }, 10*1000);
-        await getLiveGames(liveGameTimeframe); //initial API call
+
+        //initial API call
+        await getLiveGames(liveGameTimeframe); 
         lastAPICall = Date.now()
         console.log("Initial API request finished", $liveGameList)
-        liveGame = $liveGameList[0]; // set initial game to display
-        currentLiveGame = $liveGameList.length > 0; //check if any live games were returned.
+        liveGame = (<any>$liveGameList)[0]; // set initial game to display
+        currentLiveGame = (<any>$liveGameList).length > 0; //check if any live games were returned.
         loadingInd = false
 
+        // Decides when to switch which game is displayed.
         displayInterval = setInterval(() => {
-            console.log("Display interval started")
-            if ($liveGameList.length !== 0) {
-                displayedGameIndex = (displayedGameIndex >= $liveGameList.length - 1) ? 0 : displayedGameIndex + 1
+            if ((<any>$liveGameList).length !== 0) {
+                displayedGameIndex = (displayedGameIndex >= (<any>$liveGameList).length - 1) ? 0 : displayedGameIndex + 1
             }
-            console.log("Live Index", displayedGameIndex)
-            liveGame = $liveGameList[displayedGameIndex]
-            console.log("live game displayed", liveGame)
+            liveGame = (<any>$liveGameList)[displayedGameIndex]
+            console.log("live game displayed", displayedGameIndex, liveGame)
         }, display_s*1000)
-
-        /*return () => {
-            clearInterval(dataRefreshInterval);
-            clearInterval(displayInterval);
-        }*/
     })
 
     onDestroy(() => {
