@@ -4,7 +4,7 @@
 Improvements
 - hide confirmed crashed games
 */
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { tagsets } from '$lib/stores/tagsets';
 	import { getLiveGames } from "$lib/helpers/getGameLists";
@@ -30,13 +30,15 @@ Improvements
     let newLiveList: any
     let suspectedCrashedGameIndexes: number[] = []
     let confirmedCrashedGameIndexes: number[] = []
+    var dataRefreshInterval: any;
+    var displayInterval: any
 
     onMount(async () => {
         console.log("Onmount started")
         
         getAllTagSets();
 
-        const dataRefreshInterval = setInterval(async () => {
+        dataRefreshInterval = setInterval(async () => {
             console.log("Data interval ran")
             if ((currentLiveGame && Date.now() - 5*1000 > lastAPICall) || //if there is a current live game, refresh it periodically, or
                 (!currentLiveGame && Date.now() - 10*60*1000 > lastAPICall)) { //if there isn't a live game, then check for new ones less frequently
@@ -93,7 +95,7 @@ Improvements
         currentLiveGame = $liveGameList.length > 0; //check if any live games were returned.
         loadingInd = false
 
-        const displayInterval = setInterval(() => {
+        displayInterval = setInterval(() => {
             console.log("Display interval started")
             if ($liveGameList.length !== 0) {
                 displayedGameIndex = (displayedGameIndex >= $liveGameList.length - 1) ? 0 : displayedGameIndex + 1
@@ -103,10 +105,16 @@ Improvements
             console.log("live game displayed", liveGame)
         }, display_s*1000)
 
-        return () => {
+        /*return () => {
             clearInterval(dataRefreshInterval);
             clearInterval(displayInterval);
-        }
+        }*/
+    })
+
+    onDestroy(() => {
+        console.log("Live OnDestroy ran")
+        clearInterval(dataRefreshInterval)
+        clearInterval(displayInterval)
     })
 
     function getTeamImage(game: any, homeAway: string) {
