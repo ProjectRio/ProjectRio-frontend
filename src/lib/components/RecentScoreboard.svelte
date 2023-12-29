@@ -153,7 +153,8 @@
         <div class='recent-options'>
             Recent Game Options <br>
             (Press 'Refresh Games' after changing)<br>
-            <input class="checkbox" type="checkbox" checked={recentGameOptions.includeLogo} on:change={toggleTeamLogos}/> Include Team Logo <br>
+            <input class="checkbox" type="checkbox" checked={recentGameOptions.includeLogo} on:change={toggleTeamLogos}/> Include Team Logo (Long Loading Time)<br>
+            <input class="numberbox" type="number" bind:value={recentGameOptions.displayInterval} min="1" max="20"/> Change Frequency (s)<br>
             <input class="numberbox" type="number" bind:value={recentGameOptions.nGames} min="1" max="20"/> # Games<br>
             <button on:click={manualRefresh}>Refresh Games </button><br>
             <input class="checkbox" type="checkbox" checked={recentGameOptions.greenscreen} on:change={toggleGreenScreen}/> Greenscreen Mode <br>
@@ -166,7 +167,7 @@
 <style>
     .main-container {
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: 21em auto;
     }
     #game-container {
         display: grid;
