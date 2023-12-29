@@ -18,20 +18,23 @@ Improvements
         tagsetsData = $tagsets; // Get the current value of the tagsets store
     }
 
+    let liveGameOptions: any = {
+        greenscreenOn: false,
+        display_s: 10,
+        liveGameTimeframe_m: 60
+    }
+
     let loadingInd: boolean = true;
     let liveGame: any;
     let displayedGameIndex: number = 0;
-    let display_s: number = 10;
     let lastAPICall: number;
     let currentLiveGame: boolean = false;
-    let liveGameTimeframe: number = 24*60*60
     let currentLiveList: any
     let newLiveList: any
     let suspectedCrashedGameIndexes: number[] = []
     let confirmedCrashedGameIndexes: number[] = []
     var dataRefreshInterval: any;
     var displayInterval: any;
-    var greenscreenOn: boolean = false;
 
     
     //Check for possible crashes
@@ -69,28 +72,23 @@ Improvements
         }); 
     }
 
-    onMount(async () => {
-        console.log("Live OnMount started")
-        
-        getAllTagSets();
-
+    async function startIntervals () {
         //Periodically refresh API call.
         dataRefreshInterval = setInterval(async () => {
-            console.log("Data interval ran")
             if ((currentLiveGame && Date.now() - 20*1000 > lastAPICall) || //if there is a current live game, refresh it periodically, or
                 (!currentLiveGame && Date.now() - 5*60*1000 > lastAPICall)) { //if there isn't a live game, then check for new ones less frequently
                 currentLiveList = $liveGameList // store current games list before API is called for crash checking reasons.
-                await getLiveGames(liveGameTimeframe)
+                await getLiveGames(liveGameOptions.liveGameTimeframe_m*60)
                 lastAPICall = Date.now()
                 newLiveList = $liveGameList
                 currentLiveGame = (<any>$liveGameList).length > 0; //check if any live games were returned.
 
                 crashHandling()
             }
-        }, 10*1000);
-
+        }, 1*1000); //refresh rate is high since the logic above is what controls the API call frequency.
+        
         //initial API call
-        await getLiveGames(liveGameTimeframe); 
+        await getLiveGames(liveGameOptions.liveGameTimeframe_m*60); 
         lastAPICall = Date.now()
         console.log("Initial API request finished", $liveGameList)
         liveGame = (<any>$liveGameList)[0]; // set initial game to display
@@ -104,7 +102,15 @@ Improvements
             }
             liveGame = (<any>$liveGameList)[displayedGameIndex]
             console.log("live game displayed", displayedGameIndex, liveGame)
-        }, display_s*1000)
+        }, liveGameOptions.display_s*1000)
+    }
+
+    onMount(async () => {
+        console.log("Live OnMount started")
+        
+        getAllTagSets();
+
+        startIntervals()
     })
 
     onDestroy(() => {
@@ -128,19 +134,29 @@ Improvements
     } 
 
     function toggleGreenScreen() {
-        greenscreenOn = !greenscreenOn
-        if (greenscreenOn) {
+        liveGameOptions.greenscreenOn = !liveGameOptions.greenscreenOn
+        if (liveGameOptions.greenscreenOn) {
             document.getElementById('live-container')?.style.setProperty("background-color", '#00b140')
         } else {
             document.getElementById('live-container')?.style.setProperty("background-color", "")        
         }
     }
 
+    async function manualRefresh() {
+        //destroy intervals to avoid data leaks
+        clearInterval(dataRefreshInterval)
+        clearInterval(displayInterval)
+        console.log(liveGameOptions)
+
+        //start intervals again
+        startIntervals()
+    }
+
 </script>
 
 {#if !loadingInd}
-    {#if currentLiveGame}
         <div class="main-container">
+            {#if currentLiveGame}
             <div id='live-container'>
                 <div class='row-username'>
                     <div class='username-home'>{liveGame.home_player}</div>
@@ -165,14 +181,17 @@ Improvements
                 </div>
                 <div class="game-mode">{tagsetsData.find(tagset => tagset.id === liveGame.tag_set)?.name || ''}</div>
             </div>
+            {:else}
+                <p>No current live games</p>
+            {/if}
             <div class='live-options'>
                 Live Game Options <br>
-                <input class="checkbox" type="checkbox" checked={greenscreenOn} on:change={toggleGreenScreen}/> Greenscreen Mode <br>
+                <input class="numberbox" type="number" bind:value={liveGameOptions.display_s} min="1" max="20"/> Change Frequency (s)<br>
+                <input class="numberbox" type="number" bind:value={liveGameOptions.liveGameTimeframe_m} min="20" max="1440"/> Minutes ago live games started<br>
+                <button on:click={manualRefresh}>Update Display Options </button><br>
+                <input class="checkbox" type="checkbox" checked={liveGameOptions.greenscreenOn} on:change={toggleGreenScreen}/> Greenscreen Mode <br>
             </div>
         </div>  
-    {:else}
-        <p>No current live games</p>
-    {/if}
 {:else}
     <p>Loading</p>
 {/if}
@@ -180,7 +199,7 @@ Improvements
 <style>
     .main-container {
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: 21em auto;
     }
     #live-container {
         display: grid;
@@ -244,5 +263,8 @@ Improvements
     }
     .game-mode {
         text-align: center;
+    }
+    .numberbox{
+        color: black;
     }
 </style>
