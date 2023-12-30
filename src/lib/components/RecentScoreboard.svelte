@@ -132,7 +132,7 @@
     <div class="main-container">
         <div id="game-container">
             <div class="header-row">
-                <div class="header-gameStatus">Final {getInningDisplay(recentGame)}</div>
+                <div class="header-gameStatus"><a href="/games/{recentGame.game_id}">Final</a> {getInningDisplay(recentGame)}</div>
                 <div class="header-timestamp">{getTimeSinceGame(recentGame)}</div>
             </div>
             <div class="team-row">
