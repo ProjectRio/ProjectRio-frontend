@@ -1,6 +1,6 @@
 <script lang="ts">
     import {getAllUsers} from "$lib/helpers/allUsers";
-    let data;
+    let data: any;
     import {onMount} from "svelte";
     import type { TableSource } from '@skeletonlabs/skeleton';
     onMount(async () => {
@@ -17,7 +17,7 @@
         </thead>
         {#each Object.values(data) as user}
             <tbody>
-                <td>{user}</td>
+                <td><a href="/users/{user}">{user}</a></td>
             </tbody>
         {/each}
     </table>

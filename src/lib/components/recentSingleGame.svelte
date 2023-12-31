@@ -11,7 +11,7 @@
     export let displayedGame: any;
     
     let tagsetName: string = "";
-    let loadingInd: boolean = true
+    let loadingInd: boolean = true;
     
     function didHomeWin(game: any) {return game.home_score > game.away_score};
 
@@ -44,7 +44,7 @@
 
 </script>
 
-{#if !loadingInd}
+{#if (!loadingInd && displayedGame) }
     <div id="game-container">
         <a class='unstyled hover-change' href="/games/{displayedGame.game_id}"><div class="header-row">
             <div class="header-gameStatus">Final {getInningDisplay(displayedGame)}</div>
@@ -68,8 +68,10 @@
         </div>
         <div class="gameMode">{$tagsets.find((tagset) => tagset.id === displayedGame.game_mode)?.name || ""}</div>
     </div>
-{:else}
+{:else if loadingInd}
     <p>Loading</p>
+{:else}
+    <p>No game found</p>
 {/if}
 
 <style>
