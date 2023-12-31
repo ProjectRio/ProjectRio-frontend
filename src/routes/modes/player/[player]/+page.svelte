@@ -21,7 +21,7 @@ onMount(() => {
 
 <!-- recent games table (diff page..?) -->
 {#if data.games}
-<h2 style="display:flex;justify-content:center;align-items:center;">{$page.params.player}</h2>
+<h2 style="display:flex;justify-content:center;align-items:center;"><a  href="/users/{$page.params.player}">{$page.params.player}</a></h2><br>
 <div class="table-container">
 <table  class="table table-hover table-interactive">
   <thead>
