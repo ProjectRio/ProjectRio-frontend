@@ -149,7 +149,7 @@
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
-            {userHome} <br>
+            <a class='unstyled hover-change' href="/users/{userHome}">{userHome}</a> <br>
             {scoreHome}
         </div>
         <div class="finalAndMode"> 
@@ -158,7 +158,7 @@
             <span class=gameTag>{tagsetsData.find(tagset => tagset.id === gameInfo.game_mode)?.name || ''}</span>
         </div>
         <div class="userAndScoreAway">
-            {userAway} <br> 
+            <a class='unstyled hover-change' href="/users/{userAway}">{userAway}</a> <br> 
             <span class="score">{scoreAway}</span>
         </div>
         <div>
@@ -285,6 +285,10 @@
         display: block;
         font-size: 24%;
         outline: red;
+    }
+    a.hover-change:hover {
+        color: darkred;
+        text-decoration: underline;
     }
 
 
