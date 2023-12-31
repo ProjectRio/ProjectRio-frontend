@@ -36,5 +36,8 @@
 
 			<!--			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/create">create tagset</a></button></li>-->
 		</ul>
+		<ul class="list-nav flex">
+			<li><button class="btn variant-filled-primary m-2"><a href="/streaming/scoreboard">Scoreboards</a></button></li>
+		</ul>
 	</div>
 </div>

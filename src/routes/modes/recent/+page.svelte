@@ -59,6 +59,7 @@
           <th>Stadium</th>
           <th>Game Mode</th>
           <th>Game Start Date</th>
+          <th>Game Details</th>
         </tr>
       </thead>
       <tbody>
@@ -81,6 +82,9 @@
               <!-- convert tag id num to string -->
               <td class="game-mode"><a class="decoration-transparent" href={`/modes/${tagsetsData.find(tagset => tagset.id === games.game_mode)?.name}`}/ladder>{tagsetsData.find(tagset => tagset.id === games.game_mode)?.name || ''}</a></td>
               <td>{new Date(games.date_time_start * 1000).toLocaleString()}</td>
+              <td class="game-link">
+                <a class="game decoration-transparent" href={`/games/${games.game_id}`}>Click Here</a>
+              </td>
 
             </tr>
           {/if}
