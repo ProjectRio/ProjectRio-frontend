@@ -9,20 +9,9 @@
 	import { CornerDownLeft } from "lucide-svelte";
     
     export let displayedGame: any;
-    export let tagsetName: string = ""; //optional prop to pass tagset - if not passed, this component will call the API itself.
-
+    
+    let tagsetName: string = "";
     let loadingInd: boolean = true
-
-    function determineTagset(game:any) {
-        //console.log("determinetagset fn called")
-        //if tagset prop not passed get it from tagset store
-        if (tagsetName === "") {
-            //console.log("No tagset prop")
-            tagsetName = (<any>$tagsets).find((tagset: { id: number; }) => tagset.id === game.game_mode)?.name || ""
-        }
-        //console.log("tagset returned", tagsetName, "tagset store", $tagsets)
-        return tagsetName
-    }
     
     function didHomeWin(game: any) {return game.home_score > game.away_score};
 
@@ -77,7 +66,7 @@
             </div>
             <div class="row-score">{displayedGame.home_score}</div>
         </div>
-        <div class="gameMode">{determineTagset(displayedGame)}</div>
+        <div class="gameMode">{$tagsets.find((tagset) => tagset.id === displayedGame.game_mode)?.name || ""}</div>
     </div>
 {:else}
     <p>Loading</p>
