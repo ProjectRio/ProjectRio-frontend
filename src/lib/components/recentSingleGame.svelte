@@ -46,14 +46,14 @@
 
 {#if !loadingInd}
     <div id="game-container">
-        <div class="header-row">
-            <div class="header-gameStatus"><a href="/games/{displayedGame.game_id}">Final</a> {getInningDisplay(displayedGame)}</div>
+        <a class='unstyled hover-change' href="/games/{displayedGame.game_id}"><div class="header-row">
+            <div class="header-gameStatus">Final {getInningDisplay(displayedGame)}</div>
             <div class="header-timestamp">{getTimeSince(displayedGame.date_time_end)}</div>
-        </div>
+        </div></a>
         <div class="team-row">
             <div class="row-logo"><img src={getTeamImage(displayedGame, "away")} alt="away logo"></div>
             <div class="row-player-and-elo">
-                <div class="row-player">{displayedGame.away_user}</div>
+                <a class='unstyled hover-change' href="/users/{displayedGame.away_user}"><div class="row-player">{displayedGame.away_user}</div></a>
                 <div class="row-elo">ELO: {getAwayEloOld(displayedGame)} → {getAwayEloNew(displayedGame)}</div>
             </div>
             <div class="row-score">{displayedGame.away_score}</div>
@@ -61,7 +61,7 @@
         <div class="team-row">
             <div class="row-logo"><img src={getTeamImage(displayedGame, "home")} alt="home logo"></div>
             <div class="row-player-and-elo">
-                <div class="row-player">{displayedGame.home_user}</div>
+                <a class='unstyled hover-change' href="/users/{displayedGame.home_user}"><div class="row-player">{displayedGame.home_user}</div></a>
                 <div class="row-elo">ELO: {getHomeEloOld(displayedGame)} → {getHomeEloNew(displayedGame)}</div>
             </div>
             <div class="row-score">{displayedGame.home_score}</div>
@@ -110,6 +110,10 @@
     }
     .gameMode {
         text-align: center;
+    }
+    a.hover-change:hover {
+        color: red;
+        text-decoration: underline;
     }
 
 </style>
