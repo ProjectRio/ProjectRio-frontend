@@ -50,11 +50,11 @@
 
 <h1>{mode_name}</h1> <br>
 
-<h2>Last game played</h2>
+<span><h2>Last game played</h2><h3><a href="/modes/recent">(All Recent Games)</a></h3></span>
 <RecentSingleGame displayedGame={$recentGameList[0]} /> <br>
 
 <!--h2>Live games</h2-->  
-<h2>Top 10</h2>
+<h2>Top 10 </h2><h3><a href="/modes/{mode_name}/ladder">(Full Ladder)</a></h3>
 <section class="table-container">
     <table class="table table-hover table-interactive table-compact">
     
