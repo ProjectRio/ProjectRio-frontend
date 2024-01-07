@@ -12,6 +12,7 @@
     let players: any = [];
   
     // Call on page load
+    // TODO: connect to the helper function directly
     getTagSetLadder();
     async function getTagSetLadder() {
       try {
