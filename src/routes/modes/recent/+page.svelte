@@ -3,7 +3,7 @@
     import { stadiums } from '$lib/helpers/stadiumName';
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { tagsets } from '$lib/stores/tagsets';
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import {characters} from '$lib/helpers/characterName';
     import { invalidate } from '$app/navigation';
     // import { sortableTableAction } from 'svelte-legos';
@@ -15,15 +15,17 @@
     tagsetsData = $tagsets; // Get the current value of the tagsets store
     // console.log($tagsets)
     }
+    
+    var reloadInterval: any
 
-    onMount(() => {
+    onMount(async () => {
         getAllTagSets();
         rerunLoadFunction();
     })
 
-    function rerunLoadFunction() {
-      setInterval(() => {
-        console.log(new Date());
+    async function rerunLoadFunction() {
+      reloadInterval = setInterval(() => {
+        console.log("Recent games API Called at", new Date());
         invalidate(BACKEND + STAT_ENDPOINTS.GAMES);
       }, 30000);
     }
@@ -36,6 +38,10 @@
         return timestamp >= oneDayAgo;
     }
 
+    onDestroy(() => {
+        console.log("Recent games OnDestroy ran")
+        clearInterval(reloadInterval)
+    })
     
   </script>
 
