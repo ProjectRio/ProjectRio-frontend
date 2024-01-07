@@ -9,13 +9,14 @@
 	import { recentGameList } from '$lib/stores/gameLists';
     import { ladderUsers } from '$lib/stores/ladder';
     import { getTagSetLadder } from '$lib/helpers/getLadder';
-	import { filter } from '@skeletonlabs/skeleton';
+    import LadderTable from '$lib/components/LadderTable.svelte';
 
     let loadingInd: boolean = true;
     let mode_name: string = $page.params.gamemode;
     let mode_id: number
     let mode_info: any
     let ladderTop10: any[]
+    let displayedGame: any = undefined;
 
     onMount(async () => {
         //console.log("Onmount started")
@@ -30,8 +31,9 @@
         console.log(mode_id)
 
         
-        await getRecentGames(1, mode_name.replace(" ", "").replace(",", ""), false, $page.params.user)
+        await getRecentGames(1, mode_name.replace(/ /g, "").replace(",", ""), false, $page.params.user)
         console.log("Recent games retreived", $recentGameList)
+        displayedGame = $recentGameList[0]
 
         console.log(ladderUsers, $ladderUsers)
 
@@ -51,35 +53,14 @@
 <h1>{mode_name}</h1> <br>
 
 <span><h2>Last game played</h2><h3><a href="/modes/recent">(All Recent Games)</a></h3></span>
-<RecentSingleGame displayedGame={$recentGameList[0]} /> <br>
+{#if (displayedGame !== undefined)}
+    <RecentSingleGame {displayedGame} /> 
+{/if}    
+<br>
 
 <!--h2>Live games</h2-->  
 <h2>Top 10 </h2><h3><a href="/modes/{mode_name}/ladder">(Full Ladder)</a></h3>
-<section class="table-container">
-    <table class="table table-hover table-interactive table-compact">
-    
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Rating</th>
-            <th>Username</th>
-            <th>W-L</th>
-        </tr>
-        </thead>
-        <tbody>
-            {#if ladderTop10}
-                {#each ladderTop10 as player, i}
-                    <tr class="">
-                        <td>{i + 1}</td>
-                        <td>{player.adjusted_rating}</td>
-                        <td class="player-link "><a class="player decoration-transparent" href={`/modes/player/${player.username}`}>{player.username}</a></td>
-                        <td>{player.num_wins}-{player.num_losses}</td>
-                    </tr>
-                {/each}
-            {/if}
-        </tbody>
-    </table>
-</section><br>
+<LadderTable ladderGameMode = {mode_name} nUsersToDisplay=10 /> <br>
 
 <h2>Rules</h2>
 <section class="table-container">
