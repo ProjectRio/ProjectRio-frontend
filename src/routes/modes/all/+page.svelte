@@ -71,12 +71,12 @@
                     {#if !showPassedDates && hasEndDatePassed(tagset.end_date)}
                         <!-- Skip rendering if showPassedDates is false and the end date has passed -->
                     {:else if !showUnofficial && !isOfficial(tagset)}
-
+                        <div></div>
                     {:else}
                         <tr>
                             <!-- <td>{tagset.comm_id}</td> -->
                             <!-- <td>{tagset.id}</td> -->
-                            <a class="link-text decoration-transparent" href="{tagset.name}/ladder">
+                            <a class="link-text decoration-transparent" href="{tagset.name}">
                                 <td class="link-cell">{tagset.name}</td>
                             </a>
                             <td>{tagset.comm_type}</td>

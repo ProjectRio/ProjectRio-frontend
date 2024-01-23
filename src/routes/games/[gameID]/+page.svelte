@@ -43,6 +43,7 @@
     let awayElo: number = 0;
     let homeLogo: string = "";
     let awayLogo: string = "";
+    let gameMode_name: string;
 
     
     onMount(async () => {
@@ -68,6 +69,7 @@
     // Access the tagsets data in your component
     $: {
         tagsetsData = $tagsets; 
+        gameMode_name = tagsetsData.find(tagset => tagset.id === gameInfo.game_mode)?.name || ''
     }
 
     class player {
@@ -149,16 +151,16 @@
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
-            {userHome} <br>
+            <a class='unstyled hover-change' href="/users/{userHome}">{userHome}</a> <br>
             {scoreHome}
         </div>
         <div class="finalAndMode"> 
             Final
             {#if inningsPlayed!==inningsSelected} <span class="inningInfo">({inningsPlayed}/{inningsSelected})</span> {/if} <br>
-            <span class=gameTag>{tagsetsData.find(tagset => tagset.id === gameInfo.game_mode)?.name || ''}</span>
+            <a class='unstyled hover-change' href="/modes/{gameMode_name}"><span class=gameTag>{gameMode_name}</span></a>
         </div>
         <div class="userAndScoreAway">
-            {userAway} <br> 
+            <a class='unstyled hover-change' href="/users/{userAway}">{userAway}</a> <br> 
             <span class="score">{scoreAway}</span>
         </div>
         <div>
@@ -285,6 +287,10 @@
         display: block;
         font-size: 24%;
         outline: red;
+    }
+    a.hover-change:hover {
+        color: darkred;
+        text-decoration: underline;
     }
 
 

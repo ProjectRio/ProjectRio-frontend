@@ -3,7 +3,7 @@
     import { stadiums } from '$lib/helpers/stadiumName';
     import { getAllTagSets } from '$lib/helpers/tagNames';
     import { tagsets } from '$lib/stores/tagsets';
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import {characters} from '$lib/helpers/characterName';
     import { invalidate } from '$app/navigation';
     // import { sortableTableAction } from 'svelte-legos';
@@ -15,15 +15,17 @@
     tagsetsData = $tagsets; // Get the current value of the tagsets store
     // console.log($tagsets)
     }
+    
+    var reloadInterval: any
 
-    onMount(() => {
+    onMount(async () => {
         getAllTagSets();
         rerunLoadFunction();
     })
 
-    function rerunLoadFunction() {
-      setInterval(() => {
-        console.log(new Date());
+    async function rerunLoadFunction() {
+      reloadInterval = setInterval(() => {
+        console.log("Recent games API Called at", new Date());
         invalidate(BACKEND + STAT_ENDPOINTS.GAMES);
       }, 30000);
     }
@@ -36,6 +38,10 @@
         return timestamp >= oneDayAgo;
     }
 
+    onDestroy(() => {
+        console.log("Recent games OnDestroy ran")
+        clearInterval(reloadInterval)
+    })
     
   </script>
 
@@ -69,18 +75,18 @@
           {#if withinLastDay(games.date_time_start)}
             <tr>
               <td class="player-link">
-                <a class="player decoration-transparent" href={`/modes/player/${games.away_user}`}>{games.away_user}</a>
+                <a class="player decoration-transparent" href={`/users/${games.away_user}`}>{games.away_user}</a>
               </td>
               <td>{games.away_score}</td>
               <td>{games.home_score}</td>
               <td class="player-link">
-                <a class="player decoration-transparent" href={`/modes/player/${games.home_user}`}>{games.home_user}</a>
+                <a class="player decoration-transparent" href={`/users/${games.home_user}`}>{games.home_user}</a>
               </td>
               <!-- convert stadium id num to string -->
               <td>{stadiums[games.stadium]}</td>
 
               <!-- convert tag id num to string -->
-              <td class="game-mode"><a class="decoration-transparent" href={`/modes/${tagsetsData.find(tagset => tagset.id === games.game_mode)?.name}`}/ladder>{tagsetsData.find(tagset => tagset.id === games.game_mode)?.name || ''}</a></td>
+              <td class="game-mode"><a class="decoration-transparent" href={`/modes/${tagsetsData.find(tagset => tagset.id === games.game_mode)?.name}`}>{tagsetsData.find(tagset => tagset.id === games.game_mode)?.name || ''}</a></td>
               <td>{new Date(games.date_time_start * 1000).toLocaleString()}</td>
               <td class="game-link">
                 <a class="game decoration-transparent" href={`/games/${games.game_id}`}>Click Here</a>

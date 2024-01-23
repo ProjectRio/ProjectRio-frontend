@@ -12,6 +12,7 @@
     let players: any = [];
   
     // Call on page load
+    // TODO: connect to the helper function directly
     getTagSetLadder();
     async function getTagSetLadder() {
       try {
@@ -53,7 +54,7 @@
   <a href={`/modes/` + $page.params.gamemode + `/peak`} class="decoration-transparent flex m-2 "><input type="checkbox" class="checkbox" id="peak" name="peak">
     <label for="peak" class="flex m-2">View player peaks for this Game Mode.</label></a>
   </div>
-  <h1>{titleCase($page.params.gamemode)} Ladder</h1>
+  <h1><a href="/modes/{$page.params.gamemode}">{titleCase($page.params.gamemode)}</a> Ladder</h1><br>
   <section class="table-container">
 <!--    <table class="table table-hover table-interactive table-compact" use:sortableTableAction>-->
     <table class="table table-hover table-interactive table-compact">
@@ -72,7 +73,7 @@
           <tr class="">
             <td>{i + 1}</td>
             <td>{player.adjusted_rating}</td>
-            <td class="player-link "><a class="player decoration-transparent" href={`/modes/player/${player.username}`}>{player.username}</a></td>
+            <td class="player-link "><a class="player decoration-transparent" href={`/users/${player.username}`}>{player.username}</a></td>
             <td>{player.num_wins}-{player.num_losses}</td>
           </tr>
         {/each}
