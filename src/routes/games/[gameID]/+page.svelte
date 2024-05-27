@@ -147,7 +147,7 @@
 {#if !loadingInd}
     <div class="headerBox">
         <div>
-            <img src={`/src/assets/images/Teams/${homeLogo}.png`} alt="Home team is the {homeLogo}">
+            <img src={`/images/Teams/${homeLogo}.png`} alt="Home team is the {homeLogo}">
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
