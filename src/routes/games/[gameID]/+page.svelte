@@ -126,7 +126,7 @@
         console.log("away roster: ", awayRoster[0])
     }
 
-    $: homeLogoName = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
+    $: homeLogoName = "BirdoBeauties"//Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
     $: awayLogoName = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
 
     //determine Elo's
