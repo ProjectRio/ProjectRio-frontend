@@ -27,6 +27,7 @@
     import { msToTime } from '$lib/helpers/convertTime';
     import { stadiums } from '$lib/helpers/stadiumName';
     import { Team_Name } from '$lib/helpers/teamNames';
+    import GetImg from '$lib/components/getImg.svelte';
 
     console.log("Started script")
 
@@ -41,8 +42,8 @@
     let loadingInd: boolean = true;
     let homeElo: number = 0;
     let awayElo: number = 0;
-    let homeLogo: string = "";
-    let awayLogo: string = "";
+    let homeLogoName: string = "";
+    let awayLogoName: string = "";
     let gameMode_name: string;
 
     
@@ -125,8 +126,8 @@
         console.log("away roster: ", awayRoster[0])
     }
 
-    $: homeLogo = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
-    $: awayLogo = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
+    $: homeLogoName = Team_Name(Array.from(homeRoster, (charInfo) => charInfo.name), homeCaptain)
+    $: awayLogoName = Team_Name(Array.from(awayRoster, (charInfo) => charInfo.name), awayCaptain)
 
     //determine Elo's
     $: {
@@ -147,7 +148,7 @@
 {#if !loadingInd}
     <div class="headerBox">
         <div>
-            <img src={`/src/assets/images/Teams/${homeLogo}.png`} alt="Home team is the {homeLogo}">
+            <GetImg imgURL='../src/lib/images/Teams/{homeLogoName}.png' />
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
@@ -164,7 +165,7 @@
             <span class="score">{scoreAway}</span>
         </div>
         <div>
-            <img src={`/src/lib/images/Teams/${awayLogo}.png`} alt="Away team is the {awayLogo}">
+            <GetImg imgURL='../src/lib/images/Teams/{awayLogoName}.png' />
             <div class="elo">Elo {awayElo}</div>
         </div>
     </div>
