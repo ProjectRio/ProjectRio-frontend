@@ -24,9 +24,9 @@
     function getTeamImage(game: any, homeAway: string) {
         if (`${homeAway}_roster` in game) {
             let team = Team_Name(Array.from(Object.values(game[`${homeAway}_roster`]), (charIndex: any) => characters[charIndex]), game[`${homeAway}_captain`])
-            return `/src/lib/images/Teams/${team}.png`
+            return `../../lib/images/Teams/${team}.png`
         } else {
-            return `/src/lib/images/Characters/${game[`${homeAway}_captain`]}.png`
+            return `../../lib/images/Characters/${game[`${homeAway}_captain`]}.png`
         }
     } 
 
