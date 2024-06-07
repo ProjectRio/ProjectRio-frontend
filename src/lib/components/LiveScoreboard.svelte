@@ -146,7 +146,7 @@ Improvements
         let captain: string;
         captain = characters[liveGame[`${homeAway}_roster_${liveGame[`${homeAway}_captain`]}_char`]]
         let team = Team_Name(Array.from(roster, (charIndex:number) => characters[charIndex]), captain)
-        return `/src/lib/images/Teams/${team}.png`
+        return `/images/Teams/${team}.png`
     } 
 
     function toggleGreenScreen() {
@@ -186,14 +186,14 @@ Improvements
                     <div class="logo"><img src={getTeamImage(liveGame, "away")} alt="Away logo"></div>
                 </div>
                 <div class='row-situation'>
-                    <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 0) ? "Baseball" : "Baseball_bat"}.png`} alt="Offense or defence"></div>
-                    <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 0) ? characters[liveGame[`home_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`home_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
+                    <div class="offDef"><img src={`/images/${(liveGame.half_inning === 0) ? "baseball" : "Baseball_bat"}.png`} alt="Offense or defence"></div>
+                    <div class="character"><img src={`/images/Characters/${(liveGame.half_inning === 0) ? characters[liveGame[`home_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`home_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
                     <div class="bases-count">
-                        <div class="bases"><img src={`/src/lib/images/Bases/R${((liveGame.runner_on_first) ? "1" : "") + ((liveGame.runner_on_second) ? "2" : "") + ((liveGame.runner_on_third) ? "3" : "")}.png`} alt="current runners on base"></div>
+                        <div class="bases"><img src={`/images/Bases/R${((liveGame.runner_on_first) ? "1" : "") + ((liveGame.runner_on_second) ? "2" : "") + ((liveGame.runner_on_third) ? "3" : "")}.png`} alt="current runners on base"></div>
                         <div class="count">{(displayedGameIndex in confirmedCrashedGameIndexes) ? "(Crashed?)" : (liveGame.outs===0) ? "○○○" : (liveGame.outs===1) ? "●○○" : "●●○"}</div>
                     </div>
-                    <div class="character"><img src={`/src/lib/images/Characters/${(liveGame.half_inning === 1) ? characters[liveGame[`away_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`away_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
-                    <div class="offDef"><img src={`/src/lib/images/${(liveGame.half_inning === 1) ? "Baseball" : "Baseball_bat"}.png`} alt="offence or defence"></div>
+                    <div class="character"><img src={`/images/Characters/${(liveGame.half_inning === 1) ? characters[liveGame[`away_roster_${liveGame.pitcher}_char`]] : characters[liveGame[`away_roster_${liveGame.batter}_char`]]}.png`} alt="current batter/pitcher"></div>
+                    <div class="offDef"><img src={`/images/${(liveGame.half_inning === 1) ? "baseball" : "Baseball_bat"}.png`} alt="offence or defence"></div>
                 </div>
                 <div class="game-mode">{tagsetsData.find(tagset => tagset.id === liveGame.tag_set)?.name || ''}</div>
             </div>
