@@ -147,7 +147,7 @@
 {#if !loadingInd}
     <div class="headerBox">
         <div>
-            <img src={`/src/lib/images/Teams/${homeLogo}.png`} alt="Home team is the {homeLogo}">
+            <img src={`/images/Teams/${homeLogo}.png`} alt="Home team is the {homeLogo}">
             <div class="elo">Elo {homeElo}</div>
         </div>
         <div class="userAndScoreHome">
@@ -164,7 +164,7 @@
             <span class="score">{scoreAway}</span>
         </div>
         <div>
-            <img src={`/src/lib/images/Teams/${awayLogo}.png`} alt="Away team is the {awayLogo}">
+            <img src={`/images/Teams/${awayLogo}.png`} alt="Away team is the {awayLogo}">
             <div class="elo">Elo {awayElo}</div>
         </div>
     </div>
