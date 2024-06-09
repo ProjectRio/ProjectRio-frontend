@@ -8,7 +8,7 @@
 		<ul class="list-nav flex">
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/community">community</a></button></li>-->
 <!--			<li><button class="btn variant-filled-primary m-2"><a href="/stats">stats</a></button></li>-->
-			<li><button class="btn variant-filled-primary m-2"><a href="/modes/all">games</a></button></li>
+			<li><button class="btn variant-filled-primary m-2"><a href="/modes/recent">games</a></button></li>
 			<li><button class="btn variant-filled-primary m-2"><a href="/users/all">users</a></button></li>
 			<li><button class="btn variant-filled-primary m-2"><a href="/tag_set/list">view game modes</a></button></li>
 			<li><button class="btn variant-filled-primary m-2"><a href="/tag/list">view game tags</a></button></li>
