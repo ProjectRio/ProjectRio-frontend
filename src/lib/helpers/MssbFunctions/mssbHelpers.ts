@@ -37,9 +37,9 @@ export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2
   else {
     StaticRandomInt1 =
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         StaticRandomInt2 / iVar5 + TotalframesAtPlay;
+         Math.floor(StaticRandomInt2 / iVar5) + TotalframesAtPlay;
 
-    uVar1 = StaticRandomInt1 - (StaticRandomInt1 / iVar5) * iVar5;
+    uVar1 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / iVar5) * iVar5;
     uVar3 = uVar1 >> 0x1f;
     iVar5 = (uVar3 ^ uVar1) - uVar3;
     if (uVar4 < 0) {
@@ -65,9 +65,9 @@ export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, Total
   else {
     StaticRandomInt1 =
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         StaticRandomInt2 / randomNum + TotalframesAtPlay;
+         Math.floor(StaticRandomInt2 / randomNum) + TotalframesAtPlay;
     
-    uVar2 = StaticRandomInt1 - (StaticRandomInt1 / randomNum) * randomNum;
+    uVar2 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / randomNum) * randomNum;
     uVar3 = uVar2 >> 0x1f;
     randomNum = (uVar3 ^ uVar2) - uVar3;
     if (MaxNum < 0) {
@@ -80,7 +80,7 @@ export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, Total
 
 // @ts-ignore
 export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) {
-  // sometimes the game only sends 1 parameter. When this happens, I think it's for parameter 2, and parameter 1 is defaulted to 0.
+  // sometimes the decomp only sends 1 parameter. When this happens, I think parameter 1 is the negative version, and 2 is the positive version.
   let uVar4 = 0;
   let uVar1;
   let uVar2;
@@ -95,9 +95,9 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
   else {
     StaticRandomInt1 =
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         StaticRandomInt2 / const_7_ + TotalframesAtPlay;
+         Math.floor(StaticRandomInt2 / const_7_) + TotalframesAtPlay;
 
-      uVar2 = StaticRandomInt1 - (StaticRandomInt1 / const_7_) * const_7_;
+      uVar2 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / const_7_) * const_7_;
       uVar1 =  uVar2 >> 0x1f;
       uVar1 = (uVar1 ^ uVar2) - uVar1;
       if (const_7 < 0) {
@@ -106,5 +106,5 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
     
   }
   let local_28 = uVar1;
-  return (0.001 * (local_28) + param_1);
+  return [(0.001 * (local_28) + param_1), StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
 }
