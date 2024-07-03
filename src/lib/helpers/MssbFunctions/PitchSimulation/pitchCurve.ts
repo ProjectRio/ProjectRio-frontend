@@ -10,7 +10,12 @@ export function pitchCurve(dt) {
                            there are indicators set that cancel the curve calculation. */
       dt.inMemPitcher.pitchCurveVelo = 0;
       dt.inMemPitcher.unknown_alwaysSetTo0 = 0;
-      let leftOrRight = 0; //TODO: replace this with an input variable
+
+      let leftOrRight:number = 0;
+      if (dt.pitchHangtimeCounter < (dt.curveInput).length) {
+        leftOrRight = dt.curveInput[dt.pitchHangtimeCounter];
+      } 
+
       //controllerInput = inMemControls + UINT_ARRAY_80892a78[fieldingTeam];
       if ((dt.inMemPitcher.cancelCurveAndParabolicAdjInd == 0) && (dt.inMemPitcher.calced_curve != 0)) {
         curve_Interpolated =
