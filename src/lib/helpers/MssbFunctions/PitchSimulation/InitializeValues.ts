@@ -8,6 +8,11 @@ export function initializeValues(pInputs, dt) {
       dt.inMemPitcher.handedness = pInputs.pitcherHandedness;
       dt.inMemPitcher.charClass = c.stats[dt.inMemPitcher.charID]["Character Class"];
       dt.inMemPitcher.AIInd = 0;
+      dt.curveInput = pInputs.curveInput;
+      dt.StaticRandomInt1 = Math.floor(Math.random() * 5000)
+      dt.StaticRandomInt2 = Math.floor(Math.random() * 5000)
+      dt.TotalframesAtPlay = Math.floor(Math.random() * 500)
+      console.log(dt)
 
       // Set pitch type variables
       dt.inMemPitcher.captainStarPitchThrown = 0;
@@ -56,10 +61,12 @@ export function initializeValues(pInputs, dt) {
       }
       else if ((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) ||
                   (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) {
-            let dVar2 = randomInRange(0, -1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+      let dVar2 
+      [dVar2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-1, 1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
       dt.inMemPitcher.pitchStartingXOnMound = dVar2;
       dt.inMemPitcher.eggBallBounceYHeight = 0.35;
-      dVar2 = randomInRange(7, 9, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+      [dVar2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(7, 9, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+      
       dt.inMemPitcher.frontOfPlateZ = dVar2;
       }
 
