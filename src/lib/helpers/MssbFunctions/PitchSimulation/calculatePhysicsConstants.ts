@@ -7,6 +7,9 @@ export function calculatePhysicsConstants(dt) { //806b17fc
       let frameCounter = 1;
       let currentFrameCount;
       let halfFramesToPlate;
+      let uVar1;
+      let halfWayToThePlate;
+
       let controlStickInputs = [0]; //placeholder for now
       dt.inMemPitcher.ballVelocity.Z = -(dt.inMemPitcher.calced_pitchSpeed / dt.inMemPitcher.pitchSpeedScaler);
       let loopCounter = 0xfffe;
@@ -27,16 +30,14 @@ export function calculatePhysicsConstants(dt) { //806b17fc
                         // If ball is in the controllable zone, and the has control variable still is
                            //false, then set to true. 
         if ((ballZ <= 18.44) && (dt.inMemPitcher.pitchInAirInd == false)) {
-          dt.inMemPitcher.pitchInAirInd = frameCounter;
+          dt.inMemPitcher.pitchInAirInd = true;
         }
                         // if pitch has been thrown 
         if (ballZ <= dt.inMemPitcher.pitchZ_whenAirResistanceStarts) {
-          console.log("before frame is set")
           if (dt.inMemPitcher.frameBallCanStartBeingControlled == -1) {
             dt.inMemPitcher.frameBallCanStartBeingControlled = frameCounter;
-            console.log("after frame is set")
           }
-          let halfFramesToPlate = -(pitchVelo * dt.inMemPitcher.airResistance_veloAdj - pitchVelo);
+          halfFramesToPlate = -(pitchVelo * dt.inMemPitcher.airResistance_veloAdj - pitchVelo);
           if (halfFramesToPlate < -0.05) {
             pitchVelo = halfFramesToPlate;
           }
@@ -54,10 +55,10 @@ export function calculatePhysicsConstants(dt) { //806b17fc
       dt.inMemPitcher.verticalGlobalParabolicVelo = c.pitchConstantsArray[pitchSubType][5] ;
       if ((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) ||
          (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) {
-        let uVar1 = randBetween(0x37,0x3c, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+        uVar1 = randBetween(0x37,0x3c, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
         dt.inMemPitcher.verticalGlobalParabolicVelo = uVar1;
       }
-      let halfWayToThePlate = dt.inMemPitcher.frameWhenUnhittable  * 0.5;
+      halfWayToThePlate = dt.inMemPitcher.frameWhenUnhittable  * 0.5;
       dt.inMemPitcher.horizontalGlobalParabolicVelo = c.pitchConstantsArray[pitchSubType][6];
                         // Sets vertical adjustment as the ende of the parabola. 
       dt.inMemPitcher.verticalOffsetParabolaMidpoint = (halfWayToThePlate * dt.inMemPitcher.verticalGlobalParabolicVelo * halfWayToThePlate) / 10000.0;
@@ -90,7 +91,7 @@ export function calculatePhysicsConstants(dt) { //806b17fc
           dt.inMemPitcher.warioWaluStarPitchRightLeft = loopCounter;
         }
       }
-      let uVar1 = dt.inMemPitcher.captainStarPitchThrown;
+      uVar1 = dt.inMemPitcher.captainStarPitchThrown;
       if ((uVar1 == 7) || (uVar1 == 8)) {
         let boswer0Jr1 = uVar1 - 7;
         dt.inMemPitcher.bulletPitchLoopFrames =
