@@ -16,11 +16,12 @@ export function estimateXAndFrameAtBatterZ(batZ, /**varToUpdate,*/ considerCurve
     ballX_stored = ballX;
     ballZ_stored = ballZ;
     frames = frames + 1;
-    if ((ballZ_stored <= dt.inMemPitcher.pitchZ_whenAirResistanceStarts) &&
-       (ballZ = -(veloZ * dt.inMemPitcher.airResistance_veloAdj - veloZ),
-       ballZ < -0.05)) {
-      veloX = -(veloX * dt.inMemPitcher.airResistance_veloAdj - veloX);
-      veloZ = ballZ;
+    if (ballZ_stored <= dt.inMemPitcher.pitchZ_whenAirResistanceStarts) {
+      ballZ = -(veloZ * dt.inMemPitcher.airResistance_veloAdj - veloZ);
+      if (ballZ < -0.05) {   
+        veloX = -(veloX * dt.inMemPitcher.airResistance_veloAdj - veloX);
+        veloZ = ballZ;
+      }
     }
     veloX = (veloX * dt.inMemPitcher.decelerationFactor);
     veloZ = (veloZ * dt.inMemPitcher.decelerationFactor);
