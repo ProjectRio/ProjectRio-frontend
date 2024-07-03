@@ -48,12 +48,12 @@ export function pitchInAirFunction(dt) { // 806b02dc
     
       //removed wall ball section
       //The following logic has been modified from the original code to workaround a goto jump from the decomp.
-      if ((dt.inMemPitcher.captainStarPitchType == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchType == c.bJStarPitch)) {
+      if ((dt.inMemPitcher.captainStarPitchThrown == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchThrown == c.bJStarPitch)) {
         if ((dt.inMemPitcher.bulletPitchLoopStartingFrame <= dt.pitchHangtimeCounter) && (dt.inMemPitcher.bulletPitchStageCode == 0)) {
           dt.inMemPitcher.bulletPitchStageCode = 1;
         }
       } 
-      if (((dt.inMemPitcher.captainStarPitchType == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchType == c.bJStarPitch)) &&
+      if (((dt.inMemPitcher.captainStarPitchThrown == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchThrown == c.bJStarPitch)) &&
           (dt.inMemPitcher.bulletPitchStageCode == 1)) {
         /*if ((dt.inMemPitcher.bulletPitchLoopStartingFrame <= pitchHangtimeCounter) && (dt.inMemPitcher.bulletPitchStageCode == 0)) {
           dt.inMemPitcher.bulletPitchStageCode = 1;
@@ -66,7 +66,7 @@ export function pitchInAirFunction(dt) { // 806b02dc
           /*getSinAndCosOfAngle(loopAngle,&cos,&sin);*/
           local_94 = Math.cos(loopAngle);
           local_90 = Math.sin(loopAngle);
-          veloAdj = c.bulletBallConstants[dt.inMemPitcher.captainStarPitchType - 7][4];
+          veloAdj = c.bulletBallConstants[dt.inMemPitcher.captainStarPitchThrown - 7][4];
           dt.inMemPitcher.starPitchAdjustment.X = 0;
           dt.inMemPitcher.bulletPitchLoopAngleRadians = loopAngle;
           pitchVelo = 0.01 * veloAdj;
@@ -90,13 +90,22 @@ export function pitchInAirFunction(dt) { // 806b02dc
           dt.inMemPitcher.ballVelocity.Y = -(dt.inMemPitcher.ballVelocity.Y * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Y);
           dt.inMemPitcher.ballVelocity.Z = adjustedVelo;
         }
+        if (dt.inMemPitcher.ballCurrentPosition.Z <= dt.inMemPitcher.pitchZ_whenPitchSpecificResistanceStarts) {
+          adjustedVelo = -(dt.inMemPitcher.ballVelocity.Z * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Z);
+            if (adjustedVelo < -0.05) {
+              dt.inMemPitcher.ballVelocity.X = -(dt.inMemPitcher.ballVelocity.X * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.X);
+              dt.inMemPitcher.ballVelocity.Y = -(dt.inMemPitcher.ballVelocity.Y * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Y);
+              dt.inMemPitcher.ballVelocity.Z = adjustedVelo;
+            }
+        }
+       
         dt = pitchCurve(dt);
                         /* Pitch slows down by 2% each frame. */
         dt.inMemPitcher.ballVelocity.X = dt.inMemPitcher.ballVelocity.X * dt.inMemPitcher.decelerationFactor;
         dt.inMemPitcher.ballVelocity.Y = dt.inMemPitcher.ballVelocity.Y * dt.inMemPitcher.decelerationFactor;
         dt.inMemPitcher.ballVelocity.Z = dt.inMemPitcher.ballVelocity.Z * dt.inMemPitcher.decelerationFactor;
                         /* Sets parabolic vertical movement of pitch. */
-        if ((dt.inMemPitcher.captainStarPitchType == c.yoshiStarPitch) || (dt.inMemPitcher.captainStarPitchType == c.birdoStarPitch)) {
+        if ((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) || (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) {
           if (dt.inMemPitcher.pitchBounceCounter == 0) {
             frameWhenUnhittable = dt.inMemPitcher.frameWhenUnhittable;
             local_50 = dt.pitchHangtimeCounter;
@@ -151,7 +160,7 @@ export function pitchInAirFunction(dt) { // 806b02dc
                            constants that actually impact this. */
         if (dt.inMemPitcher.cancelCurveAndParabolicAdjInd == 0) {
           frameWhenUnhittable = dt.inMemPitcher.frameWhenUnhittable;
-          pitchVelo = -(dt.frameWhenUnhittable * 0.5 - dt.pitchHangtimeCounter);
+          pitchVelo = -(dt.inMemPitcher.frameWhenUnhittable * 0.5 - dt.pitchHangtimeCounter)
           dt.inMemPitcher.pitchX_parabolicAdjustment = dt.inMemPitcher.horizontalOffsetParabolaMidpoint - (pitchVelo * dt.inMemPitcher.horizontalGlobalParabolicVelo * pitchVelo) / 10000;
         }
         else {
@@ -168,13 +177,13 @@ export function pitchInAirFunction(dt) { // 806b02dc
       dt.inMemBall.AtBat_Contact_BallPos.X = dt.inMemPitcher.ballCurrentPosition.X + dt.inMemPitcher.pitchX_parabolicAdjustment;
       dt.inMemBall.AtBat_Contact_BallPos.Y = dt.inMemPitcher.ballCurrentPosition.Y + dt.inMemPitcher.pitchY_parabolicAdjustment;
       dt.inMemBall.AtBat_Contact_BallPos.Z = dt.inMemPitcher.ballCurrentPosition.Z;
-      if (((dt.inMemPitcher.captainStarPitchType == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchType == c.bJStarPitch)) && 
+      if (((dt.inMemPitcher.captainStarPitchThrown == c.bowserStarPitch) || (dt.inMemPitcher.captainStarPitchThrown == c.bJStarPitch)) && 
            (dt.inMemPitcher.bulletPitchStageCode == 1)) {
         dt.inMemBall.AtBat_Contact_BallPos.X = dt.inMemBall.AtBat_Contact_BallPos.X + dt.inMemPitcher.starPitchAdjustment.X;
         dt.inMemBall.AtBat_Contact_BallPos.Y = dt.inMemBall.AtBat_Contact_BallPos.Y + dt.inMemPitcher.starPitchAdjustment.Y;
         dt.inMemBall.AtBat_Contact_BallPos.Z = dt.inMemPitcher.ballCurrentPosition.Z + dt.inMemPitcher.starPitchAdjustment.Z;
       }
-      if (dt.inMemPitcher.captainStarPitchType == c.warioStarPitch) {
+      if (dt.inMemPitcher.captainStarPitchThrown == c.warioStarPitch) {
         if (0 <= 17 - dt.inMemBall.AtBat_Contact_BallPos.Z) {
           dt.inMemPitcher.starPitchAdjustment.X = 0.4 * ((17 - dt.inMemBall.AtBat_Contact_BallPos.Z) / 17);
           if (dt.inMemPitcher.warioWaluStarPitchRightLeft != 0) {
@@ -191,7 +200,7 @@ export function pitchInAirFunction(dt) { // 806b02dc
           //dt.inMemPitcher.warioWaluSoundPlayedInd = dt.inMemPitcher.warioWaluSoundPlayedInd + 1;
         }
       }
-      else if ((dt.inMemPitcher.captainStarPitchType == c.waluigiStarPitch) &&
+      else if ((dt.inMemPitcher.captainStarPitchThrown == c.waluigiStarPitch) &&
               (0 <= 17 - dt.inMemBall.AtBat_Contact_BallPos.Z)) {
         someAngle = (17 - dt.inMemBall.AtBat_Contact_BallPos.Z) / 17;
         pitchVelo2 = (0.4 * someAngle);
@@ -213,30 +222,30 @@ export function pitchInAirFunction(dt) { // 806b02dc
         }
         dt.inMemPitcher.warioWaluSoundPlayedInd = dt.inMemPitcher.warioWaluSoundPlayedInd + 1;
       }
-      starType = dt.inMemPitcher.captainStarPitchType;
+      starType = dt.inMemPitcher.captainStarPitchThrown;
       //removed section relating to Peach and Daisy star pitch animations
                         /* Seems like yoshi and burdo star pitches have different ground thresholds. */
-      groundYThreshold;
-      if ((dt.inMemPitcher.captainStarPitchType == c.yoshiStarPitch) ||
-         (groundYThreshold = 0.15,
-         dt.inMemPitcher.captainStarPitchType == c.birdoStarPitch)) {
+      groundYThreshold = 0.15;
+      if (dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) {
+         groundYThreshold = 0.15
+        } else if (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch) {
         groundYThreshold = 0.35;
       }
                         /* If the ball touches the ground. */
       if (dt.inMemBall.AtBat_Contact_BallPos.Y < groundYThreshold) {
-        if (((dt.inMemPitcher.captainStarPitchType == c.yoshiStarPitch) ||
-            (dt.inMemPitcher.captainStarPitchType == c.birdoStarPitch)) &&
+        if (((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) ||
+            (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) &&
            ((dt.inMemPitcher.pitchBounceCounter == 0 || (dt.inMemPitcher.pitchBounceCounter == 1)))) {
           if (dt.inMemPitcher.pitchBounceCounter == 0) {
-            rng2 = randomInRange(0, -1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [rng2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-1, 1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
             dt.inMemPitcher.pitchStartingXPosition = rng2;
             dt.inMemPitcher.bat_y_coord = 0.35;
-            rng3 = randomInRange(3,5, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
-            dt.inMemPitcher.eggBounceRelated = rng3;
+            [rng3, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(3,5, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+                        dt.inMemPitcher.eggBounceRelated = rng3;
             dt.inMemPitcher.zUnhittableThreshold = 0.5 * (rng3 + dt.inMemPitcher.zUnhittableThreshold);
           }
           else {
-            rng4 = randomInRange(0, -0.3, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [rng4, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-0.3, 0.3, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
             dt.inMemPitcher.pitchStartingXPosition = rng4;
             dt.inMemPitcher.bat_y_coord = 0.35;
             dt.inMemPitcher.zUnhittableThreshold = 0.775;
@@ -295,7 +304,7 @@ export function pitchInAirFunction(dt) { // 806b02dc
       if (0.775 <= dt.inMemBall.AtBat_Contact_BallPos.Z) {
         dt.inMemPitcher.framesUntilUnhittable = dt.inMemPitcher.frameWhenUnhittable - dt.pitchHangtimeCounter;
       }
-      if (dt.inMemBall.AtBat_Contact_BallPos.Z < -3 || dt.pitchFrames == 100) {
+      if (dt.inMemBall.AtBat_Contact_BallPos.Z < -3 || dt.pitchHangtimeCounter == 200) {
         /*dt.inMemPitcher.pitcherActionState = postPitchNoContact;
         dt.inMemPitcher.CountsUpWhileWaitingForPitch = 0;
         dt.inMemPitcher.pitchDidntResultInLiveBallInd = 1;*/
