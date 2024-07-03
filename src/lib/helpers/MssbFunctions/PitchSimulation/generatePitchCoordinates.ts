@@ -18,8 +18,9 @@ export function generatePitchCoordinates() {
 
       const pitchInputs = {
             'chargeUp': 0,
-            'pitchType': 0, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
-            'pitcher_id': 0,
+            'curveInput': [0,0],//[0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            'pitchType': 4, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
+            'pitcher_id': 3,
             'pitcherStarsOn': false,
             'pitcherHandedness': 0,
             'pitcherXOnMound': 0,
@@ -38,6 +39,7 @@ export function generatePitchCoordinates() {
 
       pitchData.calculatedPoints.pop(); // get rid of dummy data from the initialization
       pitchData.calculatedVelocity.pop(); // get rid of dummy data from the initialization
+      pitchData.calculatedAtBatBallPosPoints.pop(); // get rid of dummy data from the initialization
 
       while (!pitchData.pitchDoneSimulating) {
             pitchData = pitchInAirFunction(pitchData);
@@ -48,9 +50,11 @@ export function generatePitchCoordinates() {
             pitchData.calculatedVelocity.push({X: pitchData.inMemPitcher.ballVelocity.X, 
                         Y: pitchData.inMemPitcher.ballVelocity.Y, 
                         Z: pitchData.inMemPitcher.ballVelocity.Z})
+            pitchData.calculatedAtBatBallPosPoints.push({X: pitchData.inMemBall.AtBat_Contact_BallPos.X, 
+                  Y: pitchData.inMemBall.AtBat_Contact_BallPos.Y, 
+                  Z: pitchData.inMemBall.AtBat_Contact_BallPos.Z});
 
-            console.log(pitchData.pitchFrames)
-            pitchData.pitchFrames += 1;
+            pitchData.pitchHangtimeCounter += 1;
       }
       
       return pitchData;
