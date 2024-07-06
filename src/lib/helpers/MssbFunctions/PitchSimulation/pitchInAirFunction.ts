@@ -83,13 +83,7 @@ export function pitchInAirFunction(dt) { // 806b02dc
                            each velo variable.
                            Curve and charge is 1.5% resistance each frame. Change up is 3%. 
                            Unknown pitch type 2 adds 0.5% each frame. */
-        if ((dt.inMemPitcher.ballCurrentPosition.Z <= dt.inMemPitcher.pitchZ_whenPitchSpecificResistanceStarts)
-           && (adjustedVelo = -(dt.inMemPitcher.ballVelocity.Z * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Z),
-              adjustedVelo < -0.05)) {
-          dt.inMemPitcher.ballVelocity.X = -(dt.inMemPitcher.ballVelocity.X * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.X);
-          dt.inMemPitcher.ballVelocity.Y = -(dt.inMemPitcher.ballVelocity.Y * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Y);
-          dt.inMemPitcher.ballVelocity.Z = adjustedVelo;
-        }
+
         if (dt.inMemPitcher.ballCurrentPosition.Z <= dt.inMemPitcher.pitchZ_whenPitchSpecificResistanceStarts) {
           adjustedVelo = -(dt.inMemPitcher.ballVelocity.Z * dt.inMemPitcher.pitchSpecific_VeloAdj - dt.inMemPitcher.ballVelocity.Z);
             if (adjustedVelo < -0.05) {
