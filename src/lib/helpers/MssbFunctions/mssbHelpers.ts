@@ -22,7 +22,7 @@ export function LinearInterpolateToNewRange(value, prevMin, prevMax, nextMin, ne
 }
 
 // @ts-ignore
-export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) {
+export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) { //806dddb0
   let uVar1;
   let iVar2;
   let uVar3;
@@ -39,8 +39,8 @@ export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
          Math.floor(StaticRandomInt2 / iVar5) + TotalframesAtPlay;
 
-    uVar1 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / iVar5) * iVar5;
-    uVar3 = uVar1 >> 0x1f;
+    uVar1 = StaticRandomInt1 - (StaticRandomInt1 / iVar5) * iVar5;
+    uVar3 = Math.floor(uVar1) >> 0x1f;
     iVar5 = (uVar3 ^ uVar1) - uVar3;
     if (uVar4 < 0) {
       iVar5 = -iVar5;
@@ -51,7 +51,7 @@ export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2
 }
 
 // @ts-ignore
-export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) 
+export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay)  //806ddf4c
 {
   let iVar1;
   let uVar2;
@@ -65,10 +65,10 @@ export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, Total
   else {
     StaticRandomInt1 =
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         Math.floor(StaticRandomInt2 / randomNum) + TotalframesAtPlay;
+         StaticRandomInt2 / randomNum + TotalframesAtPlay;
     
-    uVar2 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / randomNum) * randomNum;
-    uVar3 = uVar2 >> 0x1f;
+    uVar2 = StaticRandomInt1 - (StaticRandomInt1 / randomNum) * randomNum;
+    uVar3 = Math.floor(uVar2) >> 0x1f;
     randomNum = (uVar3 ^ uVar2) - uVar3;
     if (MaxNum < 0) {
       randomNum = -randomNum;
@@ -95,10 +95,10 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
   else {
     StaticRandomInt1 =
          (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         Math.floor(StaticRandomInt2 / const_7_) + TotalframesAtPlay;
+         StaticRandomInt2 / const_7_ + TotalframesAtPlay;
 
-      uVar2 = StaticRandomInt1 - Math.floor(StaticRandomInt1 / const_7_) * const_7_;
-      uVar1 =  uVar2 >> 0x1f;
+      uVar2 = StaticRandomInt1 - (StaticRandomInt1 / const_7_) * const_7_;
+      uVar1 =  Math.floor(uVar2) >> 0x1f;
       uVar1 = (uVar1 ^ uVar2) - uVar1;
       if (const_7 < 0) {
         uVar1 = -uVar1;
