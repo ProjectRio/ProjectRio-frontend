@@ -134,6 +134,7 @@ export const defaultPitchingData = {
       'StaticRandomInt2': 0,
       'TotalframesAtPlay': 0,
       'pitchDoneSimulating': false,
+      'calcedOutputs': [{}],
       'calculatedPoints': [{}],
       'calculatedVelocity': [{}],
       'calculatedAtBatBallPosPoints': [{}]
