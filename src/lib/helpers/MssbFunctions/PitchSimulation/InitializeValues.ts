@@ -12,7 +12,6 @@ export function initializeValues(pInputs, dt) {
       dt.StaticRandomInt1 = Math.floor(Math.random() * 5000)
       dt.StaticRandomInt2 = Math.floor(Math.random() * 5000)
       dt.TotalframesAtPlay = Math.floor(Math.random() * 500)
-      console.log(dt)
 
       // Set pitch type variables
       dt.inMemPitcher.captainStarPitchThrown = 0;
@@ -69,8 +68,7 @@ export function initializeValues(pInputs, dt) {
       
       dt.inMemPitcher.frontOfPlateZ = dVar2;
       }
-
-      dt.inMemPitcher.pitchChargeUp = pInputs.pitchCharge;
+      dt.inMemPitcher.pitchChargeUp = pInputs.chargeUp;
     
       dt.inMemPitcher.Stamina = ((isNaN(pInputs.pitcherStamina)) ? 10 : pInputs.pitcherStamina);
 
@@ -99,6 +97,10 @@ export function initializeValues(pInputs, dt) {
       dt.inMemPitcher.ballCurrentPosition.X = dt.inMemPitcher.pitchRelease.X;
       dt.inMemPitcher.ballCurrentPosition.Y = dt.inMemPitcher.pitchRelease.Y;
       dt.inMemPitcher.ballCurrentPosition.Z = dt.inMemPitcher.pitchRelease.Z;
+      
+      dt.inMemBall.AtBat_Contact_BallPos.X = dt.inMemPitcher.pitchRelease.X;
+      dt.inMemBall.AtBat_Contact_BallPos.Y = dt.inMemPitcher.pitchRelease.Y;
+      dt.inMemBall.AtBat_Contact_BallPos.Z = dt.inMemPitcher.pitchRelease.Z;
 
       return dt;
 }
