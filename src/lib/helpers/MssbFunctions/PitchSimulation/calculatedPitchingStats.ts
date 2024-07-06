@@ -34,7 +34,7 @@ export function calcuatedPitchingStats(dt) { // based off of 806b1d3c
                            time.  */
             fastBallSpeed = dt.inMemPitcher.fastBallSpeed;
             curveBallSpeed = dt.inMemPitcher.curveBallSpeed;
-            dt.inMemPitcher.calced_pitchSpeed = dt.inMemPitcher.fastBallSpeed - 0.85 * (fastBallSpeed - curveBallSpeed) * (1 - dt.inMemPitcher.pitchChargeUp);
+            dt.inMemPitcher.calced_pitchSpeed = dt.inMemPitcher.fastBallSpeed - Math.floor(0.85 * (fastBallSpeed - curveBallSpeed) * (1 - dt.inMemPitcher.pitchChargeUp));
           }
         }
                         /* If not captain star pitch and (charge pitch or change up or fastball star
@@ -56,7 +56,7 @@ export function calcuatedPitchingStats(dt) { // based off of 806b1d3c
           }
           else {
                         /* Else if tired charge pitch, reduce pitch speed to 80% of normal */
-            dt.inMemPitcher.calced_pitchSpeed = (dt.inMemPitcher.calced_pitchSpeed * -(0.01 * 20 - 1));
+            dt.inMemPitcher.calced_pitchSpeed = Math.floor(dt.inMemPitcher.calced_pitchSpeed * -(0.01 * 20 - 1));
           }
                         /* If tired, reduce curve control and cursed ball by 99% */
           curveControl = (curveControl * -(0.01 * 100 - 1));
