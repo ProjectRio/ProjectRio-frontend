@@ -13,23 +13,39 @@ import { calcuatedPitchingStats } from "./calculatedPitchingStats";
 import { pitchInAirFunction } from "./pitchInAirFunction";
 import { defaultPitchingData } from "./pitchingConstants";
 
-export function generatePitchCoordinates() {
-      let pitchData = defaultPitchingData;
+export function generatePitchCoordinates(
+      {
+            chargeUp = 0,
+            curveInput = [0],
+            pitchType = 0, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
+            pitcher_id = 0,
+            pitcherStarsOn = false,
+            pitcherHandedness = 0,
+            pitcherXOnMound = 0,
+            pitchStartingX = -0.358750939,
+            pitchStartingY = 2.9281559,
+            pitchStartingZ = 17.6997108,
+            pitcherStamina = 10,
+            batter_id = 21,
+            batZ = 1.7
+      } = {}
+) {   
+      let pitchData = JSON.parse(JSON.stringify(defaultPitchingData));
 
-      const pitchInputs = {
-            'chargeUp': 0.44,
-            'curveInput': [0,0],//[0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'pitchType': 1, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
-            'pitcher_id': 0,
-            'pitcherStarsOn': false,
-            'pitcherHandedness': 0,
-            'pitcherXOnMound': 0,
-            'pitchStartingX': -0.370488256,//-0.358750939,
-            'pitchStartingY': 2.83268118,//2.9281559,
-            'pitchStartingZ': 17.872982,//17.6997108,
-            'pitcherStamina': 10,
-            'batter_id': 21,
-            'batZ': 1.7
+      const pitchInputs = { // combine input parameters into a single object
+            'chargeUp': chargeUp,
+            'curveInput': curveInput,
+            'pitchType': pitchType, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
+            'pitcher_id': pitcher_id,
+            'pitcherStarsOn': pitcherStarsOn,
+            'pitcherHandedness': pitcherHandedness,
+            'pitcherXOnMound': pitcherXOnMound,
+            'pitchStartingX': pitchStartingX,
+            'pitchStartingY': pitchStartingY,
+            'pitchStartingZ': pitchStartingZ,
+            'pitcherStamina': pitcherStamina,
+            'batter_id': batter_id,
+            'batZ': batZ
       }
 
       pitchData = initializeValues(pitchInputs, pitchData);
