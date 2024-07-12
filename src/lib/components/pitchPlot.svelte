@@ -16,12 +16,15 @@
             'batter_id': 21,
             'batZ': 1.7
       };
-      export let canvasHeight:number = 1000;
-      export let canvasWidth:number = 600;
-
+      export let canvasHeight:number = 750;
+      //export let canvasWidth:number = ; 
+      $: canvasWidth = canvasHeight / 3; // ratio of home to the mound, and 4m accross
+      $: circleRadius = canvasHeight / 250;
+      $: fontSize = Math.floor(canvasHeight/75)
 
       import * as d3 from 'd3'
       import { onMount } from "svelte";
+	import { fade } from 'svelte/transition';
 
       const ftToM = 0.3048;
       const gameHomePlateScale = (0.53*2)/16.5 // conversion between an actual homeplate front measurement (16.5 inches) to what the game uses (0.53*2 meters)
@@ -57,7 +60,7 @@
                               .range([0,canvasWidth]);
 
       $: heightScale2 = d3.scaleLinear()
-                              .domain([19, -3])  
+                              .domain([19.5, -3])  
                               .range([0,canvasHeight]); 
 
       
@@ -98,7 +101,7 @@
                   />
             {/each}
       </g>
-      <g class='pitchPath'>
+      <g class='pitchPath'  >
             {#each pitchData.calcedOutputs as point}
                   <path
                         d={pitchPathLine(pitchData.calcedOutputs)}
@@ -117,6 +120,7 @@
                               y={heightScale2(pitch_Frame.calculatedAtBatBallPosPoints.Z)} 
                               fill= 'red'
                               fill-opacity={(circleHovered && circleHovered == index) ? 1 : 0}
+                              font-size={fontSize}
                         >
                               <tspan 
                                     x={widthScale2(pitch_Frame.calculatedAtBatBallPosPoints.X + .1)} 
@@ -136,13 +140,19 @@
                               >
                               Frame {pitch_Frame.pitchFrame}
                               </tspan> 
+                              <tspan 
+                                    x={widthScale2(pitch_Frame.calculatedAtBatBallPosPoints.X + .1)} 
+                                    dy=1.3em
+                              >
+                              Curve Input {pitch_Frame.curveInput}
+                              </tspan> 
                         </text>
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
                         <!-- svelte-ignore a11y-mouse-events-have-key-events -->
                         <circle 
                               cx={widthScale2(pitch_Frame.calculatedAtBatBallPosPoints.X)} 
                               cy={heightScale2(pitch_Frame.calculatedAtBatBallPosPoints.Z)} 
-                              r="4" 
+                              r={circleRadius} 
                               on:mouseover={() => circleHovered = index}
                               on:mouseout={() => circleHovered = null}
                               fill={(circleHovered && circleHovered == index) ? 'green' : 'red'}
@@ -155,5 +165,9 @@
 <style>
       :hover {
             color: green
+      }
+
+      circle {
+            transition: 1s;
       }
 </style>
