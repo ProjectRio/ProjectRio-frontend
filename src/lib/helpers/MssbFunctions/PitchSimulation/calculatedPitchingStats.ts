@@ -16,7 +16,7 @@ export function calcuatedPitchingStats(dt) { // based off of 806b1d3c
       if (dt.inMemPitcher.captainStarPitchThrown == 0) {
                         /* If perfect pitch or fastball star pitch. */
         if ((dt.inMemPitcher.ChargePitchType == 3) || (dt.inMemPitcher.nonCapStarPitchThrown == 2)) {
-          dt.inMemPitcher.calced_pitchSpeed = dt.inMemPitcher.fastBallSpeed  * 1.05;
+          dt.inMemPitcher.calced_pitchSpeed = Math.floor(dt.inMemPitcher.fastBallSpeed  * 1.05);
         }
         else {
                         /* else if this isn't a charge pitch, then set speed to curveball speed. */
@@ -63,9 +63,9 @@ export function calcuatedPitchingStats(dt) { // based off of 806b1d3c
           cursedBall = (cursedBall * -(0.01 * 100 -1));
         }
         
-        dt.inMemPitcher.calced_cursedBall = cursedBall;
-        dt.inMemPitcher.calced_curveControl = curveControl;
-        dt.inMemPitcher.calced_curve = curve;
+        dt.inMemPitcher.calced_cursedBall = Math.floor(cursedBall);
+        dt.inMemPitcher.calced_curveControl = Math.floor(curveControl);
+        dt.inMemPitcher.calced_curve = Math.floor(curve);
       }
       else {
                         /* else if captain star pitch */
