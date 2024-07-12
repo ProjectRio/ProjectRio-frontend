@@ -87,7 +87,8 @@ export function generatePitchCoordinates(
                               Y: pitchData.inMemBall.AtBat_Contact_BallPos.Y, 
                               Z: pitchData.inMemBall.AtBat_Contact_BallPos.Z
                         },
-                        pitchFrame: pitchData.pitchHangtimeCounter
+                        pitchFrame: pitchData.pitchHangtimeCounter,
+                        curveInput: pitchData.curveInput_current
                         
                   }
             )
