@@ -25,9 +25,9 @@
                 pitchStartingZ = c.pitchBaseReleaseCoordinates[c.charIDNoDupMapping[inputPitcher_id]].curve.Z
             }
 
-            pitchStartingX = pitchStartingX + inputPitcherXOnMound;
-
             if (inputPitcherHandedness == 1) {pitchStartingX = -pitchStartingX}
+            
+            pitchStartingX = pitchStartingX + inputPitcherXOnMound;
         }
 
         // temporary way to handle pitch curve input. Once stat files are up and running, will think of a better way.
