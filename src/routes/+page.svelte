@@ -38,6 +38,7 @@
 		</ul>
 		<ul class="list-nav flex">
 			<li><button class="btn variant-filled-primary m-2"><a href="/streaming/scoreboard">Scoreboards</a></button></li>
+			<li><button class="btn variant-filled-primary m-2"><a href="/visualizations/pitchCalculator">Pitch Visualizer</a></button></li>
 		</ul>
 	</div>
 </div>
