@@ -7,6 +7,8 @@
         let inputPitcherHandedness: number = 0;
         let inputPitchType: number = 0;
         let inputPitchCharge: number = 0;
+        let inputPitchCurve: number = 2; // for now, going to do 1=left, 2=straight, 3=right
+        let inputPitcherStamina: number = 10;
 
         // These are estimates of the translation of the base release point - we should use the stat files for the real values once avaialble
         let pitchStartingX:number = -0.358750939;
@@ -23,56 +25,115 @@
                 pitchStartingZ = c.pitchBaseReleaseCoordinates[c.charIDNoDupMapping[inputPitcher_id]].curve.Z
             }
 
+            pitchStartingX = pitchStartingX + inputPitcherXOnMound;
+
             if (inputPitcherHandedness == 1) {pitchStartingX = -pitchStartingX}
         }
 
+        // temporary way to handle pitch curve input. Once stat files are up and running, will think of a better way.
+        let pitchCurveArray:number[] = [0];
+        $: {
+            pitchCurveArray.length = 0;
+            Array.from(String(inputPitchCurve), Number).forEach((value) =>{
+                let convertedValue;
+                if (value == 1) {convertedValue = -1}
+                else if (value == 2) {convertedValue = 0}
+                else if (value == 3) {convertedValue = 1}
+                else {convertedValue = 0}
+
+                pitchCurveArray.push(convertedValue)
+            })
+        }
+
         $: pitchInputs = {
-            'chargeUp': inputPitchCharge,
-            'curveInput': [0,0],//[0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            'chargeUp': inputPitchCharge, // 80890AA0 float
+            'curveInput': pitchCurveArray,//[0,0],//[0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'pitchType': inputPitchType, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
             'pitcher_id': inputPitcher_id,
             'pitcherStarsOn': false,
             'pitcherHandedness': inputPitcherHandedness,
-            'pitcherXOnMound': inputPitcherXOnMound,
-            'pitchStartingX': pitchStartingX,
-            'pitchStartingY': pitchStartingY,
-            'pitchStartingZ': pitchStartingZ,
-            'pitcherStamina': 10,
+            'pitcherXOnMound': inputPitcherXOnMound, //808909E4 float
+            'pitchStartingX': pitchStartingX, // 80890A54 float
+            'pitchStartingY': pitchStartingY, // 80890A58 float
+            'pitchStartingZ': pitchStartingZ,// 80890A5C float
+            'pitcherStamina': inputPitcherStamina, 
             'batter_id': 21,
             'batZ': 1.7
       }
-       
+
+      let plotHeight:number = 750;
+      let plotWitdh:number = plotHeight / 4.5;       
 </script>
+<div id='container'>
+    <div id="plotContainer">
+        <PitchPlot {pitchInputs} canvasHeight={plotHeight}/>
+    </div>
+    <div id="inputContainer">
+            <input 
+                bind:value={inputPitcherXOnMound} 
+                type="number"
+                step="0.01"
+                min="-0.4"
+                max="0.4"
+            /> 
+            <label for="inputPitcherXOnMound">Target X Coordinate</label><br>
+        
+        <select bind:value={inputPitcher_id}>
+            {#each Object.keys(c.charIDMapping).map((key) => [key, c.charIDMapping[key]]) as character, index}
+                <option value={character[0]} selected>{character[1]}</option>
+            {/each}
+        </select>
+        <label for="inputPitcher_id">Pitcher Character</label><br>
 
-<input bind:value={inputPitcherXOnMound} />
+        <select bind:value={inputPitcherHandedness}>
+            <option value=0 selected>Righty</option>
+            <option value=1 selected>Lefty</option>
+        </select>
+        <label for="inputPitcherHandedness">Pitcher Handedness</label><br>
 
-<select bind:value={inputPitcher_id}>
-    {#each Object.keys(c.charIDMapping).map((key) => [key, c.charIDMapping[key]]) as character, index}
-        <option value={character[0]} selected>{character[1]}</option>
-    {/each}
-</select>
+        <select bind:value={inputPitchType}>
+            <option value=0 selected>Curve</option>
+            <option value=1 selected>Charge</option>
+            <option value=2 selected>Perfect Charge</option>
+            <option value=3 selected>Change Up</option>
+            <option value=4 selected>Star</option>
+        </select> 
+        <label for="inputPitchType">Pitch Type</label><br>
 
-<select bind:value={inputPitcherHandedness}>
-    <option value=0 selected>Righty</option>
-    <option value=1 selected>Lefty</option>
-</select>
+        <input 
+            bind:value={inputPitchCharge} 
+            type="number"
+            step="0.01"
+            min="0"
+            max="1"
+        />
+        <label for="inputPitchCharge">Pitch Charge</label><br>
 
-<select bind:value={inputPitchType}>
-    <option value=0 selected>Curve</option>
-    <option value=1 selected>Charge</option>
-    <option value=2 selected>Perfect Charge</option>
-    <option value=3 selected>Change Up</option>
-    <option value=4 selected>Star</option>
-</select>
+        <input bind:value={inputPitchCurve} />
+        <label for="inputPitchCurve">Pitch Curve (1=left, 2=straight, 3=right)</label><br>
 
-<input bind:value={inputPitchCharge} />
-
-<PitchPlot {pitchInputs} canvasWidth={500}/>
+        <input 
+            bind:value={inputPitcherStamina} 
+            type="number"
+            step="1"
+            min="1"
+            max="10"
+        />
+        <label for="inputPitcherStamina">Pitcher Stamina</label><br>
+    </div>
+</div>
 <style>
     input {
         color: black;
     } 
+
     select {
         color: black;
     } 
+
+    #container {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-gap: 20px;
+    }
 </style>
