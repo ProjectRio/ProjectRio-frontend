@@ -71,6 +71,8 @@ export function pitchCurve(dt) {
           dt.inMemPitcher.anyCurveInput? = 1;
         }*/
       }
+
+      dt.curveInput_current = leftOrRight; //used to track left or right input for UI display later.
       
       return dt;
     }

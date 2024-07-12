@@ -128,6 +128,7 @@ export const defaultPitchingData = {
       },
 
       'curveInput': [],
+      'curveInput_current': 0,
 
       'pitchHangtimeCounter': 0,
       'StaticRandomInt1': 0,
