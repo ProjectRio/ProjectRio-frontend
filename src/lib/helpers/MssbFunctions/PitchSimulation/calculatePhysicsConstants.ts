@@ -16,13 +16,13 @@ export function calculatePhysicsConstants(dt) { //806b17fc
       dt.inMemPitcher.moundZ = 18.44;
       dt.inMemPitcher.pitchZ_whenAirResistanceStarts = (18.44 * (100 - c.pitchConstantsArray[pitchSubType][4])) / 100;
       dt.inMemPitcher.ballVelocity.X =
-           -(((dt.inMemPitcher.pitchStartingXOnMound - dt.inMemPitcher.ballCurrentPosition.X) *
+           -(((dt.inMemPitcher.pitchTarget.X - dt.inMemPitcher.ballCurrentPosition.X) *
              dt.inMemPitcher.ballVelocity.Z) /
-            (dt.inMemPitcher.ballCurrentPosition.Z - dt.inMemPitcher.frontOfPlateZ));
+            (dt.inMemPitcher.ballCurrentPosition.Z - dt.inMemPitcher.pitchTarget.Z));
       dt.inMemPitcher.ballVelocity.Y =
-           -(((dt.inMemPitcher.eggBallBounceYHeight - dt.inMemPitcher.ballCurrentPosition.Y) *
+           -(((dt.inMemPitcher.pitchTarget.Y - dt.inMemPitcher.ballCurrentPosition.Y) *
              dt.inMemPitcher.ballVelocity.Z) /
-            (dt.inMemPitcher.ballCurrentPosition.Z - dt.inMemPitcher.frontOfPlateZ));
+            (dt.inMemPitcher.ballCurrentPosition.Z - dt.inMemPitcher.pitchTarget.Z));
       dt.inMemPitcher.airResistance_veloAdj = 0.001 * c.pitchConstantsArray[pitchSubType][3];
       let ballZ = dt.inMemPitcher.ballCurrentPosition.Z;
       let pitchVelo = dt.inMemPitcher.ballVelocity.Z;
@@ -45,7 +45,7 @@ export function calculatePhysicsConstants(dt) { //806b17fc
         pitchVelo = pitchVelo * dt.inMemPitcher.decelerationFactor;
         ballZ = ballZ + pitchVelo;
         currentFrameCount = frameCounter;
-        if (ballZ <= dt.inMemPitcher.frontOfPlateZ) break;
+        if (ballZ <= dt.inMemPitcher.pitchTarget.Z) break;
         frameCounter = frameCounter + 1;
         loopCounter = loopCounter + -1;
         currentFrameCount = dt.inMemPitcher.frameWhenUnhittable;

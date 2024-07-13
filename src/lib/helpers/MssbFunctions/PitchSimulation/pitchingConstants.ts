@@ -9,7 +9,6 @@ export const defaultPitchingData = {
             'calced_curveControl': -1,
             'calced_pitchSpeed': -1,
             'pitchZ_whenAirResistanceStarts': -1,
-            'eggBallBounceYHeight': 0.7,
             'pitchZ_whenPitchSpecificResistanceStarts': -1,
             'pitchSpecific_VeloAdj': -1,
             'verticalGlobalParabolicVelo': -1,
@@ -93,15 +92,18 @@ export const defaultPitchingData = {
                   'Y': 0,
                   'Z': 0
             },
+            'pitchTarget': {
+                  'X': 0.5 * (-0.53 + 0.53),
+                  'Y': 0.7,
+                  'Z': 0.5 * (1.05 + 0.5)
+            },
             'pitchEstimatedEndX_withoutCurve': 0,
             'pitchEstimatedEndingX_withCurve': 0,
 
             //export constants
-            'frontOfPlateZ': 0.5 * (1.05 + 0.5),
             'horizontalCenterOfStrikeZone': 0.5 * (-0.53 + 0.53),
             'moundZ': 18.44,
             'pitchSpeedScaler': 240,
-            'pitchStartingXOnMound': 0.5 * (-0.53 + 0.53),
             'verticalCenterOfStrikeZone': 0.5 * (1.05 + 0.5),
             'decelerationFactor': 0.998,
             'strikeZoneLeft': -0.53,
