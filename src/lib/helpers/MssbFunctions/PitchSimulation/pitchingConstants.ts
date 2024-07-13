@@ -132,6 +132,31 @@ export const defaultPitchingData = {
       'curveInput': [],
       'curveInput_current': 0,
 
+      // AI related
+      'pitcherAIPitchDownTheMiddleInd': 0,
+      'aIMoundLocationIndex': 2,
+      'aIMoundLocationX': 2,
+      'aIPitchDesiredEndingLocIndex': 0, // get input from last pitch
+      'aIPitchType': -1,
+      'pitchingTeamStars': 5, // take this as an input
+      'GameControls_Inning': 1, //need input
+      'GameControls_InningsSelected': 9, // need input
+      'maxNumberOfExtraInnings':  8, // need to derive this based on selected innings
+      'GameControls_bottomOfInningInd': 0, // need inpit
+      'pitcherOnHomeTeam': 1, // need derive this based on bottom of inning ind
+      'GameScores': [0, 0], // need input
+      'GameControls_Outs': 0, // need input
+      'GameControls_Strikes': 0, // need input
+      'aIDifficultyInverse0Weak': 0, // need input
+      'nStarPitchesThrownThisAB': 0, // need input
+      'aIPerfectCharge': 0,
+      'aiPitchCurveType': 0,
+      'aiPitchCurveEndingX': 0,
+      'pitchAIDelayCurveStart': 0,
+      'runnerTracking': {
+            'baseRunnerStartingPos': 1 // need input
+      },
+
       'pitchHangtimeCounter': 0,
       'StaticRandomInt1': 0,
       'StaticRandomInt2': 0,
@@ -151,6 +176,11 @@ export const stats = [{ "Curve Ball Speed": 130, "Fast Ball Speed": 168, "Cursed
 export const pitchType_Curve = 0;
 export const pitchType_Charge = 1;
 export const pitchType_ChangeUp = 2;
+
+export const aiPitchType_Curve = 0;
+export const aiPitchType_Charge = 0;
+export const aiPitchType_Star = 0;
+export const aiPitchType_Changeup = 0;
 
 export const pitchSubType_CurveCharge = 1;
 export const pitchSubType_ChangeUp = 3;
@@ -365,4 +395,49 @@ export const pitchBaseReleaseCoordinates = [
       {'curve': {'X': -0.294719875, 'Y': 1.01028323, 'Z': 17.451561}, 'charge': {'X': -0.729693174, 'Y': 0.665731907, 'Z': 18.527298}},// 29
       {'curve': {'X': -0.795248866, 'Y': 2.18529749, 'Z': 18.4609985}, 'charge': {'X': -0.7055155504, 'Y': 3.25615358, 'Z': 18.637495}},
       {'curve': {'X': -0.137758076, 'Y': 2.01307893, 'Z': 18.0202503}, 'charge': {'X': -0.30223608, 'Y': 2.3172307, 'Z': 18.1311436}}
+]
+
+export const aIMoundLocationProbabilities = [
+      [15, 20, 30, 20, 15, 10],
+      [30, 0, 40, 0, 30, 20],
+      [20, 20, 20, 20, 20, 2],
+      [25, 20, 10, 20, 25, 8]
+]
+
+export const starLikelihoodArray = [
+      [0, 10, 20, 40],
+      [0, 15, 20, 25],
+      [0, 15, 25, 25],
+      [0, 20, 30, 35],
+      [0, 25, 35, 40]
+]
+
+export const chargePitchProb = [
+      [10, 35, 50, 60],
+      [15, 40, 60, 70],
+      [10, 30, 45, 55],
+      [5, 20, 40, 50]
+]
+
+export const perfectPitchProb = [
+      [5, 10, 15, 30],
+      [10, 15, 20, 50],
+      [15, 20, 40, 60]
+]
+
+export const changeUpProb = [
+      [0, 5, 10, 15],
+      [0, 5, 5, 15],
+      [0, 5, 10, 10],
+      [0, 10, 20, 40]
+]
+
+export const aiPitchWeakCurveProbabilities = [36, 25, 10, 5]
+
+export const aIPitchCurveEndingXConstants = [-0.65, -0.5, -0.25, 0.0, 0.25, 0.5, 0.65]
+export const pitchAIDelayPitchStartProbabilities = [
+      [50, 60, 70, 70],
+      [30, 30, 35, 40],
+      [50, 50, 55, 60],
+      [60, 70, 80, 90]
 ]

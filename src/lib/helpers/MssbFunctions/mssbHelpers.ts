@@ -108,3 +108,50 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
   let local_28 = uVar1;
   return [(0.001 * (local_28) + param_1), StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
 }
+
+// @ts-ignore
+export function WeightedRandomIndex(vals, count, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) {
+  let randomSum = 0;
+
+  let loopSum = 0;
+
+  let randomRange
+
+  vals.forEach((element: number) => {
+      loopSum += element;
+  });
+
+  let finSum = loopSum;
+
+  if (loopSum < 0) {
+      finSum = -loopSum;
+  }
+
+  if (finSum < 2) {
+      randomSum = 0;
+  }
+  else {
+      // update RandomInt in case it's called successive times
+      StaticRandomInt1 = (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) + Math.floor(StaticRandomInt2 / finSum) + TotalframesAtPlay;
+      randomRange = StaticRandomInt1 - Math.floor(StaticRandomInt1 / finSum) * finSum;
+      randomSum = (randomRange >> 0x1f ^ randomRange) - (randomRange >> 0x1f);
+      if (loopSum < 0) {
+          randomSum = -randomSum;
+      }
+  }
+  let p_loopArray = vals;
+  let newIndex = 0;
+  let i = 0;
+  if (0 < count) {
+      do {
+          if (randomSum < p_loopArray[i]) {
+              return [newIndex, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
+          }
+          randomSum -= p_loopArray[i];
+          newIndex += 1;
+          count += -1;
+          i++;
+      } while (count != 0);
+  }
+  return [0, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
+}
