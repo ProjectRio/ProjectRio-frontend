@@ -13,6 +13,21 @@ export function initializeValues(pInputs, dt) {
       dt.StaticRandomInt2 = Math.floor(Math.random() * 5000)
       dt.TotalframesAtPlay = Math.floor(Math.random() * 500)
 
+      // Set pitcher stats
+      dt.inMemPitcher.cursedBallStat = c.stats[dt.inMemPitcher.charID]['Cursed Ball'];
+      dt.inMemPitcher.curveControlStat = c.stats[dt.inMemPitcher.charID]["Curve Control"];
+      dt.inMemPitcher.curveStat = c.stats[dt.inMemPitcher.charID]["Curve"];
+      dt.inMemPitcher.fastBallSpeed = c.stats[dt.inMemPitcher.charID]["Fast Ball Speed"];
+      dt.inMemPitcher.curveBallSpeed = c.stats[dt.inMemPitcher.charID]["Curve Ball Speed"];
+
+      if (pInputs.pitcherStarsOn) {
+            dt.inMemPitcher.cursedBallStat = Math.min(dt.inMemPitcher.cursedBallStat + 50, 100)
+            dt.inMemPitcher.curveControlStat = dt.inMemPitcher.curveControlStat + 50 // no max for this stat
+            dt.inMemPitcher.curveStat = Math.min(dt.inMemPitcher.curveStat + 50, 100)
+            dt.inMemPitcher.fastBallSpeed = Math.min(dt.inMemPitcher.fastBallSpeed + 20, 200)
+            dt.inMemPitcher.curveBallSpeed = Math.min(dt.inMemPitcher.curveBallSpeed + 20, 200)
+      }
+
       // Set pitch type variables
       dt.inMemPitcher.captainStarPitchThrown = 0;
       dt.inMemPitcher.nonCapStarPitchThrown = 0;
