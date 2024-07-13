@@ -4,6 +4,7 @@
 
         let inputPitcherXOnMound: number = 0;
         let inputPitcher_id: number = 0;
+        let inputPitcherSuperstar: boolean = false;
         let inputPitcherHandedness: number = 0;
         let inputPitchType: number = 0;
         let inputPitchCharge: number = 0;
@@ -50,7 +51,7 @@
             'curveInput': pitchCurveArray,//[0,0],//[0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'pitchType': inputPitchType, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
             'pitcher_id': inputPitcher_id,
-            'pitcherStarsOn': false,
+            'pitcherStarsOn': inputPitcherSuperstar,
             'pitcherHandedness': inputPitcherHandedness,
             'pitcherXOnMound': inputPitcherXOnMound, //808909E4 float
             'pitchStartingX': pitchStartingX, // 80890A54 float
@@ -69,6 +70,7 @@
         <PitchPlot {pitchInputs} canvasHeight={plotHeight}/>
     </div>
     <div id="inputContainer">
+        <label for="inputPitcherXOnMound">
             <input 
                 bind:value={inputPitcherXOnMound} 
                 type="number"
@@ -76,50 +78,68 @@
                 min="-0.4"
                 max="0.4"
             /> 
-            <label for="inputPitcherXOnMound">Target X Coordinate</label><br>
+            Target X Coordinate
+        </label><br>
         
-        <select bind:value={inputPitcher_id}>
-            {#each Object.keys(c.charIDMapping).map((key) => [key, c.charIDMapping[key]]) as character, index}
-                <option value={character[0]} selected>{character[1]}</option>
-            {/each}
-        </select>
-        <label for="inputPitcher_id">Pitcher Character</label><br>
+        <label for="inputPitcher_id">
+            <select bind:value={inputPitcher_id}>
+                {#each Object.keys(c.charIDMapping).map((key) => [key, c.charIDMapping[key]]) as character, index}
+                    <option value={character[0]} selected>{character[1]}</option>
+                {/each}
+            </select>
+            Pitcher Character
+        </label>
 
-        <select bind:value={inputPitcherHandedness}>
-            <option value=0 selected>Righty</option>
-            <option value=1 selected>Lefty</option>
-        </select>
-        <label for="inputPitcherHandedness">Pitcher Handedness</label><br>
+        <label for="inputPitcherSuperstar">
+            <input type="checkbox" bind:checked={inputPitcherSuperstar}>
+            Pitcher Superstar
+        </label><br>
 
-        <select bind:value={inputPitchType}>
-            <option value=0 selected>Curve</option>
-            <option value=1 selected>Charge</option>
-            <option value=2 selected>Perfect Charge</option>
-            <option value=3 selected>Change Up</option>
-            <option value=4 selected>Star</option>
-        </select> 
-        <label for="inputPitchType">Pitch Type</label><br>
+        <label for="inputPitcherHandedness">
+            <select bind:value={inputPitcherHandedness}>
+                <option value=0 selected>Righty</option>
+                <option value=1 selected>Lefty</option>
+            </select>
+            Pitcher Handedness
+        </label><br>
 
-        <input 
-            bind:value={inputPitchCharge} 
-            type="number"
-            step="0.01"
-            min="0"
-            max="1"
-        />
-        <label for="inputPitchCharge">Pitch Charge</label><br>
+        <label for="inputPitchType">
+            <select bind:value={inputPitchType}>
+                <option value=0 selected>Curve</option>
+                <option value=1 selected>Charge</option>
+                <option value=2 selected>Perfect Charge</option>
+                <option value=3 selected>Change Up</option>
+                <option value=4 selected>Star</option>
+            </select> 
+            Pitch Type
+        </label><br>
 
-        <input bind:value={inputPitchCurve} />
-        <label for="inputPitchCurve">Pitch Curve (1=left, 2=straight, 3=right)</label><br>
+        <label for="inputPitchCharge">
+            <input 
+                bind:value={inputPitchCharge} 
+                type="number"
+                step="0.01"
+                min="0"
+                max="1"
+            />
+            Pitch Charge
+        </label><br>
 
-        <input 
-            bind:value={inputPitcherStamina} 
-            type="number"
-            step="1"
-            min="1"
-            max="10"
-        />
-        <label for="inputPitcherStamina">Pitcher Stamina</label><br>
+        <label for="inputPitchCurve">
+            <input bind:value={inputPitchCurve} />
+            Pitch Curve Sequence (1=left, 2=straight, 3=right)
+        </label><br>
+
+        <label for="inputPitcherStamina">
+            <input 
+                bind:value={inputPitcherStamina} 
+                type="number"
+                step="1"
+                min="1"
+                max="10"
+            />
+            Pitcher Stamina
+        </label><br>
     </div>
 </div>
 <style>
