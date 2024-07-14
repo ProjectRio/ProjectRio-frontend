@@ -1,4 +1,5 @@
 import { randomInRange } from "../mssbHelpers";
+import { ai_prePitch } from "./ai_prePitch";
 import * as c from "./pitchingConstants";
 
 // @ts-ignore
@@ -7,7 +8,8 @@ export function initializeValues(pInputs, dt) {
       dt.inMemPitcher.charID = pInputs["pitcher_id"]
       dt.inMemPitcher.handedness = pInputs.pitcherHandedness;
       dt.inMemPitcher.charClass = c.stats[dt.inMemPitcher.charID]["Character Class"];
-      dt.inMemPitcher.AIInd = 0;
+      dt.inMemPitcher.AIInd = 1;
+      dt.inMemPitcher.aILevel = 1;
       dt.curveInput = pInputs.curveInput;
       dt.StaticRandomInt1 = Math.floor(Math.random() * 5000)
       dt.StaticRandomInt2 = Math.floor(Math.random() * 5000)
@@ -28,29 +30,37 @@ export function initializeValues(pInputs, dt) {
             dt.inMemPitcher.curveBallSpeed = Math.min(dt.inMemPitcher.curveBallSpeed + 20, 200)
       }
 
+      // AI Initialize values
+      ai_prePitch(dt);
+
       // Set pitch type variables
       dt.inMemPitcher.captainStarPitchThrown = 0;
       dt.inMemPitcher.nonCapStarPitchThrown = 0;
       dt.inMemPitcher.ChargePitchType = 0;
-      if (pInputs.pitchType == 0) { //curve
+      if ((dt.inMemPitcher.AIInd == 0 && pInputs.pitchType == 0) ||
+            (dt.inMemPitcher.AIInd == 1 && dt.aIPitchType == c.aiPitchType_Curve)) { //curve
         dt.inMemPitcher.pitchType = c.pitchType_Curve;
         dt.inMemPitcher.pitchSubType = c.pitchSubType_CurveCharge;
     
-      } else if (pInputs.pitchType == 1) { //charge
+      } else if ((dt.inMemPitcher.AIInd == 0 && pInputs.pitchType == 1) ||
+                  (dt.inMemPitcher.AIInd == 1 && dt.aIPitchType == c.aiPitchType_Charge && dt.aIPerfectCharge == 0)) { //charge
         dt.inMemPitcher.pitchType = c.pitchType_Charge;
         dt.inMemPitcher.pitchSubType = c.pitchSubType_CurveCharge;  
         dt.inMemPitcher.ChargePitchType = 2; 
     
-      } else if (pInputs.pitchType == 2) { // perfect charge
+      } else if ((dt.inMemPitcher.AIInd == 0 && pInputs.pitchType == 2) ||
+                  (dt.inMemPitcher.AIInd == 1 && dt.aIPitchType == c.aiPitchType_Charge && dt.aIPerfectCharge == 1)){ // perfect charge
         dt.inMemPitcher.pitchType = c.pitchType_Charge;
         dt.inMemPitcher.pitchSubType = c.pitchSubType_CurveCharge;   
         dt.inMemPitcher.ChargePitchType = 3; 
     
-      } else if (pInputs.pitchType == 3) { // change up
+      } else if ((dt.inMemPitcher.AIInd == 0 && pInputs.pitchType == 3) ||
+                  (dt.inMemPitcher.AIInd == 1 && dt.aIPitchType == c.aiPitchType_Changeup)) { // change up
         dt.inMemPitcher.pitchType = c.pitchType_ChangeUp;
         dt.inMemPitcher.pitchSubType = c.pitchSubType_ChangeUp;  
     
-      } else if (pInputs.pitchType == 4) { // star
+      } else if ((dt.inMemPitcher.AIInd == 0 && pInputs.pitchType == 4) ||
+                  (dt.inMemPitcher.AIInd == 1 && dt.aIPitchType == c.aiPitchType_Star)) { // star
         if (c.stats[dt.inMemPitcher.charID]["Can Be Captain"] == 1) {
           dt.inMemPitcher.captainStarPitchThrown = c.stats[dt.inMemPitcher.charID]["Captain Star Hit/Pitch"];
           dt.inMemPitcher.pitchSubType = dt.inMemPitcher.captainStarPitchThrown + 3;
@@ -75,15 +85,15 @@ export function initializeValues(pInputs, dt) {
       }
       else if ((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) ||
                   (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) {
-            let dVar2 
-            [dVar2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-1, 1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            let dVar2;
+            [dVar2, dt] = randomInRange(-1, 1, dt);
             dt.inMemPitcher.pitchTarget.X = dVar2;
             dt.inMemPitcher.pitchTarget.Y = 0.35;
-            [dVar2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(7, 9, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [dVar2, dt] = randomInRange(7, 9, dt);
             
             dt.inMemPitcher.pitchTarget.Z = dVar2;
       }
-      dt.inMemPitcher.pitchChargeUp = pInputs.chargeUp;
+      dt.inMemPitcher.pitchChargeUp = (dt.AIInd == 0) ? pInputs.chargeUp : 1;
     
       dt.inMemPitcher.Stamina = ((isNaN(pInputs.pitcherStamina)) ? 10 : pInputs.pitcherStamina);
 
