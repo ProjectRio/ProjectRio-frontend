@@ -2,7 +2,7 @@ import { RandomInt_Game } from "../mssbHelpers";
 import * as c from "./pitchingConstants";
 
 // @ts-ignore
-export function pitcherAISelectPitch(dt) { // 80660334
+export function ai_selectPitch(dt) { // 80660334
   let diceRoll;
   let StarProb;
   let pitchProb;
@@ -45,8 +45,8 @@ export function pitcherAISelectPitch(dt) { // 80660334
                   }
                   else {
                         StarProb = StarProb + 236;
-                  }
-                  diceRoll = RandomInt_Game(100, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+                  };
+                  [diceRoll, dt] = RandomInt_Game(100, dt);
                   if (diceRoll < StarProb) {
                   //dt.inMemPitcher.starPitchSelectedOnController = 1;
                   dt.aIPitchType = c.aiPitchType_Star;
@@ -62,18 +62,18 @@ export function pitcherAISelectPitch(dt) { // 80660334
       }
       else {
             pitchProb = c.chargePitchProb[dt.inMemPitcher.charClass][dt.aIDifficultyInverse0Weak];
-      }
-      diceRoll = RandomInt_Game(100, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+      };
+      [diceRoll, dt] = RandomInt_Game(100, dt);
       if (diceRoll < pitchProb) {
             dt.aIPitchType = c.aiPitchType_Charge;
-            diceRoll = RandomInt_Game(100, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [diceRoll, dt] = RandomInt_Game(100, dt);
             if (diceRoll < c.changeUpProb[dt.inMemPitcher.charClass][dt.aIDifficultyInverse0Weak]) {
                   dt.aIPitchType = c.aiPitchType_Changeup;
                   dt.inMemPitcher.pitchType = c.pitchType_ChangeUp;
             }
             else {
                   pitchProb = c.perfectPitchProb[dt.GameControls_Strikes][dt.aIDifficultyInverse0Weak];
-                  diceRoll = RandomInt_Game(100, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+                  [diceRoll, dt] = RandomInt_Game(100, dt);
                   if (diceRoll < pitchProb) {
                         dt.aIPerfectCharge = 1;
                   }
