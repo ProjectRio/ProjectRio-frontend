@@ -1,4 +1,5 @@
 import { LinearInterpolateToNewRange } from "../mssbHelpers";
+import { aiPitchCurveDirection } from "./ai_pitchCurveDirection";
 import * as c from "./pitchingConstants";
 
 // @ts-ignore
@@ -10,12 +11,14 @@ export function pitchCurve(dt) {
                            there are indicators set that cancel the curve calculation. */
       dt.inMemPitcher.pitchCurveVelo = 0;
       dt.inMemPitcher.unknown_alwaysSetTo0 = 0;
-
       let leftOrRight:number = 0;
-      if (dt.pitchHangtimeCounter < (dt.curveInput).length) {
-        leftOrRight = dt.curveInput[dt.pitchHangtimeCounter];
-      } 
-
+      if (dt.inMemPitcher.AIInd == 0) {
+        if (dt.pitchHangtimeCounter < (dt.curveInput).length) {
+          leftOrRight = dt.curveInput[dt.pitchHangtimeCounter];
+        } 
+      } else {
+        leftOrRight = aiPitchCurveDirection(curve_Interpolated, dt);
+      }
       //controllerInput = inMemControls + UINT_ARRAY_80892a78[fieldingTeam];
       if ((dt.inMemPitcher.cancelCurveAndParabolicAdjInd == 0) && (dt.inMemPitcher.calced_curve != 0)) {
         curve_Interpolated =
@@ -26,7 +29,7 @@ export function pitchCurve(dt) {
                                 c.pitchConstantsArray[dt.inMemPitcher.pitchSubType][1],
                                 c.pitchConstantsArray[dt.inMemPitcher.pitchSubType][2]);
         curve_Interpolated = 0.00005 * curve_Interpolated;
-        //removed controller and AI input section
+
         framesUntilFullCurve =
              LinearInterpolateToNewRange
                                (dt.inMemPitcher.calced_curveControl,
