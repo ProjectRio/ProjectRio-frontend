@@ -153,6 +153,7 @@ export const defaultPitchingData = {
       'aiPitchCurveType': 0,
       'aiPitchCurveEndingX': 0,
       'pitchAIDelayCurveStart': 0,
+      'aiPitchDirectionInput': 0,
       'runnerTracking': {
             'baseRunnerStartingPos': 1 // need input
       },
