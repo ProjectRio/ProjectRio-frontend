@@ -22,7 +22,7 @@ export function LinearInterpolateToNewRange(value, prevMin, prevMax, nextMin, ne
 }
 
 // @ts-ignore
-export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) { //806dddb0
+export function randBetween(param_1, param_2, dt) { //806dddb0
   let uVar1;
   let iVar2;
   let uVar3;
@@ -35,11 +35,11 @@ export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2
     iVar5 = 0;
   }
   else {
-    StaticRandomInt1 =
-         (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         Math.floor(StaticRandomInt2 / iVar5) + TotalframesAtPlay;
+    dt.StaticRandomInt1 =
+         (dt.StaticRandomInt1 - (dt.StaticRandomInt2 & 0xff)) +
+         Math.floor(dt.StaticRandomInt2 / iVar5) + dt.TotalframesAtPlay;
 
-    uVar1 = StaticRandomInt1 - (StaticRandomInt1 / iVar5) * iVar5;
+    uVar1 = dt.StaticRandomInt1 - (dt.StaticRandomInt1 / iVar5) * iVar5;
     uVar3 = Math.floor(uVar1) >> 0x1f;
     iVar5 = (uVar3 ^ uVar1) - uVar3;
     if (uVar4 < 0) {
@@ -47,11 +47,11 @@ export function randBetween(param_1, param_2, StaticRandomInt1, StaticRandomInt2
     }
     
   }
-  return param_1 + iVar5;
+  return [param_1 + iVar5, dt];
 }
 
 // @ts-ignore
-export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay)  //806ddf4c
+export function RandomInt_Game(MaxNum, dt)  //806ddf4c
 {
   let iVar1;
   let uVar2;
@@ -63,11 +63,11 @@ export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, Total
     randomNum = 0;
   }
   else {
-    StaticRandomInt1 =
-         (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         StaticRandomInt2 / randomNum + TotalframesAtPlay;
+    dt.StaticRandomInt1 =
+         (dt.StaticRandomInt1 - (dt.StaticRandomInt2 & 0xff)) +
+         dt.StaticRandomInt2 / randomNum + dt.TotalframesAtPlay;
     
-    uVar2 = StaticRandomInt1 - (StaticRandomInt1 / randomNum) * randomNum;
+    uVar2 = dt.StaticRandomInt1 - (dt.StaticRandomInt1 / randomNum) * randomNum;
     uVar3 = Math.floor(uVar2) >> 0x1f;
     randomNum = (uVar3 ^ uVar2) - uVar3;
     if (MaxNum < 0) {
@@ -75,11 +75,11 @@ export function RandomInt_Game(MaxNum, StaticRandomInt1, StaticRandomInt2, Total
     }
   
   }
-  return randomNum;
+  return [randomNum, dt];
 }
 
 // @ts-ignore
-export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) {
+export function randomInRange(param_1, param_2, dt) {
   // sometimes the decomp only sends 1 parameter. When this happens, I think parameter 1 is the negative version, and 2 is the positive version.
   let uVar4 = 0;
   let uVar1;
@@ -93,11 +93,11 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
     uVar1 = 0;
   }
   else {
-    StaticRandomInt1 =
-         (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) +
-         StaticRandomInt2 / const_7_ + TotalframesAtPlay;
+    dt.StaticRandomInt1 =
+         (dt.StaticRandomInt1 - (dt.StaticRandomInt2 & 0xff)) +
+         dt.StaticRandomInt2 / const_7_ + dt.TotalframesAtPlay;
 
-      uVar2 = StaticRandomInt1 - (StaticRandomInt1 / const_7_) * const_7_;
+      uVar2 = dt.StaticRandomInt1 - (dt.StaticRandomInt1 / const_7_) * const_7_;
       uVar1 =  Math.floor(uVar2) >> 0x1f;
       uVar1 = (uVar1 ^ uVar2) - uVar1;
       if (const_7 < 0) {
@@ -106,11 +106,11 @@ export function randomInRange(param_1, param_2, StaticRandomInt1, StaticRandomIn
     
   }
   let local_28 = uVar1;
-  return [(0.001 * (local_28) + param_1), StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
+  return [(0.001 * (local_28) + param_1), dt];
 }
 
 // @ts-ignore
-export function WeightedRandomIndex(vals, count, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay) {
+export function WeightedRandomIndex(vals, count, dt) {
   let randomSum = 0;
 
   let loopSum = 0;
@@ -132,8 +132,8 @@ export function WeightedRandomIndex(vals, count, StaticRandomInt1, StaticRandomI
   }
   else {
       // update RandomInt in case it's called successive times
-      StaticRandomInt1 = (StaticRandomInt1 - (StaticRandomInt2 & 0xff)) + Math.floor(StaticRandomInt2 / finSum) + TotalframesAtPlay;
-      randomRange = StaticRandomInt1 - Math.floor(StaticRandomInt1 / finSum) * finSum;
+      dt.StaticRandomInt1 = (dt.StaticRandomInt1 - (dt.StaticRandomInt2 & 0xff)) + Math.floor(dt.StaticRandomInt2 / finSum) + dt.TotalframesAtPlay;
+      randomRange = dt.StaticRandomInt1 - Math.floor(dt.StaticRandomInt1 / finSum) * finSum;
       randomSum = (randomRange >> 0x1f ^ randomRange) - (randomRange >> 0x1f);
       if (loopSum < 0) {
           randomSum = -randomSum;
@@ -145,7 +145,7 @@ export function WeightedRandomIndex(vals, count, StaticRandomInt1, StaticRandomI
   if (0 < count) {
       do {
           if (randomSum < p_loopArray[i]) {
-              return [newIndex, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
+              return [newIndex, dt];
           }
           randomSum -= p_loopArray[i];
           newIndex += 1;
@@ -153,5 +153,5 @@ export function WeightedRandomIndex(vals, count, StaticRandomInt1, StaticRandomI
           i++;
       } while (count != 0);
   }
-  return [0, StaticRandomInt1, StaticRandomInt2, TotalframesAtPlay];
+  return [0, dt];
 }

@@ -231,20 +231,20 @@ export function pitchInAirFunction(dt) { // 806b02dc
             (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) &&
            ((dt.inMemPitcher.pitchBounceCounter == 0 || (dt.inMemPitcher.pitchBounceCounter == 1)))) {
           if (dt.inMemPitcher.pitchBounceCounter == 0) {
-            [rng2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-1, 1, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [rng2, dt] = randomInRange(-1, 1, dt);
             dt.inMemPitcher.pitchStartingXPosition = rng2;
             dt.inMemPitcher.bat_y_coord = 0.35;
-            [rng3, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(3,5, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [rng3, dt] = randomInRange(3,5, dt);
                         dt.inMemPitcher.eggBounceRelated = rng3;
             dt.inMemPitcher.zUnhittableThreshold = 0.5 * (rng3 + dt.inMemPitcher.zUnhittableThreshold);
           }
           else {
-            [rng4, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay] = randomInRange(-0.3, 0.3, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+            [rng4, dt] = randomInRange(-0.3, 0.3, dt);
             dt.inMemPitcher.pitchStartingXPosition = rng4;
             dt.inMemPitcher.bat_y_coord = 0.35;
             dt.inMemPitcher.zUnhittableThreshold = 0.775;
           }
-          dt.inMemPitcher.calced_pitchSpeed = randBetween(70, 90, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+          [dt.inMemPitcher.calced_pitchSpeed, dt] = randBetween(70, 90, dt);
           calced_pitchSpeed = dt.inMemPitcher.calced_pitchSpeed;
           dt.inMemPitcher.pitchBounceCounter = dt.inMemPitcher.pitchBounceCounter + 1;
           dt.inMemPitcher.ballVelocity.Z = -calced_pitchSpeed / 240;

@@ -55,7 +55,7 @@ export function calculatePhysicsConstants(dt) { //806b17fc
       dt.inMemPitcher.verticalGlobalParabolicVelo = c.pitchConstantsArray[pitchSubType][5] ;
       if ((dt.inMemPitcher.captainStarPitchThrown == c.yoshiStarPitch) ||
          (dt.inMemPitcher.captainStarPitchThrown == c.birdoStarPitch)) {
-        uVar1 = randBetween(0x37,0x3c, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+        [uVar1, dt] = randBetween(0x37,0x3c, dt);
         dt.inMemPitcher.verticalGlobalParabolicVelo = uVar1;
       }
       halfWayToThePlate = dt.inMemPitcher.frameWhenUnhittable  * 0.5;
@@ -75,7 +75,7 @@ export function calculatePhysicsConstants(dt) { //806b17fc
         if (dt.inMemPitcher.AIInd == 0) {
           if ((controlStickInputs[0]) == 0) {
             if ((controlStickInputs[0]) == 0) {
-              loopCounter = RandomInt_Game(2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+              [loopCounter, dt] = RandomInt_Game(2, dt);
               dt.inMemPitcher.warioWaluStarPitchRightLeft = loopCounter;
             }
             else {
@@ -87,17 +87,17 @@ export function calculatePhysicsConstants(dt) { //806b17fc
           }
         }
         else {
-          loopCounter = RandomInt_Game(2, dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+          [loopCounter, dt] = RandomInt_Game(2, dt);
           dt.inMemPitcher.warioWaluStarPitchRightLeft = loopCounter;
         }
       }
       uVar1 = dt.inMemPitcher.captainStarPitchThrown;
       if ((uVar1 == 7) || (uVar1 == 8)) {
         let boswer0Jr1 = uVar1 - 7;
-        dt.inMemPitcher.bulletPitchLoopFrames =
-             randBetween(c.bulletBallConstants[boswer0Jr1][0],c.bulletBallConstants[boswer0Jr1][1], dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
-        dt.inMemPitcher.bulletPitchLoopStartingFrame =
-             randBetween(c.bulletBallConstants[boswer0Jr1][2],c.bulletBallConstants[boswer0Jr1][3], dt.StaticRandomInt1, dt.StaticRandomInt2, dt.TotalframesAtPlay);
+        [dt.inMemPitcher.bulletPitchLoopFrames, dt] =
+             randBetween(c.bulletBallConstants[boswer0Jr1][0],c.bulletBallConstants[boswer0Jr1][1], dt);
+        [dt.inMemPitcher.bulletPitchLoopStartingFrame, dt] =
+             randBetween(c.bulletBallConstants[boswer0Jr1][2],c.bulletBallConstants[boswer0Jr1][3], dt);
         dt.inMemPitcher.frameWhenUnhittable =
              dt.inMemPitcher.frameWhenUnhittable + dt.inMemPitcher.bulletPitchLoopFrames;
       }
