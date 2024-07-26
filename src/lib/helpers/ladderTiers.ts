@@ -126,7 +126,7 @@ export function getTierImage (rating: number) {
 export function getTierColor (rating: number) {
     const tier = getTier(rating);
     const colors = {
-        Shell: ["#5dae5d", "#90c890", "#cbe5cb", "#e5f2e5", "#ffffff"],
+        Shell: ["#8bbf8c", "#a4cca5", "#bbdfba", "#d7ecd1", "#e6f0e1"],
         Mushroom: ["#ff4949", "#ff5a5a", "#f97979", "#ff8989", "#ffa9a9"],
         Flower: ["#ff6700", "#fb7216", "#ff8532", "#fd8f45", "#ffa162"],
         Star: ["#fff25c", "#fff476", "#fff68f", "#fff8a9", "#fffac2"],
