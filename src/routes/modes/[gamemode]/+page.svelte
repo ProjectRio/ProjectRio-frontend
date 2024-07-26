@@ -60,7 +60,7 @@
 
 <!--h2>Live games</h2-->  
 <h2>Top 10 </h2><h3><a href="/modes/{mode_name}/ladder">(Full Ladder)</a></h3>
-<LadderTable ladderGameMode = {mode_name} nUsersToDisplay=10 /> <br>
+<LadderTable ladderGameMode = {mode_name} nUsersToDisplay={10} /> <br>
 
 <h2>Rules</h2>
 <section class="table-container">

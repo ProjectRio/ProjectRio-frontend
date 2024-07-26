@@ -81,10 +81,8 @@
 <!--<button class="btn variant-ghost-error">-->
 <!--    <a href="/modes" class="decoration-transparent"><button class="game-mode">Return to Games List</button></a>-->
 <!--</button>-->
-<div class="flex-auto">
-
-    <a href={`/modes/` + $page.params.gamemode + `/ladder`} class="decoration-transparent"><input type="checkbox" class="checkbox" id="ladder" name="ladder">
-        <label for="ladder">View ladder for this Game Mode.</label></a>
+<div class="flex-auto m-4">
+    <a href={`/modes/` + $page.params.gamemode + `/ladder`}>View ladder for this Game Mode.</a>
 </div>
   
   <h1>{titleCase($page.params.gamemode)} - ELO Peaks</h1>
