@@ -12,7 +12,6 @@
     
     let tagsetName: string = "";
     let loadingInd: boolean = true;
-    let gameMode_name: string;
     
     function didHomeWin(game: any) {return game.home_score > game.away_score};
 
@@ -33,13 +32,16 @@
     function getInningDisplay(game:any) {
         return (game.innings_played === game.innings_selected) ? "" : `(${game.innings_played}/${game.innings_selected})`}
 
+        
+    function getGameMode(game:any) {
+        return $tagsets.find((tagset) => tagset.id === game.game_mode)?.name || ""}
+
     onMount(async () => {
         //console.log("Onmount started")
         if ($tagsets.length === 0) {
             console.log("No tagsets in store, calling API")
             await getAllTagSets();
         }
-        gameMode_name = $tagsets.find((tagset) => tagset.id === displayedGame.game_mode)?.name || ""
         //console.log("game on mount finished")
         loadingInd = false
     })
@@ -68,8 +70,8 @@
             </div>
             <div class="row-score">{displayedGame.home_score}</div>
         </div>
-        <a class='unstyled hover-change' href="/modes/{gameMode_name}">
-            <div class="gameMode">{gameMode_name}</div>
+        <a class='unstyled hover-change' href="/modes/{getGameMode(displayedGame)}">
+            <div class="gameMode">{getGameMode(displayedGame)}</div>
         </a>
     </div>
 {:else if loadingInd}
