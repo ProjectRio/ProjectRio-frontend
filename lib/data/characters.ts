@@ -133,5 +133,6 @@ export const stadiums: { [key: string]: string } = {
 	'2': 'Wario Palace',
 	'3': 'Yoshi Park',
 	'4': 'Peach Garden',
-	'5': 'DK Jungle'
+	'5': 'DK Jungle',
+	'6': 'Toy Field'
 };
