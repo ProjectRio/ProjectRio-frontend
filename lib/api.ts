@@ -105,9 +105,29 @@ export async function getRecentGames(opts: {
 }
 
 export async function getLiveGames(timeFilterSeconds: number): Promise<any[]> {
-	const res = await apiGet(STAT_ENDPOINTS.LIVE_GAMES);
 	const cutoff = Math.floor(Date.now() / 1000) - timeFilterSeconds;
-	return (res.ongoing_games ?? []).filter((game: any) => game.start_time > cutoff);
+	let games: any[] = [];
+	try {
+		const res = await apiGet(STAT_ENDPOINTS.LIVE_GAMES);
+		games = (res.ongoing_games ?? []).filter((game: any) => game.start_time > cutoff);
+	} catch (err) {
+		// In dev we fall through to fixtures below; in prod the error is real.
+		if (process.env.NODE_ENV !== 'development') throw err;
+	}
+
+	// Dev convenience: when nothing is actually ongoing (or the API is
+	// unreachable), serve the committed example games so the live UI is testable.
+	// This whole block is dead code in a production build, so neither the
+	// fixtures nor the example JSON ship to deployed users.
+	if (games.length === 0 && process.env.NODE_ENV === 'development') {
+		const { exampleLiveGames } = await import('./devFixtures');
+		if (exampleLiveGames.length > 0) {
+			console.info('[dev] No ongoing games from API — showing example fixtures (example_ongoing_game.json)');
+			return exampleLiveGames;
+		}
+	}
+
+	return games;
 }
 
 export async function getGameStats(gameID: number): Promise<any> {
