@@ -32,52 +32,53 @@ export default function LiveGameCard({ game, tagsets }: { game: any; tagsets: Ta
 	const pitchingSide = game.half_inning === 0 ? 'home' : 'away';
 	const batter = liveCharacter(game, battingSide, 'batter');
 	const pitcher = liveCharacter(game, pitchingSide, 'pitcher');
+	const gameId = `${game.start_time}-${game.home_player}-${game.away_player}`;
 
 	return (
-		<div className="panel panel-glow">
-			<div className="flex items-center justify-between border-b border-night-800 px-4 py-2">
-				<span className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-wider text-rio-400">
-					<LiveDot /> Live — {game.half_inning === 0 ? 'Top' : 'Bot'} {game.inning}
-				</span>
-				<span className="text-xs text-fog-500">{stadiums[game.stadium_id] ?? ''}</span>
-			</div>
-			<LiveTeamRow game={game} side="away" />
-			<LiveTeamRow game={game} side="home" />
-			<div className="flex items-center justify-between border-t border-night-800 px-4 py-2">
-				<div className="flex items-center gap-3 text-xs text-fog-300">
-					{batter && (
-						<span className="flex items-center gap-1">
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img src={characterImage(batter)} alt="" className="h-5 w-5 object-contain" /> {batter}
-						</span>
-					)}
-					<span className="text-fog-500">vs</span>
-					{pitcher && (
-						<span className="flex items-center gap-1">
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img src={characterImage(pitcher)} alt="" className="h-5 w-5 object-contain" /> {pitcher}
-						</span>
-					)}
-				</div>
-				<div className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src={basesImage(!!Number(game.runner_on_first), !!Number(game.runner_on_second), !!Number(game.runner_on_third))}
-						alt="Runners on base"
-						className="h-6 w-6 object-contain"
-					/>
-					<span className="font-mono text-xs text-fog-300" title={`${game.outs} outs`}>
-						{outsDisplay(game.outs)}
+		<Link href={`/games/live/${encodeURIComponent(gameId)}`}>
+			<div className="panel panel-glow cursor-pointer hover:bg-night-700 transition-colors">
+				<div className="flex items-center justify-between border-b border-night-800 px-4 py-2">
+					<span className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-wider text-rio-400">
+						<LiveDot /> Live — {game.half_inning === 0 ? 'Top' : 'Bot'} {game.inning}
 					</span>
+					<span className="text-xs text-fog-500">{stadiums[game.stadium_id] ?? ''}</span>
 				</div>
-			</div>
-			{mode && (
-				<div className="border-t border-night-800 px-4 py-2">
-					<Link href={`/modes/${encodeURIComponent(mode)}`}>
+				<LiveTeamRow game={game} side="away" />
+				<LiveTeamRow game={game} side="home" />
+				<div className="flex items-center justify-between border-t border-night-800 px-4 py-2">
+					<div className="flex items-center gap-3 text-xs text-fog-300">
+						{batter && (
+							<span className="flex items-center gap-1">
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src={characterImage(batter)} alt="" className="h-5 w-5 object-contain" /> {batter}
+							</span>
+						)}
+						<span className="text-fog-500">vs</span>
+						{pitcher && (
+							<span className="flex items-center gap-1">
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src={characterImage(pitcher)} alt="" className="h-5 w-5 object-contain" /> {pitcher}
+							</span>
+						)}
+					</div>
+					<div className="flex items-center gap-2">
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img
+							src={basesImage(!!Number(game.runner_on_first), !!Number(game.runner_on_second), !!Number(game.runner_on_third))}
+							alt="Runners on base"
+							className="h-6 w-6 object-contain"
+						/>
+						<span className="font-mono text-xs text-fog-300" title={`${game.outs} outs`}>
+							{outsDisplay(game.outs)}
+						</span>
+					</div>
+				</div>
+				{mode && (
+					<div className="border-t border-night-800 px-4 py-2">
 						<Badge color="gray">{mode}</Badge>
-					</Link>
-				</div>
-			)}
-		</div>
+					</div>
+				)}
+			</div>
+		</Link>
 	);
 }

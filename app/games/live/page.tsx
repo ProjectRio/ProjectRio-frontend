@@ -54,11 +54,19 @@ export default function LiveGamesPage() {
 				/>
 			)}
 			{games !== null && games.length > 0 && (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{games.map((game) => (
-						<LiveGameCard key={game.start_time} game={game} tagsets={tagsets} />
-					))}
-				</div>
+				<>
+					{games.some((game) => game._devFixture) && (
+						<p className="mb-4 rounded-lg border border-star-500/40 bg-star-500/10 px-4 py-2 text-sm text-star-400">
+							Dev mode: no real games are live, so these are example fixtures from{' '}
+							<code>example_ongoing_game.json</code>.
+						</p>
+					)}
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{games.map((game) => (
+							<LiveGameCard key={game.start_time} game={game} tagsets={tagsets} />
+						))}
+					</div>
+				</>
 			)}
 		</div>
 	);
