@@ -15,7 +15,7 @@ import LiveFieldView from '@/components/LiveFieldView';
 import LineScore, { MetaItem } from '@/components/LineScore';
 import { Spinner, EmptyState, Badge, Panel, PanelHeader, PlayerLink, LiveDot } from '@/components/ui';
 
-const REFRESH_MS = 15_000;
+const REFRESH_MS = 10_000;
 // The endpoint only returns ongoing games; keep a generous window so a game
 // that's been running a while still resolves from a direct link.
 const LOOKBACK_SECONDS = 24 * 60 * 60;
