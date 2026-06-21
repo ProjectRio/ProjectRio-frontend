@@ -2,14 +2,16 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getGameStats, getGame, type GameSummary } from '@/lib/api';
+import { getGameStats, getMatchups, type GameSummary, type ScoringPlay } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
 import { stadiums, characterName } from '@/lib/data/characters';
 import { teamName, teamImage } from '@/lib/data/teamNames';
-import { tagSetName } from '@/lib/gameDisplay';
+import { tagSetName, ordinal } from '@/lib/gameDisplay';
+import { atBatResultName } from '@/lib/mssb/constants';
 import { getAvg, getOps, getOppAvg, getERA, getIpString } from '@/lib/statCalcs';
 import { msToTime } from '@/lib/time';
 import { Spinner, ErrorState, Badge, PlayerLink, Panel, PanelHeader } from '@/components/ui';
+import LineScore, { MetaItem } from '@/components/LineScore';
 
 interface RosterEntry {
 	name: string;
@@ -395,6 +397,105 @@ function TeamPanel({
 	);
 }
 
+function GameLineScore({ info }: { info: GameSummary }) {
+	const linescore = info.linescore;
+	if (!linescore) return null;
+	const [away, home] = linescore;
+	const innings = Math.max(away.length, home.length);
+	if (innings === 0) return null;
+	const homeWon = info.home_score > info.away_score;
+
+	const firstPitch = info.date_time_start ? new Date(info.date_time_start * 1000).toLocaleString() : '—';
+	const gameTime =
+		info.date_time_start && info.date_time_end
+			? msToTime((info.date_time_end - info.date_time_start) * 1000)
+			: '—';
+
+	return (
+		<LineScore
+			innings={innings}
+			teams={[
+				{ label: info.away_user, runs: away, total: info.away_score, highlight: !homeWon },
+				{ label: info.home_user, runs: home, total: info.home_score, highlight: homeWon }
+			]}
+			meta={
+				<>
+					<MetaItem label="First Pitch" value={firstPitch} />
+					<MetaItem label="Game Time" value={gameTime} />
+					<MetaItem label="Stadium" value={stadiums[info.stadium] ?? 'Unknown'} />
+				</>
+			}
+		/>
+	);
+}
+
+function ScoringPlayRow({ play }: { play: ScoringPlay }) {
+	const awayBatting = play.half_inning === 0;
+	// The endpoint reports the score BEFORE the play; add the RBIs to the batting side.
+	const awayAfter = play.away_score + (awayBatting ? play.result_rbi : 0);
+	const homeAfter = play.home_score + (awayBatting ? 0 : play.result_rbi);
+	const result = atBatResultName(play.result_of_ab);
+
+	return (
+		<div className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
+			<div className="flex min-w-0 items-center gap-2">
+				<span className="truncate text-fog-100">{characterName(play.batter)}</span>
+				{result && <span className="text-fog-500">— {result}</span>}
+				{play.result_rbi > 0 && (
+					<span className="shrink-0 text-fog-300">
+						{play.result_rbi} RBI
+					</span>
+				)}
+			</div>
+			<span className="shrink-0 font-display font-bold tabular-nums text-fog-100">
+				<span className={awayBatting ? '' : 'text-fog-500'}>{awayAfter}</span>
+				<span className="text-fog-500">–</span>
+				<span className={awayBatting ? 'text-fog-500' : ''}>{homeAfter}</span>
+			</span>
+		</div>
+	);
+}
+
+function ScoringSummary({ info }: { info: GameSummary }) {
+	const plays = info.scoring_plays;
+	if (!plays || plays.length === 0) return null;
+
+	// Group consecutive plays by half-inning, preserving event order.
+	const groups: { inning: number; half: number; plays: ScoringPlay[] }[] = [];
+	for (const play of plays) {
+		const last = groups[groups.length - 1];
+		if (last && last.inning === play.inning && last.half === play.half_inning) {
+			last.plays.push(play);
+		} else {
+			groups.push({ inning: play.inning, half: play.half_inning, plays: [play] });
+		}
+	}
+
+	return (
+		<Panel className="flex h-full flex-col">
+			<PanelHeader title="Scoring Summary" />
+			<div className="min-h-0 flex-1 divide-y divide-night-800 overflow-y-auto">
+				{groups.map((group, gi) => (
+					<div key={gi}>
+						<div className="bg-night-850 px-4 py-1.5 font-display text-xs font-semibold uppercase tracking-wider">
+							<span style={{ color: group.half === 0 ? AWAY_COLOR : HOME_COLOR }}>
+								{group.half === 0 ? 'Top' : 'Bottom'} {ordinal(group.inning)}
+							</span>
+							<span className="text-fog-500">
+								{' '}
+								— {group.half === 0 ? info.away_user : info.home_user}
+							</span>
+						</div>
+						{group.plays.map((play) => (
+							<ScoringPlayRow key={play.event_num} play={play} />
+						))}
+					</div>
+				))}
+			</div>
+		</Panel>
+	);
+}
+
 function TeamScore({
 	user,
 	elo,
@@ -440,7 +541,11 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 		(async () => {
 			try {
 				const id = Number(gameID);
-				const [gameStats, game] = await Promise.all([getGameStats(id), getGame(id)]);
+				const gameStats = await getGameStats(id);
+				const [user1, user2] = Object.keys(gameStats);
+				if (!user1 || !user2) throw new Error('no stats');
+				const matchups = await getMatchups(user1, user2, { linescore: true });
+				const game = matchups.find((g) => g.game_id === id) ?? null;
 				if (!game) throw new Error('no game');
 				if (!cancelled) {
 					setStats(gameStats);
@@ -470,7 +575,7 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 	return (
 		<div className="space-y-8">
 			{/* Score header */}
-			<div className="panel relative overflow-hidden p-6">
+			<div className="panel sticky top-16 z-40 overflow-hidden p-6 shadow-lg shadow-night-950/50">
 				<div
 					className="pointer-events-none absolute inset-0"
 					style={{ backgroundImage: 'radial-gradient(ellipse 70% 120% at 50% -20%, rgb(230 0 18 / 0.18), transparent)' }}
@@ -508,44 +613,30 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 				</div>
 			</div>
 
+			{/* Line score */}
+			<GameLineScore info={info} />
+
 			{/* Box scores */}
 			<div className="grid gap-6 lg:grid-cols-2">
 				<TeamPanel title={`${info.away_user} (Away)`} roster={awayRoster} captain={info.away_captain ?? ''} />
 				<TeamPanel title={`${info.home_user} (Home)`} roster={homeRoster} captain={info.home_captain ?? ''} />
 			</div>
 
-			{/* Contact quality */}
-			<ContactQuality
-				awayRoster={awayRoster}
-				homeRoster={homeRoster}
-				awayUser={info.away_user}
-				homeUser={info.home_user}
-			/>
-
-			{/* Game info */}
-			<Panel>
-				<PanelHeader title="Game Info" />
-				<dl className="grid gap-4 px-4 py-4 text-sm sm:grid-cols-3">
-					<div>
-						<dt className="kicker !text-fog-500">First Pitch</dt>
-						<dd className="mt-1 text-fog-100">
-							{info.date_time_start ? new Date(info.date_time_start * 1000).toLocaleString() : '—'}
-						</dd>
+			{/* Contact quality + scoring summary side by side. The contact graph
+			    sets the row height; the scoring summary fills it and scrolls. */}
+			<div className="grid items-stretch gap-6 lg:grid-cols-2">
+				<ContactQuality
+					awayRoster={awayRoster}
+					homeRoster={homeRoster}
+					awayUser={info.away_user}
+					homeUser={info.home_user}
+				/>
+				<div className="relative">
+					<div className="lg:absolute lg:inset-0">
+						<ScoringSummary info={info} />
 					</div>
-					<div>
-						<dt className="kicker !text-fog-500">Game Time</dt>
-						<dd className="mt-1 text-fog-100">
-							{info.date_time_start && info.date_time_end
-								? msToTime((info.date_time_end - info.date_time_start) * 1000)
-								: '—'}
-						</dd>
-					</div>
-					<div>
-						<dt className="kicker !text-fog-500">Stadium</dt>
-						<dd className="mt-1 text-fog-100">{stadiums[info.stadium] ?? '—'}</dd>
-					</div>
-				</dl>
-			</Panel>
+				</div>
+			</div>
 		</div>
 	);
 }

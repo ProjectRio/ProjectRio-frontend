@@ -7,11 +7,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getLiveGames, getMatchups } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
-import { tagSetName, outsDisplay } from '@/lib/gameDisplay';
+import { tagSetName, outsDisplay, ordinal } from '@/lib/gameDisplay';
 import { characterImage, stadiums } from '@/lib/data/characters';
 import { teamNameFromLogo, logoImage } from '@/lib/data/logoToTeam';
-import { parseLiveTeam, handLabel, ordinal, inningsPitched, slotStatus, type LiveTeam, type LiveRosterSlot } from '@/lib/liveGame';
+import { parseLiveTeam, handLabel, inningsPitched, slotStatus, type LiveTeam, type LiveRosterSlot } from '@/lib/liveGame';
 import LiveFieldView from '@/components/LiveFieldView';
+import LineScore, { MetaItem } from '@/components/LineScore';
 import { Spinner, EmptyState, Badge, Panel, PanelHeader, PlayerLink, LiveDot } from '@/components/ui';
 
 const REFRESH_MS = 15_000;
@@ -52,76 +53,34 @@ function TeamHero({ team, batting, align }: { team: LiveTeam; batting: boolean; 
 	);
 }
 
-function MetaItem({ label, value }: { label: string; value: string }) {
-	return (
-		<div>
-			<dt className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">{label}</dt>
-			<dd className="mt-0.5 text-xs text-fog-100">{value}</dd>
-		</div>
-	);
-}
-
 function MiniLineScore({ game, away, home, mode }: { game: any; away: LiveTeam; home: LiveTeam; mode: string }) {
 	const awayScores: number[] = game.away_inning_scores ?? [];
 	const homeScores: number[] = game.home_inning_scores ?? [];
 	const innings = Math.max(game.innings_selected ?? 0, game.inning ?? 0, awayScores.length, homeScores.length);
-	const cols = Array.from({ length: innings }, (_, i) => i + 1);
 	const minutesAgo = Math.max(0, Math.round((Date.now() / 1000 - game.start_time) / 60));
 	const startedAt = new Date(game.start_time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
-	const cell = (scores: number[], inning: number, side: 'away' | 'home') => {
-		const battingNow = inning === game.inning && (game.half_inning === 0 ? side === 'away' : side === 'home');
-		const value = inning <= scores.length ? scores[inning - 1] : '–';
-		return (
-			<td
-				key={inning}
-				className={`min-w-7 px-2.5 py-1 text-center tabular-nums ${battingNow ? 'rounded bg-rio-500/20 font-bold text-fog-100' : 'text-fog-300'}`}
-			>
-				{value}
-			</td>
-		);
-	};
+	// 0 = away, 1 = home; the batting side is set by half_inning.
+	const battingSide = game.half_inning === 0 ? 0 : 1;
 
 	return (
-		<div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-4">
-			<div className="overflow-x-auto">
-				<table className="text-xs leading-tight">
-					<thead>
-						<tr className="font-display uppercase tracking-wider text-fog-500">
-							<th></th>
-							{cols.map((i) => (
-								<th key={i} className={`min-w-7 px-2.5 pb-1 text-center font-semibold ${i > game.innings_selected ? 'text-star-400' : ''}`}>
-									{i}
-								</th>
-							))}
-							<th className="min-w-7 border-l border-night-700 pb-1 pl-3 text-center font-bold">R</th>
-						</tr>
-					</thead>
-					<tbody>
-						{(
-							[
-								['away', away, awayScores],
-								['home', home, homeScores]
-							] as const
-						).map(([side, team, scores]) => (
-							<tr key={side}>
-								<td className="whitespace-nowrap pr-4 text-right font-medium text-fog-100">{team.player}</td>
-								{cols.map((i) => cell(scores, i, side))}
-								<td className="border-l border-night-700 pl-3 text-center font-bold tabular-nums text-fog-100">
-									{team.score}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
-			<dl className="flex flex-wrap gap-x-8 gap-y-3 text-left">
-				{mode && <MetaItem label="Mode" value={mode} />}
-				<MetaItem label="Stadium" value={stadiums[game.stadium_id] ?? 'Unknown'} />
-				<MetaItem label="Format" value={`${game.innings_selected} innings`} />
-				<MetaItem label="Started" value={`${startedAt} · ${minutesAgo} min ago`} />
-			</dl>
-		</div>
+		<LineScore
+			innings={innings}
+			regulationInnings={game.innings_selected}
+			cellHighlight={(inning, side) => inning === game.inning && side === battingSide}
+			teams={[
+				{ label: away.player, runs: awayScores, total: away.score },
+				{ label: home.player, runs: homeScores, total: home.score }
+			]}
+			meta={
+				<>
+					{mode && <MetaItem label="Mode" value={mode} />}
+					<MetaItem label="Stadium" value={stadiums[game.stadium_id] ?? 'Unknown'} />
+					<MetaItem label="Format" value={`${game.innings_selected} innings`} />
+					<MetaItem label="Started" value={`${startedAt} · ${minutesAgo} min ago`} />
+				</>
+			}
+		/>
 	);
 }
 
@@ -409,9 +368,7 @@ export default function LiveGamePage({ params }: { params: Promise<{ gameId: str
 			</div>
 
 			{/* Line score + game meta — scrolls normally */}
-			<div className="panel p-6">
-				<MiniLineScore game={game} away={away} home={home} mode={mode} />
-			</div>
+			<MiniLineScore game={game} away={away} home={home} mode={mode} />
 
 			{/* Field + current matchup */}
 			<div className="grid gap-6 lg:grid-cols-[1.25fr_1fr]">
