@@ -55,11 +55,6 @@ export function handLabel(hand: number): string {
 	return hand === 1 ? 'L' : 'R';
 }
 
-export function ordinal(n: number): string {
-	const suffix = n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th');
-	return `${n}${suffix}`;
-}
-
 export function inningsPitched(outsPitched: number): string {
 	return `${Math.floor(outsPitched / 3)}.${outsPitched % 3}`;
 }
