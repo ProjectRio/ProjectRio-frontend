@@ -81,6 +81,8 @@ export interface GameSummary {
 	home_score: number;
 	away_captain?: string;
 	home_captain?: string;
+	away_roster?: number[];
+	home_roster?: number[];
 	date_time_start?: number;
 	date_time_end?: number;
 	innings_played?: number;
@@ -133,6 +135,11 @@ export async function getLiveGames(timeFilterSeconds: number): Promise<any[]> {
 export async function getGameStats(gameID: number): Promise<any> {
 	const res = await apiGet(STAT_ENDPOINTS.STATS, `?games=${gameID}&exclude_nonfair=1&by_char=1&by_user=1`);
 	return res.Stats ?? {};
+}
+
+export async function getGame(gameID: number): Promise<GameSummary | null> {
+	const res = await apiGet(STAT_ENDPOINTS.GAMES, `?game_id=${gameID}`);
+	return res.games?.[0] ?? null;
 }
 
 export async function getMatchups(captain1: string, captain2: string): Promise<GameSummary[]> {
