@@ -37,7 +37,7 @@ function TeamRow({ game, side }: { game: GameSummary; side: 'home' | 'away' }) {
 }
 
 export default function GameCard({ game, tagsets }: { game: GameSummary; tagsets: TagSet[] }) {
-	const mode = tagSetName(tagsets, game.game_mode as unknown as number);
+	const mode = tagSetName(tagsets, game.game_mode as number);
 
 	return (
 		<div className="panel panel-glow">

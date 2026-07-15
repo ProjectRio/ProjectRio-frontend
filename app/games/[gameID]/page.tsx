@@ -274,7 +274,7 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 	const awayElo = homeWon ? info.loser_result_elo : info.winner_result_elo;
 	const homeLogo = teamName(homeRoster.map((r) => r.name), info.home_captain ?? '');
 	const awayLogo = teamName(awayRoster.map((r) => r.name), info.away_captain ?? '');
-	const mode = tagSetName(tagsets, info.game_mode as unknown as number);
+	const mode = tagSetName(tagsets, info.game_mode as number);
 
 	return (
 		<div className="space-y-8">

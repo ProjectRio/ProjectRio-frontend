@@ -74,7 +74,7 @@ export async function apiPost<T = any>(endpoint: string, body?: unknown): Promis
 
 export interface GameSummary {
 	game_id: number;
-	game_mode?: string;
+	game_mode?: number | null; // tag_set id — resolve with tagSetName()
 	away_user: string;
 	home_user: string;
 	away_score: number;
@@ -218,8 +218,15 @@ export async function getTagSetLadder(gameMode: string): Promise<LadderPlayer[]>
 // ---------- Users / communities / tags ----------
 
 export async function getAllUsers(): Promise<string[]> {
+	// /user/all returns {users: {id: username}} — a map keyed by id, not a list.
 	const res = await apiGet(USER_ENDPOINTS.USER_ALL);
-	return res.users ?? [];
+	return Object.values(res.users ?? {});
+}
+
+export async function getAllPlayerGames(username: string): Promise<GameSummary[]> {
+	// limit_games=False lifts the 50-game cap: the full history for one player.
+	const res = await apiGet(STAT_ENDPOINTS.GAMES, `?limit_games=False&username=${encodeURIComponent(username)}`);
+	return res.games ?? [];
 }
 
 export async function getUserCommunities(username: string): Promise<any[]> {
