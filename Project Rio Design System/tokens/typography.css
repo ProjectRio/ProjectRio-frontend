@@ -1,0 +1,40 @@
+/* ============================================================
+   Project Rio — Typography tokens
+   Display = Rajdhani (uppercase, wide tracking — scoreboards,
+   headings, buttons, labels). Body = Inter. Mono = JetBrains
+   Mono for tabular stat numerals.
+   ============================================================ */
+:root {
+	--font-display: 'Rajdhani', 'Arial Narrow', sans-serif;
+	--font-body: 'Inter', system-ui, -apple-system, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+	/* Type scale (rem) */
+	--text-xs: 0.75rem; /* 12px — table headers, captions, badges */
+	--text-sm: 0.875rem; /* 14px — body small, table cells */
+	--text-base: 1rem; /* 16px — body */
+	--text-lg: 1.125rem; /* 18px — card titles */
+	--text-xl: 1.25rem; /* 20px — wordmark */
+	--text-2xl: 1.5rem; /* 24px */
+	--text-3xl: 1.875rem; /* 30px — section headings */
+	--text-4xl: 2.25rem; /* 36px — page titles */
+	--text-5xl: 3rem; /* 48px — hero / box-score numerals */
+	--text-6xl: 3.75rem; /* 60px — hero display */
+
+	/* Weights */
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-semibold: 600;
+	--weight-bold: 700;
+
+	/* Line heights */
+	--leading-tight: 1.05; /* display headings */
+	--leading-snug: 1.25;
+	--leading-normal: 1.6; /* body copy */
+
+	/* Letter-spacing — Rajdhani caps want air */
+	--tracking-tight: 0.02em; /* headings */
+	--tracking-wide: 0.08em; /* buttons */
+	--tracking-wider: 0.1em; /* labels, table heads */
+	--tracking-widest: 0.25em; /* kickers */
+}

@@ -1,0 +1,196 @@
+/* ============================================================
+   Project Rio — base element styles + signature utility classes
+   Ported from app/globals.css so consumers get the live site's
+   panel / button / table / input vocabulary out of the box.
+   ============================================================ */
+
+/* ---------- Base ---------- */
+html {
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	background-color: var(--bg-page);
+	color: var(--text-primary);
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	line-height: var(--leading-normal);
+	-webkit-font-smoothing: antialiased;
+	/* Subtle arena-light wash behind everything */
+	background-image: var(--wash-arena);
+	background-attachment: fixed;
+}
+
+h1, h2, h3, h4 {
+	font-family: var(--font-display);
+	font-weight: var(--weight-bold);
+	letter-spacing: var(--tracking-tight);
+	line-height: var(--leading-tight);
+	margin: 0;
+}
+
+::selection {
+	background-color: var(--rio-500);
+	color: #fff;
+}
+
+/* Pixel-art sprites must never blur */
+.pixelated {
+	image-rendering: pixelated;
+}
+
+/* Live-game pulse (LiveDot) and loading spinner */
+@keyframes rio-ping {
+	75%, 100% { transform: scale(2); opacity: 0; }
+}
+@keyframes rio-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* ---------- Panel — the standard card surface ---------- */
+.panel {
+	background-color: var(--surface-card);
+	border: var(--border-width) solid var(--border-card);
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+.panel-glow {
+	transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.panel-glow:hover {
+	border-color: rgb(230 0 18 / 0.55);
+	box-shadow: var(--glow-red);
+}
+
+.panel-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+	padding: var(--space-3) var(--space-4);
+	border-bottom: var(--border-width) solid var(--border-card);
+	background-color: var(--surface-raised);
+	font-family: var(--font-display);
+	font-size: var(--text-sm);
+	font-weight: var(--weight-bold);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider);
+	color: var(--text-secondary);
+}
+
+/* ---------- Kicker — uppercase label above headings ---------- */
+.kicker {
+	font-family: var(--font-display);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-widest);
+	font-size: var(--text-xs);
+	font-weight: var(--weight-semibold);
+	color: var(--rio-400);
+	margin: 0;
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary,
+.btn-secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	font-family: var(--font-display);
+	font-weight: var(--weight-bold);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wide);
+	font-size: var(--text-sm);
+	padding: 0.625rem 1.5rem;
+	clip-path: var(--clip-button);
+	cursor: pointer;
+	border: none;
+	transition: background-color var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+}
+.btn-primary {
+	background-color: var(--rio-500);
+	color: #fff;
+}
+.btn-primary:hover {
+	background-color: var(--rio-400);
+}
+.btn-primary:active {
+	background-color: var(--rio-600);
+}
+.btn-secondary {
+	font-weight: var(--weight-semibold);
+	border: var(--border-width) solid var(--border-strong);
+	color: var(--text-primary);
+	background-color: transparent;
+}
+.btn-secondary:hover {
+	border-color: var(--rio-400);
+	color: var(--rio-300);
+}
+
+/* ---------- Data tables ---------- */
+.stat-table {
+	width: 100%;
+	font-size: var(--text-sm);
+	border-collapse: collapse;
+}
+.stat-table thead th {
+	font-family: var(--font-display);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider);
+	font-size: 0.7rem;
+	font-weight: var(--weight-semibold);
+	color: var(--text-muted);
+	text-align: left;
+	padding: 0.625rem 0.75rem;
+	border-bottom: var(--border-width) solid var(--border-card);
+	background-color: var(--surface-raised);
+	white-space: nowrap;
+}
+.stat-table tbody td {
+	padding: 0.625rem 0.75rem;
+	border-bottom: var(--border-width) solid var(--border-hairline);
+	white-space: nowrap;
+}
+.stat-table tbody tr:hover {
+	background-color: var(--accent-soft);
+}
+.stat-table tbody tr:last-child td {
+	border-bottom: none;
+}
+.stat-table .tabular {
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Form inputs ---------- */
+.input {
+	width: 100%;
+	background-color: var(--surface-raised);
+	border: var(--border-width) solid var(--border-strong);
+	border-radius: var(--radius-md);
+	padding: 0.625rem 0.875rem;
+	color: var(--text-primary);
+	font-family: var(--font-body);
+	font-size: 0.9rem;
+	outline: none;
+	transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.input:focus {
+	border-color: var(--rio-400);
+	box-shadow: var(--focus-shadow);
+}
+.input::placeholder {
+	color: var(--text-muted);
+}
+.label {
+	display: block;
+	font-family: var(--font-display);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider);
+	font-size: var(--text-xs);
+	font-weight: var(--weight-semibold);
+	color: var(--text-secondary);
+	margin-bottom: 0.375rem;
+}

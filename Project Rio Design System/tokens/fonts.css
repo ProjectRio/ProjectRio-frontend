@@ -1,0 +1,12 @@
+/* ============================================================
+   Project Rio — Webfonts
+   The frontend loads Rajdhani (display, condensed sporty caps)
+   and Inter (body) via next/font/google. We pull the same two
+   from the Google Fonts CDN so consumers match the live site.
+   NOTE: served from Google's CDN, not self-hosted binaries.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* JetBrains Mono stands in for tabular/monospace stat readouts
+   (the app uses font-mono for outs / pitch counts). */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
