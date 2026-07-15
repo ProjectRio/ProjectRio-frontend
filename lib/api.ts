@@ -81,12 +81,41 @@ export interface GameSummary {
 	home_score: number;
 	away_captain?: string;
 	home_captain?: string;
+	away_roster?: number[];
+	home_roster?: number[];
 	date_time_start?: number;
 	date_time_end?: number;
 	innings_played?: number;
 	innings_selected?: number;
 	tags?: string[];
+	// Present when fetched with include_linescore=1: [awayRuns, homeRuns], one
+	// entry per inning. The bottom of the final inning may be 'X' (home didn't bat).
+	linescore?: [(number | 'X')[], (number | 'X')[]];
+	scoring_plays?: ScoringPlay[];
 	[key: string]: any;
+}
+
+export interface ScoringRunner {
+	char_id: number;
+	initial_base: number;
+	result_base: number;
+	out_type: number;
+	out_location: number;
+	steal: number;
+}
+
+export interface ScoringPlay {
+	inning: number;
+	half_inning: number; // 0 = top (away batting), 1 = bottom (home batting)
+	event_num: number;
+	result_rbi: number;
+	result_of_ab: number;
+	batter: number; // char_id
+	pitcher: number; // char_id
+	away_score: number; // running score BEFORE this play
+	home_score: number;
+	outs: number;
+	runners: (ScoringRunner | null)[];
 }
 
 export async function getRecentGames(opts: {
@@ -135,11 +164,18 @@ export async function getGameStats(gameID: number): Promise<any> {
 	return res.Stats ?? {};
 }
 
-export async function getMatchups(captain1: string, captain2: string): Promise<GameSummary[]> {
-	const res = await apiGet(
-		STAT_ENDPOINTS.GAMES,
-		`?username=${encodeURIComponent(captain1)}&vs_username=${encodeURIComponent(captain2)}`
-	);
+// The /games/ endpoint has no game_id filter, so a single game can only be
+// found by listing a matchup and picking it out. `linescore` adds per-inning
+// run totals (and scoring plays) for the box-score page.
+export async function getMatchups(
+	captain1: string,
+	captain2: string,
+	opts: { linescore?: boolean } = {}
+): Promise<GameSummary[]> {
+	const params =
+		`?username=${encodeURIComponent(captain1)}&vs_username=${encodeURIComponent(captain2)}` +
+		(opts.linescore ? '&include_linescore=1&include_scoring_plays=1' : '');
+	const res = await apiGet(STAT_ENDPOINTS.GAMES, params);
 	return res.games ?? [];
 }
 
