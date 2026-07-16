@@ -1,4 +1,6 @@
-export const BACKEND = 'https://api.projectrio.app';
+// Override for development against a local or test Rio Web server, e.g.
+// NEXT_PUBLIC_RIO_BACKEND=http://127.0.0.1:5050 npm run dev
+export const BACKEND = process.env.NEXT_PUBLIC_RIO_BACKEND || 'https://api.projectrio.app';
 
 export const STAT_ENDPOINTS = {
 	CHARACTERS: '/characters/',
@@ -177,6 +179,13 @@ export async function getMatchups(
 		(opts.linescore ? '&include_linescore=1&include_scoring_plays=1' : '');
 	const res = await apiGet(STAT_ENDPOINTS.GAMES, params);
 	return res.games ?? [];
+}
+
+// Full per-pitch event detail for one game (AB-by-AB view + hit visualizer).
+// Requires a Rio Web deployment with /games/events/; callers should treat a
+// failure as "event data unavailable" and degrade gracefully.
+export async function getGameEvents(gameID: number): Promise<import('./mssb/BattingSimulation/eventToSim').GameEventsResponse> {
+	return apiGet('/games/events/', `?game_id=${gameID}`);
 }
 
 // ---------- Stats ----------
