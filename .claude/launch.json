@@ -6,6 +6,12 @@
 			"runtimeExecutable": "npm",
 			"runtimeArgs": ["run", "dev"],
 			"port": 3000
+		},
+		{
+			"name": "next-dev-plain",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run", "dev:plain"],
+			"port": 3000
 		}
 	]
 }

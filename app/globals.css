@@ -200,3 +200,48 @@
 		margin-bottom: 0.375rem;
 	}
 }
+
+/* Draft room focus mode: chrome-free for streams and OBS scenes. */
+html[data-focus] body > *:not(main) {
+	display: none;
+}
+html[data-focus] main {
+	max-width: none;
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+}
+
+/* The pre-rendered stadium in the lineup planner: a slow drift, and its lights breathing. */
+@keyframes rio-stadium-drift {
+	from {
+		transform: scale(1.03) translate(0.5%, 0.4%);
+	}
+	to {
+		transform: scale(1.07) translate(-0.6%, -0.6%);
+	}
+}
+@keyframes rio-stadium-glow {
+	from {
+		opacity: 0.12;
+	}
+	to {
+		opacity: 0.75;
+	}
+}
+.rio-stadium-drift {
+	transform-origin: 50% 60%;
+	animation: rio-stadium-drift 26s ease-in-out infinite alternate;
+}
+.rio-stadium-glow {
+	mix-blend-mode: screen;
+	animation: rio-stadium-glow 3.4s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+	.rio-stadium-drift,
+	.rio-stadium-glow {
+		animation: none;
+	}
+	.rio-stadium-glow {
+		opacity: 0.4;
+	}
+}

@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// Enable calling Cloudflare bindings during `next dev`.
+// Enable calling Cloudflare bindings during `next dev`. `CF_DEV_BINDINGS=0`
+// skips the workerd shim (npm run dev:plain) for sandboxes where it can't
+// write its state — this app uses no bindings in development.
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-initOpenNextCloudflareForDev();
+if (process.env.CF_DEV_BINDINGS !== '0') initOpenNextCloudflareForDev();

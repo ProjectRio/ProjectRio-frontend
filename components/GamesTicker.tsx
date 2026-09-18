@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { getLiveGames, getRecentGames, type GameSummary } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
@@ -91,7 +91,43 @@ function TickerBox({ item }: { item: TickerItem }) {
 	);
 }
 
+// Site-wide "hide the ticker" preference, kept in localStorage. A thin
+// "Scores" tab stays at the top so it can be brought back.
+const HIDDEN_KEY = 'rio:ticker-hidden';
+const HIDDEN_EVENT = 'rio:ticker-hidden';
+
+function subscribeHidden(callback: () => void) {
+	window.addEventListener(HIDDEN_EVENT, callback);
+	window.addEventListener('storage', callback);
+	return () => {
+		window.removeEventListener(HIDDEN_EVENT, callback);
+		window.removeEventListener('storage', callback);
+	};
+}
+
+function readHidden(): boolean {
+	try {
+		return localStorage.getItem(HIDDEN_KEY) === '1';
+	} catch {
+		return false;
+	}
+}
+
+export function setTickerHidden(hidden: boolean) {
+	try {
+		localStorage.setItem(HIDDEN_KEY, hidden ? '1' : '0');
+	} catch {
+		/* private mode */
+	}
+	window.dispatchEvent(new Event(HIDDEN_EVENT));
+}
+
+export function useTickerHidden(): boolean {
+	return useSyncExternalStore(subscribeHidden, readHidden, () => false);
+}
+
 export default function GamesTicker() {
+	const hidden = useTickerHidden();
 	const [items, setItems] = useState<TickerItem[]>([]);
 	const tagsets = useTagsets();
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -151,9 +187,34 @@ export default function GamesTicker() {
 
 	if (items.length === 0) return null;
 
+	if (hidden) {
+		return (
+			<div className="sticky top-16 z-40 border-b border-night-700 bg-night-950/90 backdrop-blur">
+				<div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
+					<button
+						type="button"
+						onClick={() => setTickerHidden(false)}
+						className="py-0.5 font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500 hover:text-fog-100"
+					>
+						Show scores ▾
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="sticky top-16 z-40 border-b border-night-700 bg-night-900/95 backdrop-blur">
 			<div className="relative mx-auto max-w-7xl">
+				<button
+					type="button"
+					aria-label="Hide the scores ticker"
+					title="Hide the scores ticker"
+					onClick={() => setTickerHidden(true)}
+					className="absolute right-1 top-0.5 z-20 px-1 font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500 hover:text-fog-100"
+				>
+					Hide ×
+				</button>
 				{edges.left && (
 					<button
 						aria-label="Scroll left"

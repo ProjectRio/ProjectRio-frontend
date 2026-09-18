@@ -26,7 +26,8 @@ import {
 	simulateRandomLandings,
 	type SimulationOutput
 } from '@/lib/mssb/BattingSimulation/simulatePaths';
-import { COLLISION_TYPE_KEYS, getTheme3D, type StadiumTheme3D } from './stadiumThemes';
+import { getTheme3D, type StadiumTheme3D } from './stadiumThemes';
+import { applyEnvironment, buildStadium, fetchStadium, makeGlowTexture, makeSkyTexture, pulseGlow, setupSunShadows } from './stadiumScene';
 
 const METERS_TO_FEET = 3.28084;
 const PATH_COLORS = [0xffffff, 0xffd24d, 0x6ecbff, 0xff8fe1, 0x9dff8f];
@@ -34,46 +35,6 @@ const PATH_COLORS = [0xffffff, 0xffd24d, 0x6ecbff, 0xff8fe1, 0x9dff8f];
 // ---------------------------------------------------------------------------
 // three.js scene manager (imperative core, owned by the React component)
 // ---------------------------------------------------------------------------
-
-const stadiumCache = new Map<number, Promise<any>>();
-
-function fetchStadium(stadiumId: number): Promise<any> {
-	if (!stadiumCache.has(stadiumId)) {
-		stadiumCache.set(
-			stadiumId,
-			fetch(`/stadiums/${stadiumId}.json`).then((r) => {
-				if (!r.ok) throw new Error(`stadium ${stadiumId} fetch failed`);
-				return r.json();
-			})
-		);
-	}
-	return stadiumCache.get(stadiumId)!;
-}
-
-function makeGlowTexture(): THREE.CanvasTexture {
-	const c = document.createElement('canvas');
-	c.width = c.height = 64;
-	const ctx = c.getContext('2d')!;
-	const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-	g.addColorStop(0, 'rgba(255,255,255,1)');
-	g.addColorStop(0.35, 'rgba(255,255,255,0.55)');
-	g.addColorStop(1, 'rgba(255,255,255,0)');
-	ctx.fillStyle = g;
-	ctx.fillRect(0, 0, 64, 64);
-	return new THREE.CanvasTexture(c);
-}
-
-function makeRainbowTexture(): THREE.CanvasTexture {
-	const c = document.createElement('canvas');
-	c.width = c.height = 128;
-	const ctx = c.getContext('2d')!;
-	const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-	const stops = ['#7a2fd4', '#2f55d4', '#2fb8d4', '#2fd45a', '#e8e02f', '#e8862f', '#d42b2b'];
-	stops.forEach((color, i) => g.addColorStop(i / (stops.length - 1), color));
-	ctx.fillStyle = g;
-	ctx.fillRect(0, 0, 128, 128);
-	return new THREE.CanvasTexture(c);
-}
 
 class VisualizerScene {
 	private renderer: THREE.WebGLRenderer;
@@ -100,6 +61,9 @@ class VisualizerScene {
 
 		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 		container.appendChild(this.renderer.domElement);
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -107,7 +71,8 @@ class VisualizerScene {
 		this.controls.enableDamping = true;
 		this.controls.update();
 
-		this.scene.add(this.hemiLight, this.sunLight);
+		setupSunShadows(this.sunLight);
+		this.scene.add(this.hemiLight, this.sunLight, this.sunLight.target);
 
 		// The game's coordinate system is mirrored relative to three.js (1B is +X
 		// but should appear on the right from behind home plate), so everything
@@ -128,10 +93,7 @@ class VisualizerScene {
 				const p = points[frame % points.length];
 				mesh.position.set(p[0], p[1], p[2]);
 			}
-			const pulse = 0.82 + 0.18 * Math.sin(now / 280);
-			for (const mat of this.pulsingMaterials) {
-				mat.color.copy(mat.userData.baseColor as THREE.Color).multiplyScalar(pulse);
-			}
+			pulseGlow(this.pulsingMaterials, now);
 			this.controls.update();
 			this.renderer.render(this.scene, this.camera);
 		};
@@ -160,93 +122,18 @@ class VisualizerScene {
 
 	applyEnvironment(theme: StadiumTheme3D) {
 		this.container.style.background = `linear-gradient(${theme.skyTop}, ${theme.skyBottom})`;
-		this.scene.fog = new THREE.FogExp2(new THREE.Color(theme.fog), theme.fogDensity);
-		this.hemiLight.color.set(theme.hemi.sky);
-		this.hemiLight.groundColor.set(theme.hemi.ground);
-		this.hemiLight.intensity = theme.hemi.intensity;
-		this.sunLight.color.set(theme.sun.color);
-		this.sunLight.intensity = theme.sun.intensity;
-		this.sunLight.position.set(...theme.sun.position);
+		applyEnvironment(this.scene, this.hemiLight, this.sunLight, theme);
+		if (this.scene.background instanceof THREE.Texture) this.scene.background.dispose();
+		this.scene.background = makeSkyTexture(theme);
+		this.renderer.toneMappingExposure = theme.exposure ?? 1;
 	}
 
 	buildStadium(stadiumJson: any, theme: StadiumTheme3D) {
 		this.disposeGroup(this.stadiumGroup);
-		this.pulsingMaterials = [];
 		this.applyEnvironment(theme);
-
-		const positions: number[] = [];
-		const colors: number[] = [];
-		const emissivePositions: Record<string, number[]> = {};
-
-		const streamColor = (t: number) => {
-			const key = COLLISION_TYPE_KEYS[t & 0x0f];
-			const hex = theme.palette[key] || '#ff00ff';
-			const c = new THREE.Color(hex);
-			if ((t & 0xf0) === 0x80) c.multiplyScalar(theme.foulMult);
-			return [c.r, c.g, c.b];
-		};
-
-		const pushTri = (pa: any, pb: any, pc: any, collisionType: number) => {
-			// stadium data is y-down; flip to y-up
-			const tri = [pa, pb, pc].map((p) => [p.X, -p.Y, p.Z]);
-			const key = COLLISION_TYPE_KEYS[collisionType & 0x0f];
-			const glow = theme.emissive[key];
-			if (glow) {
-				(emissivePositions[glow] ||= []).push(...tri[0], ...tri[1], ...tri[2]);
-				return;
-			}
-			const c = streamColor(collisionType);
-			for (const v of tri) {
-				positions.push(...v);
-				colors.push(...c);
-			}
-		};
-
-		for (const box of stadiumJson['Triangle Collections']) {
-			for (const coll of box['Triangles']) {
-				const pts = coll['Points'];
-				if (coll['CollectionType'] === 0) {
-					for (let i = 0; i + 2 < pts.length; i += 3) {
-						pushTri(pts[i].Point, pts[i + 1].Point, pts[i + 2].Point, pts[i + 2].CollisionType);
-					}
-				} else {
-					for (let i = 0; i + 2 < pts.length; i++) {
-						pushTri(pts[i].Point, pts[i + 1].Point, pts[i + 2].Point, pts[i + 2].CollisionType);
-					}
-				}
-			}
-		}
-
-		const geo = new THREE.BufferGeometry();
-		geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-		geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-		geo.computeVertexNormals();
-		this.stadiumGroup.add(
-			new THREE.Mesh(
-				geo,
-				new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })
-			)
-		);
-
-		for (const [hex, pos] of Object.entries(emissivePositions)) {
-			const eg = new THREE.BufferGeometry();
-			eg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-			const mat = new THREE.MeshBasicMaterial({ color: hex, side: THREE.DoubleSide });
-			mat.userData.baseColor = new THREE.Color(hex);
-			this.pulsingMaterials.push(mat);
-			this.stadiumGroup.add(new THREE.Mesh(eg, mat));
-		}
-
-		for (const d of theme.decals ?? []) {
-			const mat =
-				d.color === 'rainbow'
-					? new THREE.MeshBasicMaterial({ map: makeRainbowTexture(), side: THREE.DoubleSide })
-					: new THREE.MeshBasicMaterial({ color: d.color, side: THREE.DoubleSide });
-			const pad = new THREE.Mesh(new THREE.CircleGeometry(d.r, 48), mat);
-			pad.rotation.x = -Math.PI / 2;
-			pad.position.set(d.x, 0.06, d.z);
-			this.stadiumGroup.add(pad);
-		}
+		const built = buildStadium(stadiumJson, theme, { shadows: true });
+		this.pulsingMaterials = built.pulsing;
+		this.stadiumGroup.add(built.group);
 	}
 
 	buildHit(

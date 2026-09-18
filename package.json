@@ -7,11 +7,13 @@
 	},
 	"scripts": {
 		"dev": "next dev",
+		"dev:plain": "CF_DEV_BINDINGS=0 next dev",
 		"build": "next build",
 		"start": "next start",
 		"check": "tsc --noEmit",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+		"render:stadiums": "node scripts/render-stadiums.mjs"
 	},
 	"dependencies": {
 		"@types/three": "^0.185.1",
