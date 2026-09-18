@@ -1,7 +1,8 @@
 'use client';
 
-// The pre-rendered stadium fields (public/stadiums/renders), produced from the
-// Rio Visualizer's three.js scene by scripts/render-stadiums.mjs. The manifest
+// The pre-rendered stadium fields (public/stadiums/renders): RioVisualizer's
+// stills (render_stadiums.py, through its HitRenderer), copied in by
+// `npm run sync:stadiums` (scripts/sync-stadium-renders.mjs). The manifest
 // carries each image's projection matrix, so anything at stadium coordinates
 // (home plate at the origin, first base +X, outfield +Z) can be pinned to the
 // picture the same way the 3D camera saw it.
@@ -29,7 +30,7 @@ let manifestPromise: Promise<Manifest> | null = null;
 export function loadManifest(): Promise<Manifest> {
 	if (!manifestPromise) {
 		manifestPromise = fetch(`${RENDERS_BASE}/manifest.json`).then((response) => {
-			if (!response.ok) throw new Error('stadium renders missing — run npm run render:stadiums');
+			if (!response.ok) throw new Error('stadium renders missing — run npm run sync:stadiums');
 			return response.json();
 		});
 	}

@@ -12,6 +12,10 @@
 // components/visualizer/stadiumScene.ts or stadiumThemes.ts changes.
 //
 // Env: RENDER_BASE (default http://localhost:3000), CHROME (path to the binary).
+//
+// Prefer `npm run sync:stadiums`: it copies RioVisualizer's stills, which are
+// rendered through its HitRenderer and so include the mound, bases, plate and
+// foul lines that this scene lacks.
 
 import { spawn } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';

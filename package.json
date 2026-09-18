@@ -13,7 +13,8 @@
 		"check": "tsc --noEmit",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-		"render:stadiums": "node scripts/render-stadiums.mjs"
+		"render:stadiums": "node scripts/render-stadiums.mjs",
+		"sync:stadiums": "node scripts/sync-stadium-renders.mjs"
 	},
 	"dependencies": {
 		"@types/three": "^0.185.1",
