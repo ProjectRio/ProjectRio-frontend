@@ -37,7 +37,7 @@ export interface Collection {
 	page_config?: { sections: CollectionSection[] };
 }
 
-export type CollectionSection = 'competitions' | 'ladder' | 'champions' | 'all_time' | 'prices' | 'children';
+export type CollectionSection = 'standings' | 'competitions' | 'ladder' | 'champions' | 'all_time' | 'prices' | 'children';
 
 // ── Competitions (§3f) ─────────────────────────────────────────────────────
 

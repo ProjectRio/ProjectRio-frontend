@@ -68,7 +68,7 @@ export const COLLECTIONS: Collection[] = [
 		organizers: ['MattGree', 'Peppermint'],
 		sponsor: { name: 'Project Rio Patreon', url: 'https://www.patreon.com/projectrio/posts' },
 		founded: 2020,
-		page_config: { sections: ['competitions', 'champions', 'prices', 'all_time'] }
+		page_config: { sections: ['standings', 'competitions', 'champions', 'prices', 'all_time'] }
 	},
 	{
 		slug: 'nnl',
@@ -80,7 +80,7 @@ export const COLLECTIONS: Collection[] = [
 		approved: true,
 		organizers: ['Nick H'],
 		founded: 2022,
-		page_config: { sections: ['competitions', 'champions', 'all_time', 'prices'] }
+		page_config: { sections: ['standings', 'competitions', 'champions', 'all_time', 'prices'] }
 	},
 	{
 		slug: 'muddyball',
@@ -93,7 +93,7 @@ export const COLLECTIONS: Collection[] = [
 		organizers: ['Pico'],
 		template: 'Six to eight teams · $40 fixed-price build · 10-game season · no trades',
 		founded: 2024,
-		page_config: { sections: ['competitions', 'champions'] }
+		page_config: { sections: ['standings', 'competitions', 'champions'] }
 	},
 	{
 		slug: 'big-balla',
@@ -129,7 +129,7 @@ export const COLLECTIONS: Collection[] = [
 		organizers: ['Vokal'],
 		template: '6 entrants · 2 sides of 3 · exhaustive 54-character draft · 9 cross-side fixtures · Stars On or Off per night',
 		founded: 2025,
-		page_config: { sections: ['competitions', 'champions'] }
+		page_config: { sections: ['standings', 'competitions', 'champions'] }
 	}
 ];
 

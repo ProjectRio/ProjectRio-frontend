@@ -60,6 +60,154 @@ function CompetitionsSection({ collection, competitions }: { collection: Collect
 	);
 }
 
+interface LifetimeRow {
+	name: string;
+	seasons: number;
+	w: number;
+	l: number;
+	rf: number;
+	ra: number;
+	hasRuns: boolean;
+	titles: number;
+	bestFinish: number | null;
+	last: { competition: Competition; w: number; l: number; rank: number } | null;
+	logo?: string;
+}
+
+/** Lifetime win–loss across every competition in the collection (membership rolls up from child collections). */
+function lifetimeStandings(competitions: Competition[]): LifetimeRow[] {
+	const rows = new Map<string, LifetimeRow>();
+	const ordered = [...competitions].sort((a, b) => (a.starts_at ?? 0) - (b.starts_at ?? 0));
+	for (const competition of ordered) {
+		const table = standingsFor(competition);
+		if (table.length === 0) continue;
+		for (const standing of table) {
+			const row = rows.get(standing.name) ?? { name: standing.name, seasons: 0, w: 0, l: 0, rf: 0, ra: 0, hasRuns: false, titles: 0, bestFinish: null, last: null };
+			row.seasons += 1;
+			row.w += standing.total.w;
+			row.l += standing.total.l;
+			if (Number.isFinite(standing.diff)) {
+				row.rf += standing.total.rf;
+				row.ra += standing.total.ra;
+				row.hasRuns = true;
+			}
+			if (competition.champion === standing.name) row.titles += 1;
+			if (competition.state === 'completed' && (row.bestFinish === null || standing.rank < row.bestFinish)) row.bestFinish = standing.rank;
+			row.last = { competition, w: standing.total.w, l: standing.total.l, rank: standing.rank };
+			row.logo = participantByName(competition, standing.name)?.logo ?? row.logo;
+			rows.set(standing.name, row);
+		}
+	}
+	return [...rows.values()].sort((a, b) => {
+		const pa = a.w + a.l ? a.w / (a.w + a.l) : 0;
+		const pb = b.w + b.l ? b.w / (b.w + b.l) : 0;
+		return pb - pa || b.w - a.w || b.titles - a.titles;
+	});
+}
+
+type LifetimeSort = 'pct' | 'wins' | 'titles';
+
+function LifetimeStandingsSection({ competitions }: { competitions: Competition[] }) {
+	const [showAll, setShowAll] = useState(false);
+	const [sort, setSort] = useState<LifetimeSort>('pct');
+	const rows = useMemo(() => {
+		const base = lifetimeStandings(competitions);
+		if (sort === 'wins') return [...base].sort((a, b) => b.w - a.w || a.l - b.l);
+		if (sort === 'titles') return [...base].sort((a, b) => b.titles - a.titles || b.w - a.w);
+		return base;
+	}, [competitions, sort]);
+	if (rows.length === 0) return <p className="text-sm text-fog-500">No games recorded yet.</p>;
+	const hasRuns = rows.some((row) => row.hasRuns);
+	const withGames = competitions.filter((competition) => standingsFor(competition).length > 0);
+	const visible = showAll ? rows : rows.slice(0, 12);
+	const teams = competitions.some((competition) => competition.teams?.length);
+	return (
+		<Panel>
+			<div className="flex flex-wrap items-center justify-between gap-2 border-b border-night-700 bg-night-850 px-3 py-2 text-xs text-fog-500">
+				<span>
+					Regular-season record across {withGames.length} {withGames.length === 1 ? 'season' : 'seasons'} · playoff games not included
+				</span>
+				<label className="flex items-center gap-1.5">
+					Sort by
+					<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs text-fog-300" value={sort} onChange={(event) => setSort(event.target.value as LifetimeSort)}>
+						<option value="pct">Win %</option>
+						<option value="wins">Wins</option>
+						<option value="titles">Titles</option>
+					</select>
+				</label>
+			</div>
+			<div className="overflow-x-auto">
+				<table className="stat-table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>{teams ? 'Team' : 'Manager'}</th>
+							<th className="text-right">Seasons</th>
+							<th className="text-right">W</th>
+							<th className="text-right">L</th>
+							<th className="text-right">%</th>
+							{hasRuns && (
+								<>
+									<th className="text-right">RF</th>
+									<th className="text-right">RA</th>
+									<th className="text-right">Diff</th>
+								</>
+							)}
+							<th className="text-right">Titles</th>
+							<th className="text-right" title="Best regular-season finish">
+								Best seed
+							</th>
+							<th>Last season</th>
+						</tr>
+					</thead>
+					<tbody>
+						{visible.map((row, index) => {
+							const gp = row.w + row.l;
+							const diff = row.rf - row.ra;
+							return (
+								<tr key={row.name}>
+									<td className="font-display font-bold text-fog-500">{index + 1}</td>
+									<td>
+										<span className="inline-flex items-center gap-2">
+											<Mark participant={{ name: row.name, logo: row.logo, members: [row.name] }} size={24} />
+											{teams ? <span className="font-medium text-fog-100">{row.name}</span> : <ParticipantName participant={{ name: row.name, members: [row.name] }} name={row.name} />}
+										</span>
+									</td>
+									<td className="text-right tabular-nums text-fog-300">{row.seasons}</td>
+									<td className="text-right font-display font-bold tabular-nums text-fog-100">{row.w}</td>
+									<td className="text-right tabular-nums text-fog-300">{row.l}</td>
+									<td className="text-right tabular-nums">{gp ? (row.w / gp).toFixed(3).replace(/^0/, '') : '—'}</td>
+									{hasRuns && (
+										<>
+											<td className="text-right tabular-nums text-fog-300">{row.hasRuns ? row.rf : '—'}</td>
+											<td className="text-right tabular-nums text-fog-300">{row.hasRuns ? row.ra : '—'}</td>
+											<td className={`text-right tabular-nums ${!row.hasRuns ? 'text-fog-500' : diff > 0 ? 'text-emerald-300' : diff < 0 ? 'text-rio-300' : 'text-fog-300'}`}>{row.hasRuns ? (diff > 0 ? `+${diff}` : diff) : '—'}</td>
+										</>
+									)}
+									<td className="text-right tabular-nums text-star-400">{row.titles ? `★${row.titles > 1 ? row.titles : ''}` : ''}</td>
+									<td className="text-right tabular-nums text-fog-300">{row.bestFinish ? `#${row.bestFinish}` : '—'}</td>
+									<td className="text-xs text-fog-500">
+										{row.last && (
+											<Link href={`/competitions/${row.last.competition.slug}`} className="hover:text-fog-100">
+												{row.last.competition.season_label} · {row.last.w}–{row.last.l} · #{row.last.rank}
+											</Link>
+										)}
+									</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			</div>
+			{rows.length > 12 && (
+				<button type="button" className="w-full border-t border-night-800 py-2 text-xs text-fog-500 hover:text-fog-100" onClick={() => setShowAll(!showAll)}>
+					{showAll ? 'Show fewer' : `Show all ${rows.length}`}
+				</button>
+			)}
+		</Panel>
+	);
+}
+
 function ChampionsSection({ competitions }: { competitions: Competition[] }) {
 	const winners = competitions.filter((competition) => competition.champion);
 	if (winners.length === 0) return <p className="text-sm text-fog-500">No titles decided yet.</p>;
@@ -161,7 +309,7 @@ function AllTimeSection({ competitions }: { competitions: Competition[] }) {
 									{row.name}
 								</Link>
 								<span className="text-[11px] text-fog-500">
-									{row.seasons} season{row.seasons === 1 ? '' : 's'} · {row.w}–{row.l}
+									{row.seasons} season{row.seasons === 1 ? '' : 's'}
 									{row.titles > 0 && <span className="ml-1 text-star-400">★{row.titles > 1 ? row.titles : ''}</span>}
 								</span>
 							</span>
@@ -348,6 +496,12 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
 			{sections.map((section) => {
 				switch (section) {
+					case 'standings':
+						return (
+							<Section key={section} title="Lifetime standings">
+								<LifetimeStandingsSection competitions={competitions} />
+							</Section>
+						);
 					case 'children':
 						return children.length ? (
 							<Section key={section} title="Sections">
@@ -378,7 +532,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 						);
 					case 'all_time':
 						return (
-							<Section key={section} title="All-time">
+							<Section key={section} title="All-time stats">
 								<AllTimeSection competitions={competitions.filter((competition) => competition.state === 'completed')} />
 							</Section>
 						);
