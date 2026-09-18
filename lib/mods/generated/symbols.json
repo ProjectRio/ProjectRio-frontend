@@ -1,0 +1,1998 @@
+{
+	"meta": {
+		"repo": "ProjectRio/ProjectRio-Modding",
+		"ref": "6bcb1fb7aea8ff521b4fc472d5c226a29da5b234",
+		"decomp": {
+			"repo": "LittleCoaks/mssb-dtk",
+			"ref": "4afd4fc57274590566340eb0c9e7376e841623f8"
+		},
+		"generatedAt": "2026-09-18T01:16:03.046Z"
+	},
+	"tables": {
+		"character-stats": {
+			"symbol": "Static_Stats_Tables",
+			"address": "0x8034E9A0",
+			"axes": [
+				{
+					"count": 54,
+					"stride": 160
+				}
+			],
+			"elem": {
+				"kind": "struct",
+				"name": "StatTable",
+				"size": 59,
+				"fields": [
+					{
+						"name": "CurveBallSpeed",
+						"offset": 0,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "FastBallSpeed",
+						"offset": 1,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "cursedBall",
+						"offset": 2,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Curve",
+						"offset": 3,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "curveControl",
+						"offset": 4,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[0]",
+						"offset": 5,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[1]",
+						"offset": 6,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[2]",
+						"offset": 7,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[3]",
+						"offset": 8,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[4]",
+						"offset": 9,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[5]",
+						"offset": 10,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[6]",
+						"offset": 11,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[7]",
+						"offset": 12,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[8]",
+						"offset": 13,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[9]",
+						"offset": 14,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[10]",
+						"offset": 15,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[11]",
+						"offset": 16,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[12]",
+						"offset": 17,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[13]",
+						"offset": 18,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[14]",
+						"offset": 19,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[15]",
+						"offset": 20,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[16]",
+						"offset": 21,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[17]",
+						"offset": 22,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[18]",
+						"offset": 23,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[19]",
+						"offset": 24,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[20]",
+						"offset": 25,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[21]",
+						"offset": 26,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[22]",
+						"offset": 27,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[23]",
+						"offset": 28,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[24]",
+						"offset": 29,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[25]",
+						"offset": 30,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "UnusedBytes[26]",
+						"offset": 31,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "FieldingStats",
+						"offset": 32,
+						"type": "word",
+						"size": 4,
+						"signed": false,
+						"enum": "FIELDING_ABILITIES"
+					},
+					{
+						"name": "CharID",
+						"offset": 36,
+						"type": "short",
+						"size": 2,
+						"signed": true
+					},
+					{
+						"name": "FieldingArm",
+						"offset": 38,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BattingStance",
+						"offset": 39,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "SlapContactSize",
+						"offset": 40,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "ChargeContactSize",
+						"offset": 41,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "SlapHitPower",
+						"offset": 42,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "ChargeHitPower",
+						"offset": 43,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BuntingContactSize",
+						"offset": 44,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "HitTrajectoryPushPull",
+						"offset": 45,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "HitTrajectoryHighLow",
+						"offset": 46,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Speed",
+						"offset": 47,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "ThrowingArm",
+						"offset": 48,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "CharacterClass",
+						"offset": 49,
+						"type": "byte",
+						"size": 1,
+						"signed": false,
+						"enum": "CHARACTER_CLASS"
+					},
+					{
+						"name": "Weight",
+						"offset": 50,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Captain",
+						"offset": 51,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "CaptainStarHitPitch",
+						"offset": 52,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "NonCaptainStarSwing",
+						"offset": 53,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "NonCaptainStarPitch",
+						"offset": 54,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BattingStatBar",
+						"offset": 55,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "PitchingStatBar",
+						"offset": 56,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RunningStatBar",
+						"offset": 57,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "FieldingStatBar",
+						"offset": 58,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					}
+				]
+			},
+			"path": "[].stats"
+		},
+		"chemistry": {
+			"symbol": "Static_Stats_Tables",
+			"address": "0x8034E9DB",
+			"axes": [
+				{
+					"count": 54,
+					"stride": 160
+				}
+			],
+			"elem": {
+				"kind": "struct",
+				"name": "ChemistryTable",
+				"size": 54,
+				"fields": [
+					{
+						"name": "Mario",
+						"offset": 0,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Luigi",
+						"offset": 1,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "DK",
+						"offset": 2,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Diddy",
+						"offset": 3,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Peach",
+						"offset": 4,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Daisy",
+						"offset": 5,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Yoshi",
+						"offset": 6,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BabyMario",
+						"offset": 7,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BabyLuigi",
+						"offset": 8,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Bowser",
+						"offset": 9,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Wario",
+						"offset": 10,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Waluigi",
+						"offset": 11,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedKoopa",
+						"offset": 12,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedToad",
+						"offset": 13,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Boo",
+						"offset": 14,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Toadette",
+						"offset": 15,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedShyGuy",
+						"offset": 16,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Birdo",
+						"offset": 17,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Monty",
+						"offset": 18,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BowserJr",
+						"offset": 19,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedParatroopa",
+						"offset": 20,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BluePianta",
+						"offset": 21,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedPianta",
+						"offset": 22,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "YellowPianta",
+						"offset": 23,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlueNoki",
+						"offset": 24,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedNoki",
+						"offset": 25,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenNoki",
+						"offset": 26,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "HammerBro",
+						"offset": 27,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Toadsworth",
+						"offset": 28,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlueToad",
+						"offset": 29,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "YellowToad",
+						"offset": 30,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenToad",
+						"offset": 31,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "PurpleToad",
+						"offset": 32,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlueMagikoopa",
+						"offset": 33,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedMagikoopa",
+						"offset": 34,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenMagikoopa",
+						"offset": 35,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "YellowMagikoopa",
+						"offset": 36,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "KingBoo",
+						"offset": 37,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Petey",
+						"offset": 38,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Dixie",
+						"offset": 39,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Goomba",
+						"offset": 40,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "Paragoomba",
+						"offset": 41,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenKoopa",
+						"offset": 42,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenParatroopa",
+						"offset": 43,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlueShyGuy",
+						"offset": 44,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "YellowShyGuy",
+						"offset": 45,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenShyGuy",
+						"offset": 46,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlackShyGuy",
+						"offset": 47,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GrayDryBones",
+						"offset": 48,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "GreenDryBones",
+						"offset": 49,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "RedDryBones",
+						"offset": 50,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BlueDryBones",
+						"offset": 51,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "FireBro",
+						"offset": 52,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "BoomerangBro",
+						"offset": 53,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					}
+				]
+			},
+			"path": "[].chemistry"
+		},
+		"batter-reaches": {
+			"symbol": "BatterHitbox",
+			"address": "0x807B84F8",
+			"axes": [
+				{
+					"count": 54,
+					"stride": 36
+				}
+			],
+			"elem": {
+				"kind": "struct",
+				"name": "BatterReachStruct",
+				"size": 36,
+				"fields": [
+					{
+						"name": "HorizontalRangeNear",
+						"offset": 0,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "HorizontalRangeFar",
+						"offset": 4,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "VerticalRangeFront",
+						"offset": 8,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "VerticalRangeBack",
+						"offset": 12,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "batOffsetFromBatterX",
+						"offset": 16,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "batOffsetFromBatterZ",
+						"offset": 20,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "BoxMoveSpeed",
+						"offset": 24,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "PitchingHeight",
+						"offset": 28,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "TrimmedBat",
+						"offset": 32,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					}
+				]
+			}
+		},
+		"exit-velocity": {
+			"symbol": "BallHitArray",
+			"address": "0x807B6D74",
+			"axes": [
+				{
+					"count": 2,
+					"stride": 30
+				},
+				{
+					"count": 5,
+					"stride": 6
+				},
+				{
+					"count": 3,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"horizontal-angles": {
+			"symbol": "BattingAngleRanges",
+			"address": "0x807B6394",
+			"axes": [
+				{
+					"count": 3,
+					"stride": 120
+				},
+				{
+					"count": 2,
+					"stride": 60
+				},
+				{
+					"count": 15,
+					"stride": 4
+				},
+				{
+					"count": 2,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"horizontal-power-multipliers": {
+			"symbol": "horizTrajPowerMultipliers",
+			"address": "0x807B70F8",
+			"axes": [
+				{
+					"count": 3,
+					"stride": 20
+				},
+				{
+					"count": 5,
+					"stride": 4
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "float",
+				"size": 4,
+				"signed": true
+			}
+		},
+		"curve-effects": {
+			"symbol": "s_ballCurveData",
+			"address": "0x807B72BC",
+			"axes": [
+				{
+					"count": 2,
+					"stride": 12
+				}
+			],
+			"elem": {
+				"kind": "struct",
+				"name": "VecXYZ",
+				"size": 12,
+				"fields": [
+					{
+						"name": "x",
+						"offset": 0,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "y",
+						"offset": 4,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					},
+					{
+						"name": "z",
+						"offset": 8,
+						"type": "float",
+						"size": 4,
+						"signed": true
+					}
+				]
+			}
+		},
+		"vertical-angles": {
+			"symbol": "HitVertTrajRanges",
+			"address": "0x807B67CC",
+			"axes": [
+				{
+					"count": 2,
+					"stride": 100
+				},
+				{
+					"count": 5,
+					"stride": 20
+				},
+				{
+					"count": 5,
+					"stride": 4
+				},
+				{
+					"count": 2,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"vertical-probabilities": {
+			"symbol": "BattingVerticalAngleRangeProbabilities",
+			"address": "0x807B6B00",
+			"axes": [
+				{
+					"count": 3,
+					"stride": 100
+				},
+				{
+					"count": 2,
+					"stride": 50
+				},
+				{
+					"count": 2,
+					"stride": 25
+				},
+				{
+					"count": 5,
+					"stride": 5
+				}
+			],
+			"elem": {
+				"kind": "struct",
+				"name": "trajZones",
+				"size": 5,
+				"fields": [
+					{
+						"name": "bottom",
+						"offset": 0,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "low",
+						"offset": 1,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "mid",
+						"offset": 2,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "high",
+						"offset": 3,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					},
+					{
+						"name": "top",
+						"offset": 4,
+						"type": "byte",
+						"size": 1,
+						"signed": false
+					}
+				]
+			}
+		},
+		"captain-star-vertical-angles": {
+			"symbol": "CaptainStarSwingBattingVerticalAngleRanges",
+			"address": "0x807B695C",
+			"axes": [
+				{
+					"count": 12,
+					"stride": 20
+				},
+				{
+					"count": 5,
+					"stride": 4
+				},
+				{
+					"count": 2,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"star-swing-vertical-angles": {
+			"symbol": "NonCaptainStarSwingBattingVerticalAngleRanges",
+			"address": "0x807B6A4C",
+			"axes": [
+				{
+					"count": 3,
+					"stride": 20
+				},
+				{
+					"count": 5,
+					"stride": 4
+				},
+				{
+					"count": 2,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"batting-constants": {
+			"entries": [
+				{
+					"address": "0x807B733C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "overChargeLerpBtwnSlapAndChargePower"
+				},
+				{
+					"address": "0x807B7340",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "regularBoxSpeedMult"
+				},
+				{
+					"address": "0x807B7344",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "centeringBoxSpeedMult"
+				},
+				{
+					"address": "0x807B7348",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "moonshotMult"
+				},
+				{
+					"address": "0x807B731C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "minStarHitVelo"
+				},
+				{
+					"address": "0x807B734C",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "frameChargeDownEnds"
+				},
+				{
+					"address": "0x807B734E",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "framesUntilChargeIsEnabled"
+				},
+				{
+					"address": "0x807B7366",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "regularHitGamePause"
+				},
+				{
+					"address": "0x807B7368",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "captainStarHitGamePause"
+				},
+				{
+					"address": "0x807B736A",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "moonshotGamePause"
+				},
+				{
+					"address": "0x807B5C00",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"container": "lbl_3_data_4600 (game .data)"
+				},
+				{
+					"address": "0x807B5BFC",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_45FC (game .data)"
+				},
+				{
+					"address": "0x807B70F0",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5AF0 (game .data)"
+				},
+				{
+					"address": "0x807ADB20",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_rodata_6E0 (game .rodata)"
+				},
+				{
+					"address": "0x807B5C20",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "chemBobbleMults",
+					"path": "[2]"
+				},
+				{
+					"address": "0x807B5C24",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "chemBobbleMults",
+					"path": "[3]"
+				},
+				{
+					"address": "0x807B5C28",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "chemBobbleMults",
+					"path": "[4]"
+				},
+				{
+					"address": "0x807B76F4",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "starPowerCosts",
+					"path": "moonShotCost"
+				},
+				{
+					"address": "0x807B76F5",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "starPowerCosts",
+					"path": "captainStarCost"
+				},
+				{
+					"address": "0x807B76F6",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "starPowerCosts",
+					"path": "nonCaptain_CaptainStarCost"
+				},
+				{
+					"address": "0x807B76F7",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "starPowerCosts",
+					"path": "regularStarCost"
+				},
+				{
+					"address": "0x807B7354",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "fireballStunFrames"
+				},
+				{
+					"address": "0x807B735E",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "FrameWhenPeachHitAppearsAgain"
+				},
+				{
+					"address": "0x807B7360",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "FrameWhenDaisyHitAppearsAgain"
+				},
+				{
+					"address": "0x807B7320",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "DKStarAngleDelta"
+				},
+				{
+					"address": "0x807B7324",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "DKStarHangtimePercentStart"
+				},
+				{
+					"address": "0x807B7328",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "DKStarHangtimePercentEnd"
+				},
+				{
+					"address": "0x807B735C",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "framesBeforeGroundWhenGarlicSplits"
+				},
+				{
+					"address": "0x807B7334",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "garlicSpreadLower"
+				},
+				{
+					"address": "0x807B7338",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "garlicSpreadUpper"
+				},
+				{
+					"address": "0x807B7330",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "bulletStarEnergyMultiplier"
+				},
+				{
+					"address": "0x807B732C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "g_hitFloats",
+					"path": "eggVeloMaintainedOnBounce"
+				},
+				{
+					"address": "0x807B7358",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "g_hitShorts",
+					"path": "NEggBounces"
+				}
+			]
+		},
+		"pitching-constants": {
+			"entries": [
+				{
+					"address": "0x807B5A7C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_4474+0x8 (game .data)"
+				},
+				{
+					"address": "0x807B7590",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[0]"
+				},
+				{
+					"address": "0x807B7594",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[1]"
+				},
+				{
+					"address": "0x807B9682",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_8080+0x2 (game .data)"
+				},
+				{
+					"address": "0x807B9684",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_8080+0x4 (game .data)"
+				},
+				{
+					"address": "0x807B7540",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5F3C+0x4 (game .data)"
+				},
+				{
+					"address": "0x807B7530",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5F08+0x28 (game .data)"
+				},
+				{
+					"address": "0x807B752C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5F08+0x24 (game .data)"
+				},
+				{
+					"address": "0x807B7528",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5F08+0x20 (game .data)"
+				},
+				{
+					"address": "0x807B751C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5F08+0x14 (game .data)"
+				},
+				{
+					"address": "0x807B7510",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"container": "lbl_3_data_5F08+0x8 (game .data)"
+				},
+				{
+					"address": "0x807B74E6",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC+0xA (game .data)"
+				},
+				{
+					"address": "0x807B74E8",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC+0xC (game .data)"
+				},
+				{
+					"address": "0x807B74EA",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC+0xE (game .data)"
+				},
+				{
+					"address": "0x807B74EC",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC+0x10 (game .data)"
+				},
+				{
+					"address": "0x807B74DC",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC (game .data)"
+				},
+				{
+					"address": "0x807B74E2",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5EDC+0x6 (game .data)"
+				},
+				{
+					"address": "0x807B7498",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "strikeZone",
+					"path": "[0]"
+				},
+				{
+					"address": "0x807B749C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "strikeZone",
+					"path": "[1]"
+				},
+				{
+					"address": "0x807B74A0",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "strikeZone",
+					"path": "[2]"
+				},
+				{
+					"address": "0x807B74A4",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "strikeZone",
+					"path": "[3]"
+				},
+				{
+					"address": "0x807B74A8",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "strikeZone",
+					"path": "[4]"
+				},
+				{
+					"address": "0x807B755C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[0]"
+				},
+				{
+					"address": "0x807B7560",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[1]"
+				},
+				{
+					"address": "0x807B7564",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[2]"
+				},
+				{
+					"address": "0x807B7568",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[3]"
+				},
+				{
+					"address": "0x807B756C",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[4]"
+				},
+				{
+					"address": "0x807B7570",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[5]"
+				},
+				{
+					"address": "0x807B7574",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[6]"
+				},
+				{
+					"address": "0x807B7578",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "eggConstants",
+					"path": "[7]"
+				},
+				{
+					"address": "0x807B757C",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5F7C (game .data)"
+				},
+				{
+					"address": "0x807B757E",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5F7C+0x2 (game .data)"
+				},
+				{
+					"address": "0x807B7580",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5F7C+0x4 (game .data)"
+				},
+				{
+					"address": "0x807B7582",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"container": "lbl_3_data_5F7C+0x6 (game .data)"
+				},
+				{
+					"address": "0x807B7550",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[0]"
+				},
+				{
+					"address": "0x807B7551",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[1]"
+				},
+				{
+					"address": "0x807B7552",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[2]"
+				},
+				{
+					"address": "0x807B7553",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[3]"
+				},
+				{
+					"address": "0x807B7554",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[4]"
+				},
+				{
+					"address": "0x807B7555",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[5]"
+				},
+				{
+					"address": "0x807B7556",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[6]"
+				},
+				{
+					"address": "0x807B7557",
+					"type": "byte",
+					"size": 1,
+					"signed": false,
+					"symbol": "bulletBallConstants",
+					"path": "[7]"
+				},
+				{
+					"address": "0x807B75B0",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[8]"
+				},
+				{
+					"address": "0x807B75B4",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[9]"
+				},
+				{
+					"address": "0x807B75B8",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[10]"
+				},
+				{
+					"address": "0x807B75BC",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "pitchSpeedScaler",
+					"path": "[11]"
+				}
+			]
+		},
+		"fielder-hitboxes": {
+			"symbol": "FielderHitboxConsts",
+			"address": "0x807B8FB4",
+			"axes": [
+				{
+					"count": 55,
+					"stride": 16
+				},
+				{
+					"count": 8,
+					"stride": 2
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "short",
+				"size": 2,
+				"signed": true
+			}
+		},
+		"hitbox-scalers": {
+			"symbol": "charSizeMultipliers",
+			"address": "0x800E8300",
+			"axes": [
+				{
+					"count": 54,
+					"stride": 8
+				},
+				{
+					"count": 2,
+					"stride": 4
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "float",
+				"size": 4,
+				"signed": true
+			}
+		},
+		"hitbox-constants": {
+			"entries": [
+				{
+					"address": "0x807AE638",
+					"type": "float",
+					"size": 4,
+					"signed": true,
+					"symbol": "_0_01_HitboxScaleMultiplier"
+				},
+				{
+					"address": "0x807B9314",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "FielderHitboxConsts",
+					"path": "[54][0]"
+				},
+				{
+					"address": "0x807B9316",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "FielderHitboxConsts",
+					"path": "[54][1]"
+				},
+				{
+					"address": "0x807B931C",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "FielderHitboxConsts",
+					"path": "[54][4]"
+				},
+				{
+					"address": "0x807B931E",
+					"type": "short",
+					"size": 2,
+					"signed": true,
+					"symbol": "FielderHitboxConsts",
+					"path": "[54][5]"
+				}
+			]
+		},
+		"bobble-chances": {
+			"symbol": "BobbleArray",
+			"address": "0x807B5D14",
+			"axes": [
+				{
+					"count": 2,
+					"stride": 24
+				},
+				{
+					"count": 4,
+					"stride": 6
+				},
+				{
+					"count": 2,
+					"stride": 3
+				},
+				{
+					"count": 3,
+					"stride": 1
+				}
+			],
+			"elem": {
+				"kind": "prim",
+				"type": "byte",
+				"size": 1,
+				"signed": false
+			}
+		}
+	},
+	"enums": {
+		"BATTING_HAND": {
+			"flags": false,
+			"members": [
+				{
+					"name": "RIGHT",
+					"value": 0
+				},
+				{
+					"name": "LEFT",
+					"value": 1
+				}
+			]
+		},
+		"CHARACTER_CLASS": {
+			"flags": false,
+			"members": [
+				{
+					"name": "BALANCED",
+					"value": 0
+				},
+				{
+					"name": "POWER",
+					"value": 1
+				},
+				{
+					"name": "SPEED",
+					"value": 2
+				},
+				{
+					"name": "TECHNIQUE",
+					"value": 3
+				}
+			]
+		},
+		"FIELDING_ABILITIES": {
+			"flags": true,
+			"members": [
+				{
+					"name": "WALL_SPLAT",
+					"value": 1
+				},
+				{
+					"name": "WALL_JUMP",
+					"value": 2
+				},
+				{
+					"name": "CLAMBER",
+					"value": 4
+				},
+				{
+					"name": "SLIDING_CATCH",
+					"value": 8
+				},
+				{
+					"name": "LASER",
+					"value": 16
+				},
+				{
+					"name": "QUICK_THROW",
+					"value": 32
+				},
+				{
+					"name": "SUPER_JUMP",
+					"value": 64
+				},
+				{
+					"name": "MAGICAL_CATCH",
+					"value": 128
+				},
+				{
+					"name": "TONGUE_CATCH",
+					"value": 256
+				},
+				{
+					"name": "SUCTION",
+					"value": 512
+				},
+				{
+					"name": "SUPER_CATCH",
+					"value": 1024
+				},
+				{
+					"name": "BALL_DASH",
+					"value": 2048
+				},
+				{
+					"name": "BODY_CHECK",
+					"value": 4096
+				},
+				{
+					"name": "SUPER_CURVE",
+					"value": 8192
+				},
+				{
+					"name": "UNASSIGNED",
+					"value": 16384
+				},
+				{
+					"name": "UNASSIGNED2",
+					"value": 32768
+				}
+			]
+		},
+		"REGULAR_STAR_SWING": {
+			"flags": false,
+			"members": [
+				{
+					"name": "NONE",
+					"value": 0
+				},
+				{
+					"name": "POPFLY",
+					"value": 1
+				},
+				{
+					"name": "GROUNDER",
+					"value": 2
+				},
+				{
+					"name": "LINEDRIVE",
+					"value": 3
+				}
+			]
+		}
+	}
+}

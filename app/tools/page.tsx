@@ -10,6 +10,11 @@ const TOOLS = [
 		description: 'Frame-accurate pitch trajectory simulation straight from the game engine decompilation.'
 	},
 	{
+		href: '/tools/mods',
+		title: 'Game Mods',
+		description: 'Edit character stats, chemistry, batting, pitching and fielding tables and generate Gecko codes.'
+	},
+	{
 		href: '/muddyball',
 		title: 'Muddyball Draft Board',
 		description: 'Build a budget roster, arrange your lineup and field, and share it with a link.'
