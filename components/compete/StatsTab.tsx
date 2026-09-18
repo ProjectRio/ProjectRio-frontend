@@ -9,7 +9,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { characterImage } from '@/lib/data/characters';
-import type { CharacterLine, Competition, StatLine } from '@/lib/compete/types';
+import type { CharacterLine, Competition } from '@/lib/compete/types';
 import { BATTING_TABLE, PITCHING_TABLE, STAT_COLUMNS, TEAM_TABLE, characterTotals, derive, leagueContext, qualifyingGames, sumLines, teamLines, type DerivedLine } from '@/lib/compete/stats';
 import { standingsFor } from './StandingsTable';
 import StatTable, { type StatTableRow } from './StatTable';
@@ -209,6 +209,3 @@ export function Leaders({ competition }: { competition: Competition }) {
 	);
 }
 
-export function statLineOf(lines: StatLine[]): StatLine {
-	return sumLines(lines);
-}

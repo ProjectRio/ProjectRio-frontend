@@ -96,15 +96,6 @@ export function ParticipantName({ participant, name, className = '' }: { partici
 	return <span className={`font-medium text-fog-100 ${className}`}>{label}</span>;
 }
 
-export function ParticipantChip({ competition, name, size = 22, muted = false }: { competition: Competition; name: string; size?: number; muted?: boolean }) {
-	const participant = participantByName(competition, name);
-	return (
-		<span className={`inline-flex min-w-0 items-center gap-2 ${muted ? 'opacity-60' : ''}`}>
-			<Mark participant={participant} size={size} />
-			<ParticipantName participant={participant} name={name} className="truncate" />
-		</span>
-	);
-}
 
 export const FILE_LABELS: Record<FileStatus, { label: string; className: string; dot: string }> = {
 	processed: { label: 'Processed', className: 'text-emerald-300', dot: 'bg-emerald-400' },
