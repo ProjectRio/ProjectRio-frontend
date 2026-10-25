@@ -596,7 +596,8 @@ export default function RunningCalculator() {
 				<p className="text-xs text-fog-500">
 					Top-down, from behind home plate. The thick line is the simulated path for the selected mashing mode. Numbered circles mark each
 					second since contact, and the time under each base is when the runner reaches it. Callouts show the lead, where rounding starts,
-					any slide (drawn dashed) and, on a run to 1B, the overrun past the base. The dotted curve and small circles are the full rounding spline and its control points; dashed
+					any slide, and the overrun past the final base when the runner stops there: past 1B, or past 2B or 3B after rounding.
+					Slides and overruns are drawn dashed. The dotted curve and small circles are the full rounding spline and its control points; dashed
 					lines are the straight baselines. Home plate is drawn at the game&apos;s size with its back point at the origin, where the foul lines meet; the small dot
 					beside it is the point runners actually run to and from (0.4, 0.3), which the game places slightly toward 1st, so the
 					baselines start there. The inset at the bottom right zooms in on the selected character&apos;s batter&apos;s boxes.

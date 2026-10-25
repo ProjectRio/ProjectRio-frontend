@@ -8,6 +8,8 @@ import {
 	OVERRUN_1B_PATH,
 	OVERRUN_1B_RETURN_FRAMES,
 	OVERRUN_1B_SLOWDOWN_FRAMES,
+	OVERRUN_BASE_RETURN_FRAMES,
+	OVERRUN_BASE_SLOWDOWN_FRAMES,
 	SLIDE_RECOVERY_FRAMES
 } from '@/lib/mssb/RunningSimulation/runningConstants';
 import { makeSpline } from '@/lib/mssb/RunningSimulation/spline';
@@ -145,6 +147,7 @@ export default function RunPathChart({
 }) {
 	const [hover, setHover] = useState<{ i: number; left: number; top: number } | null>(null);
 	const moving = run.trace.filter((t) => !t.held);
+	const hoverable = [...moving, ...run.overrun];
 	const toPath = (pts: [number, number][]) => pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join('');
 	const d = toPath([run.start, ...moving.map((t) => [t.x, t.z] as [number, number])]);
 	const refD = toPath(REFERENCE_SPLINE);
@@ -163,6 +166,24 @@ export default function RunPathChart({
 	const seconds = moving.filter((t) => t.f % 60 === 0);
 	const endBase = run.bases.length ? run.bases[run.bases.length - 1].base : -1;
 	const showOverrun = startBase === 0 && endBase === 1;
+	// A rounding runner who stops at 2B or 3B carries on over the base, drifts past and comes back.
+	const baseOverrun = (() => {
+		if (!run.overrun.length) return null;
+		const last = run.trace[run.trace.length - 1];
+		const pts: [number, number][] = [[last.x, last.z], ...run.overrun.map((t) => [t.x, t.z] as [number, number])];
+		const base = endBase % 4;
+		const b = BASE_COORDS[base];
+		let far = pts[0];
+		let metres = 0;
+		for (const p of pts) {
+			const dd = Math.hypot(p[0] - b[0], p[1] - b[1]);
+			if (dd > metres) {
+				metres = dd;
+				far = p;
+			}
+		}
+		return { d: toPath(pts), base, far, metres };
+	})();
 	const leadBase = startBase > 0 ? BASE_COORDS[startBase] : null;
 	const leadMetres = leadBase ? Math.hypot(run.start[0] - leadBase[0], run.start[1] - leadBase[1]) : 0;
 
@@ -173,7 +194,7 @@ export default function RunPathChart({
 		const my = ((event.clientY - r.top) * H) / r.height;
 		let best = -1;
 		let bd = 14 * 14;
-		moving.forEach((t, i) => {
+		hoverable.forEach((t, i) => {
 			const dd = (X(t.x) - mx) ** 2 + (Y(t.z) - my) ** 2;
 			if (dd < bd) {
 				bd = dd;
@@ -184,7 +205,7 @@ export default function RunPathChart({
 		const wrap = (svg.parentElement as HTMLElement).getBoundingClientRect();
 		setHover({ i: best, left: event.clientX - wrap.left, top: event.clientY - wrap.top });
 	}
-	const hoverFrame = hover ? moving[hover.i] : null;
+	const hoverFrame = hover ? hoverable[hover.i] : null;
 
 	const boxes = (['R', 'L'] as const).map((sd) => ({ sd, rect: batterBoxRect(charId, sd) }));
 
@@ -296,14 +317,8 @@ export default function RunPathChart({
 				{/* the 1B overrun, after the batter is safe */}
 				{showOverrun && (
 					<>
-						<path
-							d={toPath(OVERRUN_POINTS)}
-							fill="none"
-							stroke={color}
-							strokeWidth={3}
-							strokeDasharray="2 5"
-							strokeLinecap="round"
-						/>
+						<path d={toPath(OVERRUN_POINTS)} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" opacity={0.35} />
+						<path d={toPath(OVERRUN_POINTS)} fill="none" stroke="var(--color-fog-100)" strokeWidth={2} strokeDasharray="4 3" />
 						<circle cx={X(OVERRUN_POINTS[OVERRUN_POINTS.length - 1][0])} cy={Y(OVERRUN_POINTS[OVERRUN_POINTS.length - 1][1])} r={3.5} fill={color} />
 						<Callout
 							at={OVERRUN_POINTS[OVERRUN_POINTS.length - 1]}
@@ -313,6 +328,26 @@ export default function RunPathChart({
 							dir={[0, 1]}
 							anchor="end"
 							push={58}
+						/>
+					</>
+				)}
+
+				{baseOverrun && (
+					<>
+						<path d={baseOverrun.d} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" opacity={0.35} />
+						<path d={baseOverrun.d} fill="none" stroke="var(--color-fog-100)" strokeWidth={2} strokeDasharray="4 3" />
+						<circle cx={X(baseOverrun.far[0])} cy={Y(baseOverrun.far[1])} r={3.5} fill="var(--color-fog-100)" />
+						<Callout
+							at={baseOverrun.far}
+							text={`Rounds past ${BASE_NAMES[baseOverrun.base]}, then back`}
+							sub={[
+								`after the runner is safe: ${baseOverrun.metres.toFixed(1)} m past,`,
+								`${OVERRUN_BASE_SLOWDOWN_FRAMES} frames out, ${OVERRUN_BASE_RETURN_FRAMES} back`
+							]}
+							color="var(--color-fog-100)"
+							dir={baseOverrun.base === 2 ? [-1, 0.35] : [1, -0.2]}
+							anchor={baseOverrun.base === 2 ? 'end' : 'start'}
+							push={40}
 						/>
 					</>
 				)}

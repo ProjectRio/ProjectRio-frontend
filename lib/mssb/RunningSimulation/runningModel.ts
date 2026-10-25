@@ -15,6 +15,9 @@ import {
 	MAX_ACCEL_PENALTY,
 	MAX_SPEED_PENALTY,
 	MAX_STAMINA,
+	OVERRUN_BASE_DISTANCE,
+	OVERRUN_BASE_RETURN_FRAMES,
+	OVERRUN_BASE_SLOWDOWN_FRAMES,
 	ROUND_START_PERCENT,
 	ROUNDING_STRENGTH_PER_FRAME,
 	RUNNER_AUTO_START_FRAME,
@@ -104,6 +107,11 @@ export interface RunResult {
 	/** When the runner first counts as on each base along the route. */
 	bases: BaseReach[];
 	start: [number, number];
+	/**
+	 * Frames after arrival for a rounding runner who stops at 2B or 3B: they carry on over the base,
+	 * drift past it and come back (running_overrunBaseControl). Empty otherwise.
+	 */
+	overrun: FrameState[];
 }
 
 export interface RunOptions {
@@ -188,7 +196,23 @@ export function simulateRun(o: RunOptions): RunResult {
 	let leftToReach = F(F(1 - pct) - margin); // percentLeftToNextBaseReach
 	const bases: BaseReach[] = [];
 	const trace: FrameState[] = [];
+	const overrun: FrameState[] = [];
 	const interval = MASH_INTERVAL[o.mash];
+	let arrivedAt: number | null = null; // set once on the end base, while the overrun plays out
+	let overrunStage = 0; // overrunBaseStage: 0 none, 1 pending, 2 slowdown, 3 return
+	let overrunCD = 0;
+	let overrunStep = F(0);
+	let overrunDone = false;
+	const result = (frame: number): RunResult => ({
+		frame,
+		topFrame: firstTop,
+		L: legLength(start, o.startBase),
+		k,
+		trace,
+		bases,
+		start,
+		overrun
+	});
 
 	for (let f = 1; f < 4000; f++) {
 		// running_updateStamina (running_beginFrame), from last frame's velocity.
@@ -227,7 +251,42 @@ export function simulateRun(o: RunOptions): RunResult {
 		// running_calcSpeedVariables
 		const held = f < restartAfter && !moving && action === 'none';
 		let cap = F(0);
-		if (action === 'slide') {
+		let overrunStepping = false;
+		if (overrunStage > 0) {
+			// running_overrunBaseControl: slow down past the base, then return to it; it moves the runner itself.
+			overrunStepping = true;
+			if (overrunStage === 1) {
+				overrunStage = 2;
+				overrunCD = OVERRUN_BASE_SLOWDOWN_FRAMES;
+				overrunStep = F(F(OVERRUN_BASE_DISTANCE) / F((overrunCD + 1) * Math.trunc(overrunCD / 2)));
+			}
+			if (overrunStage === 2) {
+				overrunCD--;
+				if (overrunCD < 0) {
+					overrunStage = 3;
+					overrunCD = OVERRUN_BASE_RETURN_FRAMES;
+					overrunStep = F(F(margin - pct) / overrunCD);
+				} else {
+					step = F(overrunStep * overrunCD);
+				}
+			}
+			if (overrunStage === 3) {
+				overrunCD--;
+				if (overrunCD < 0) {
+					overrunDone = true;
+					step = F(0);
+				} else {
+					step = overrunStep;
+				}
+			}
+			fbr = F(fbr + step);
+			pct = F(pct + step);
+			if (overrunDone) {
+				pct = margin; // running_placeRunnerOnBase
+				fbr = F(Math.trunc(fbr) + margin);
+			}
+			v = F(Math.abs(step) * L);
+		} else if (action === 'slide') {
 			// running_updateActionAndVelocity, stage MOVING: cover the rest of the baseline in equal steps.
 			actionCD--;
 			const excess = F(F(1 - margin) - pct);
@@ -281,7 +340,7 @@ export function simulateRun(o: RunOptions): RunResult {
 			}
 			step = F(v * F(1 / L));
 		}
-		if (step !== 0) {
+		if (step !== 0 && !overrunStepping) {
 			const scaled = Math.trunc(F(F(10000) * F(fbr + step)));
 			fbr = F(scaled / 10000);
 			pct = F((scaled % 10000) / 10000);
@@ -289,11 +348,13 @@ export function simulateRun(o: RunOptions): RunResult {
 		prevV = v;
 
 		// running_updateBaseArrival: crossing a base.
-		if (v > 0 && Math.trunc(fbr) > Math.trunc(fbrStart)) {
+		if (!overrunStepping && v > 0 && Math.trunc(fbr) > Math.trunc(fbrStart)) {
 			const b = Math.trunc(fbr);
 			if (rounding || action !== 'none') {
 				fbr = F(b); // keeps speed; progress past the base this frame is dropped
 				pct = F(0);
+				// Not sent on from the end base: running_updateBaseArrival starts the overrun.
+				if (arrivedAt !== null) overrunStage = 1;
 			} else {
 				// running_stopRunner + running_placeRunnerOnBase: stop, and stand 3% along the next baseline.
 				v = F(0);
@@ -331,10 +392,15 @@ export function simulateRun(o: RunOptions): RunResult {
 			pos = xF;
 		}
 
-		trace.push({ f, v, fbr, pct, mash: m, stamina, cap, held, x: pos[0], z: pos[1], strength, L, action });
-		if (reached === o.endBase) {
-			return { frame: f, topFrame: firstTop, L: legLength(start, o.startBase), k, trace, bases, start };
+		const state: FrameState = { f, v, fbr, pct, mash: m, stamina, cap, held, x: pos[0], z: pos[1], strength, L, action };
+		if (arrivedAt === null) trace.push(state);
+		else overrun.push(state);
+		if (arrivedAt === null && reached === o.endBase) {
+			// A rounding runner stopping at 2B or 3B overruns it; everyone else is done.
+			if (o.path === 'round' && rounding && o.endBase < 4) arrivedAt = f;
+			else return result(f);
 		}
+		if (overrunDone || (arrivedAt !== null && f - arrivedAt > 300)) return result(arrivedAt ?? f);
 	}
 	throw new Error('Runner never reached the end base');
 }

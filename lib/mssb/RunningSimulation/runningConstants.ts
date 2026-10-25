@@ -177,3 +177,8 @@ export const OVERRUN_1B_PATH: [number, number][] = [
 /** overrun1BStageFrames: frames running out along the overrun spline, then frames returning to 1B. */
 export const OVERRUN_1B_SLOWDOWN_FRAMES = 60;
 export const OVERRUN_1B_RETURN_FRAMES = 120;
+
+/** overrunBaseStageFrames / overrunBaseDistance: a rounding runner who stops at 2B or 3B drifts past and comes back. */
+export const OVERRUN_BASE_SLOWDOWN_FRAMES = 15;
+export const OVERRUN_BASE_RETURN_FRAMES = 10;
+export const OVERRUN_BASE_DISTANCE = 0.1;

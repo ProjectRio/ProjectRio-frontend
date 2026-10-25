@@ -641,7 +641,7 @@ percentTowardsNextBase = (scaled % 10000) / 10000`}</Pre>
 			<Section
 				num="7 · Running the bases"
 				title="Runners on base, rounding, sliding and scoring"
-				refs="runner.c:470 (45-frame lead), :3147 running_updateLeadoff, :3740 (go on frame 5) · :3965 running_roundBaseDecision · :3547 (rounding blend), :3619 running_basePathPosition · :3196 (crossing a base) · :3172 running_stopRunner, :3355 running_placeRunnerOnBase · :3806 running_triggerSlideOrBodyCheck, :3865 (slide window), :2962 running_updateActionAndVelocity · :3319 (scoring)"
+				refs="runner.c:470 (45-frame lead), :3147 running_updateLeadoff, :3740 (go on frame 5) · :3965 running_roundBaseDecision · :3547 (rounding blend), :3619 running_basePathPosition · :3196 (crossing a base) · :3094 running_overrunBaseControl · :3172 running_stopRunner, :3355 running_placeRunnerOnBase · :3806 running_triggerSlideOrBodyCheck, :3865 (slide window), :2962 running_updateActionAndVelocity · :3319 (scoring)"
 			>
 				<p>
 					<b className="text-fog-100">Runners on base.</b> Every pitch, <C>running_setDefaultRunners</C> starts each runner on a 45-frame
@@ -663,7 +663,9 @@ L         = |position − currentBase| + |nextBase − position|                
 					spline. Crossing a base while rounding keeps the runner&apos;s speed, but progress snaps back to exactly the base, so any overshoot
 					that frame is lost. The game never starts rounding on the 3B-to-home baseline (<C>fractionalBasesRan ≥ 3</C>); a runner already
 					rounding carries on, but a runner starting on 3rd runs it straight. The batter starts rounding a frame later than other runners,
-					because the 1st-base overrun check holds them until they are halfway.
+					because the 1st-base overrun check holds them until they are halfway. A rounding runner who stops at 2B or 3B doesn&apos;t stop on
+					the bag: they cross it, and <C>running_overrunBaseControl</C> carries them 9.4% of the next baseline past it (about 2.5 m) over 15
+					frames, then back to the base over 10. That happens after they count as safe, so it doesn&apos;t change the arrival time.
 				</p>
 				<p>
 					<b className="text-fog-100">Not rounding.</b> A runner who isn&apos;t rounding stops on the base when they cross it:{' '}
