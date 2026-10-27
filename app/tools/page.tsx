@@ -5,6 +5,18 @@ export const metadata = { title: 'Tools' };
 
 const TOOLS = [
 	{
+		href: '/characters/analytics',
+		title: 'Character Win Rates',
+		description:
+			'Which characters win more than they should? Slice every logged game by mode, roster combo, captain, player, and rating.'
+	},
+	{
+		href: '/characters/swing-lab',
+		title: 'Swing Lab',
+		description:
+			'Which contact frame, stick direction and swing type actually work for a character — measured over every recorded contact across any set of game modes.'
+	},
+	{
 		href: '/codes',
 		title: 'Gecko Code Library',
 		description: 'Search every gecko code across all Project Rio communities and copy them straight into Dolphin.'
