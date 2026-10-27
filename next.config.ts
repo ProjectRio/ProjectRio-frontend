@@ -6,10 +6,6 @@ const nextConfig: NextConfig = {
 		// Cloudflare Workers does not run the default Next.js image optimizer.
 		unoptimized: true
 	},
-	eslint: {
-		// lib/mssb contains verbatim decompiled game code that fails stylistic rules.
-		ignoreDuringBuilds: true
-	},
 	async redirects() {
 		// Routes carried over from the SvelteKit site.
 		return [
