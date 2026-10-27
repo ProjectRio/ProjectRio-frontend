@@ -53,8 +53,37 @@ export const TAG_ENDPOINTS = {
 
 export async function apiGet<T = any>(endpoint: string, params = ''): Promise<T> {
 	const response = await fetch(BACKEND + endpoint + params);
-	if (!response.ok) throw new Error(`API ${endpoint} responded ${response.status}`);
+	if (!response.ok) throw new ApiError(endpoint, response.status, await reasonFor(response));
 	return response.json();
+}
+
+// The backend explains 4xx failures in the body ("Unknown tag(s): [...]"),
+// which is exactly what a caller needs to show. Flask sends an HTML error page,
+// so pull the <p> out of it and fall back to the raw text.
+async function reasonFor(response: Response): Promise<string | null> {
+	try {
+		const body = (await response.text()).slice(0, 600);
+		const paragraph = body.match(/<p>([\s\S]*?)<\/p>/i)?.[1] ?? (/<\/?[a-z]/i.test(body) ? '' : body);
+		const reason = paragraph
+			.replace(/&#x27;/g, "'")
+			.replace(/&quot;/g, '"')
+			.replace(/&amp;/g, '&')
+			.trim();
+		return reason || null;
+	} catch {
+		return null;
+	}
+}
+
+export class ApiError extends Error {
+	constructor(
+		readonly endpoint: string,
+		readonly status: number,
+		readonly reason: string | null
+	) {
+		super(reason ? `${reason} (${endpoint} ${status})` : `API ${endpoint} responded ${status}`);
+		this.name = 'ApiError';
+	}
 }
 
 export async function apiPost<T = any>(endpoint: string, body?: unknown): Promise<T> {
@@ -218,6 +247,16 @@ export async function getCharBattingStats(charId: string | null, mode = DEFAULT_
 		apiGet(STAT_ENDPOINTS.STATS, params + '&by_user=1')
 	]);
 	return { overall: overall.Stats ?? {}, byUser: byUser.Stats ?? {} };
+}
+
+// Fielding block only (pitches/outs per position, catches). Multiple char ids
+// are summed server-side — pass every color variant of a character at once.
+export async function getCharFieldingStats(charIds: (string | number)[], mode = DEFAULT_MODE) {
+	const params =
+		`?exclude_batting=1&exclude_pitching=1&exclude_misc=1&tag=${encodeURIComponent(mode)}` +
+		charIds.map((id) => `&char_id=${id}`).join('');
+	const res = await apiGet(STAT_ENDPOINTS.STATS, params);
+	return res.Stats?.Fielding ?? null;
 }
 
 export async function getCharPitchingStats(charId: string | null, mode = DEFAULT_MODE) {
