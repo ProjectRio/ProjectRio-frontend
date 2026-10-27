@@ -12,7 +12,8 @@ const NAV_LINKS = [
 	{ href: '/games/live', label: 'Live' },
 	{ href: '/modes', label: 'Ranked' },
 	{ href: '/users', label: 'Players' },
-	{ href: '/characters', label: 'Characters' },
+	// '/characters' is intentionally unlisted while we rethink that page;
+	// it (and /characters/analytics) stay reachable by URL.
 	{ href: '/communities', label: 'Communities' },
 	{ href: '/tools', label: 'Tools' }
 ];
@@ -129,9 +130,17 @@ export default function Nav() {
 					{username ? (
 						<AccountMenu username={username} />
 					) : (
-						<Link href="/login" className="btn-primary !px-4 !py-2 text-sm">
-							Log In
-						</Link>
+						<>
+							<Link
+								href="/login"
+								className="px-1 font-display text-sm font-semibold uppercase tracking-wider text-fog-300 transition-colors hover:text-fog-100"
+							>
+								Log In
+							</Link>
+							<Link href="/signup" className="btn-primary !px-4 !py-2 text-sm">
+								Sign Up
+							</Link>
+						</>
 					)}
 				</div>
 
@@ -183,10 +192,23 @@ export default function Nav() {
 								</Link>
 							</li>
 						)}
+						{!username && (
+							<li>
+								<Link
+									href="/signup"
+									className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-rio-400"
+									onClick={() => setOpen(false)}
+								>
+									Sign Up
+								</Link>
+							</li>
+						)}
 						<li>
 							<Link
 								href={username ? '/logout' : '/login'}
-								className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-rio-400"
+								className={`block px-3 py-2 font-display font-semibold uppercase tracking-wider ${
+									username ? 'text-rio-400' : 'text-fog-300 hover:text-fog-100'
+								}`}
 								onClick={() => setOpen(false)}
 							>
 								{username ? 'Log Out' : 'Log In'}
