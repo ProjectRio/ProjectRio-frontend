@@ -1,0 +1,38 @@
+/* ============================================================
+   Project Rio — Radii, borders, shadows, motion
+   The app uses modest dark-UI radii, 1px borders on the night
+   scale, and a signature red "panel glow" on hover. Buttons are
+   cut with an angled clip-path (no radius) for a sporty edge.
+   ============================================================ */
+:root {
+	/* Corner radii */
+	--radius-sm: 0.25rem; /* 4px — badges, tier chips */
+	--radius-md: 0.5rem; /* 8px — inputs */
+	--radius-lg: 0.75rem; /* 12px — panels/cards */
+	--radius-xl: 1rem; /* 16px — large CTA panels */
+	--radius-2xl: 1.5rem; /* 24px — hero section */
+	--radius-full: 9999px; /* avatars, live dot */
+
+	/* Borders */
+	--border-width: 1px;
+
+	/* Angled clip — the brand button shape */
+	--clip-button: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); /* @kind other */
+
+	/* Shadows / glows */
+	--shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4);
+	--glow-red: 0 0 24px rgb(230 0 18 / 0.12); /* panel-glow hover */
+	--glow-red-strong: 0 0 32px rgb(230 0 18 / 0.25); /* hero wash */
+	--focus-shadow: 0 0 0 3px rgb(230 0 18 / 0.15);
+
+	/* Arena-light background washes (body + hero) */
+	--wash-arena:
+		radial-gradient(ellipse 80% 40% at 50% -10%, rgb(230 0 18 / 0.12), transparent),
+		radial-gradient(ellipse 60% 50% at 100% 110%, rgb(245 187 0 / 0.05), transparent); /* @kind other */
+	--wash-hero: radial-gradient(ellipse 60% 70% at 50% -10%, rgb(230 0 18 / 0.25), transparent); /* @kind other */
+
+	/* Motion */
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+	--dur-fast: 150ms; /* @kind other */
+	--dur-mid: 250ms; /* @kind other */
+}

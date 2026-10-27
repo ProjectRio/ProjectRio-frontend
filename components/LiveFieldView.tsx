@@ -46,7 +46,7 @@ const RUNNER_SPOTS = {
 	third: { x: THIRD.x * RUNNER_LEAD, y: THIRD.y * RUNNER_LEAD }
 };
 
-interface StadiumTheme {
+export interface StadiumTheme {
 	bg: string;
 	grass: string;
 	grassDark: string;
@@ -57,7 +57,7 @@ interface StadiumTheme {
 	accent: string;
 }
 
-const STADIUM_THEMES: Record<number, StadiumTheme> = {
+export const STADIUM_THEMES: Record<number, StadiumTheme> = {
 	// Mario Stadium — classic ballpark greens
 	0: {
 		bg: '#0c1118',
@@ -137,7 +137,7 @@ const STADIUM_THEMES: Record<number, StadiumTheme> = {
 	}
 };
 
-interface Projection {
+export interface Projection {
 	wall: [number, number][];
 	scale: number;
 	px: (x: number) => number;
@@ -146,7 +146,7 @@ interface Projection {
 	wallDist: (dir: { x: number; y: number }) => number;
 }
 
-function buildProjection(stadiumId: number): Projection {
+export function buildProjection(stadiumId: number): Projection {
 	const wall = stadiumWalls[stadiumId] ?? stadiumWalls[0];
 	let minX = Infinity,
 		maxX = -Infinity,
@@ -187,7 +187,7 @@ function buildProjection(stadiumId: number): Projection {
 	return { wall, scale, px, py, maxDist, wallDist };
 }
 
-function StadiumField({ proj, theme }: { proj: Projection; theme: StadiumTheme }) {
+export function StadiumField({ proj, theme }: { proj: Projection; theme: StadiumTheme }) {
 	const { wall, scale: s, px, py } = proj;
 	const wallPath = wall.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${px(x).toFixed(2)} ${py(y).toFixed(2)}`).join(' ') + ' Z';
 

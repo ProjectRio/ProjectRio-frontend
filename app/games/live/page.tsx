@@ -6,7 +6,7 @@ import { useTagsets } from '@/lib/useTagsets';
 import LiveGameCard from '@/components/LiveGameCard';
 import { PageHeader, Spinner, EmptyState, ErrorState, LiveDot } from '@/components/ui';
 
-const REFRESH_MS = 30_000;
+const REFRESH_MS = 10_000;
 const LIVE_WINDOW_SECONDS = 60 * 60;
 
 export default function LiveGamesPage() {
@@ -41,7 +41,7 @@ export default function LiveGamesPage() {
 		<div>
 			<PageHeader kicker="Happening now" title="Live Games">
 				<span className="flex items-center gap-2 text-sm text-fog-500">
-					<LiveDot /> Auto-refreshes every 30s
+					<LiveDot /> Auto-refreshes every {REFRESH_MS / 1000}s
 				</span>
 			</PageHeader>
 

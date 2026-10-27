@@ -1,0 +1,24 @@
+<!-- @dsCard group="Colors" viewport="700x140" name="Ranked Tiers" subtitle="Shell → Legend ladder tiers (lib/ladder.ts, division I)." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 20px; }
+	.row { display: flex; gap: 10px; flex-wrap: wrap; }
+	.chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--radius-sm); font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+	.dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+	<div class="row">
+		<span class="chip" style="background:#8bbf8c22;color:var(--tier-shell);border:1px solid #8bbf8c55"><span class="dot" style="background:var(--tier-shell)"></span>Shell</span>
+		<span class="chip" style="background:#ff494922;color:var(--tier-mushroom);border:1px solid #ff494955"><span class="dot" style="background:var(--tier-mushroom)"></span>Mushroom</span>
+		<span class="chip" style="background:#ff670022;color:var(--tier-flower);border:1px solid #ff670055"><span class="dot" style="background:var(--tier-flower)"></span>Flower</span>
+		<span class="chip" style="background:#fff25c22;color:var(--tier-star);border:1px solid #fff25c55"><span class="dot" style="background:var(--tier-star)"></span>Star</span>
+		<span class="chip" style="background:#77558722;color:#bf9ece;border:1px solid #77558799"><span class="dot" style="background:var(--tier-special)"></span>Special</span>
+		<span class="chip" style="background:#af914622;color:var(--tier-legend);border:1px solid #af914655"><span class="dot" style="background:var(--tier-legend)"></span>Legend</span>
+	</div>
+</body>
+</html>

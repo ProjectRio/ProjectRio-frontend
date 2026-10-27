@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getAllTags } from '@/lib/api';
 import { PageHeader, Panel, Spinner, ErrorState } from '@/components/ui';
 
@@ -16,7 +17,11 @@ export default function TagsPage() {
 
 	return (
 		<div>
-			<PageHeader kicker="Rulebook" title="Game Tags" />
+			<PageHeader kicker="Rulebook" title="Game Tags">
+				<Link href="/codes" className="btn-secondary !px-4 !py-2 text-sm">
+					Browse Gecko Codes
+				</Link>
+			</PageHeader>
 			{error && <ErrorState message={error} />}
 			{!tags && !error && <Spinner label="Loading tags…" />}
 			{tags && (

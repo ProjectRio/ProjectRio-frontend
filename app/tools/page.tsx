@@ -5,6 +5,11 @@ export const metadata = { title: 'Tools' };
 
 const TOOLS = [
 	{
+		href: '/codes',
+		title: 'Gecko Code Library',
+		description: 'Search every gecko code across all Project Rio communities and copy them straight into Dolphin.'
+	},
+	{
 		href: '/tools/pitch-calculator',
 		title: 'Pitch Calculator',
 		description: 'Frame-accurate pitch trajectory simulation straight from the game engine decompilation.'

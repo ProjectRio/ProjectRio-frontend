@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Rio Web Page" description="Project Rio site scaffold — sticky nav, hero, and a content grid using the design system." -->
+<helmet>
+<script src="./ds-base.js"></script>
+</helmet>
+<div style="min-height:100vh;background:var(--bg-page);background-image:var(--wash-arena);background-attachment:fixed;color:var(--text-primary);font-family:var(--font-body)">
+
+  <header style="position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border-card);background:rgb(7 7 11 / 0.9);backdrop-filter:blur(8px)">
+    <div style="max-width:80rem;margin:0 auto;height:4rem;display:flex;align-items:center;gap:24px;padding:0 24px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="../../assets/logos/mushroom.png" width="36" height="36" style="image-rendering:pixelated" alt="Project Rio" />
+        <span style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:0.25em">Project<span style="color:var(--rio-500)">Rio</span></span>
+      </div>
+      <nav style="display:flex;gap:4px;flex:1">
+        <a style="padding:8px 12px;font-family:var(--font-display);font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--rio-400)">Games</a>
+        <a style="padding:8px 12px;font-family:var(--font-display);font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--fog-300)">Ranked</a>
+        <a style="padding:8px 12px;font-family:var(--font-display);font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--fog-300)">Characters</a>
+        <a style="padding:8px 12px;font-family:var(--font-display);font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--fog-300)">Tools</a>
+      </nav>
+      <x-import component-from-global-scope="ProjectRioDesignSystem_6fbb66.Button" size="sm" hint-size="90px,38px">Log In</x-import>
+    </div>
+  </header>
+
+  <main style="max-width:80rem;margin:0 auto;padding:32px 24px">
+    <section style="position:relative;overflow:hidden;border-radius:1.5rem;border:1px solid var(--border-card);background:var(--surface-card);padding:72px 24px;text-align:center">
+      <div style="position:absolute;inset:0;pointer-events:none;background-image:var(--wash-hero)"></div>
+      <div style="position:relative;max-width:760px;margin:0 auto">
+        <img src="../../assets/logos/mushroom.png" width="88" height="88" style="image-rendering:pixelated" alt="" />
+        <h1 style="margin:24px 0 0;font-family:var(--font-display);font-weight:700;font-size:3.5rem;line-height:1.05;text-transform:uppercase;letter-spacing:0.02em">Your headline in <span style="color:var(--rio-500)">Rio Red</span></h1>
+        <p style="margin:16px auto 0;max-width:520px;font-size:1.125rem;color:var(--fog-300)">Swap this hero copy for your own. Everything below inherits the Project Rio dark-arena look from the design system tokens.</p>
+        <div style="margin-top:32px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px">
+          <x-import component-from-global-scope="ProjectRioDesignSystem_6fbb66.Button" hint-size="180px,44px">Primary Action</x-import>
+          <x-import component-from-global-scope="ProjectRioDesignSystem_6fbb66.Button" variant="secondary" hint-size="160px,44px">Secondary</x-import>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-top:48px">
+      <p style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.25em;font-size:0.75rem;font-weight:600;color:var(--rio-400);margin:0">Section kicker</p>
+      <h2 style="margin:4px 0 24px;font-family:var(--font-display);font-weight:700;font-size:1.875rem;text-transform:uppercase">Three-up content grid</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div style="background:var(--surface-card);border:1px solid var(--border-card);border-radius:0.75rem;padding:20px">
+          <h3 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;text-transform:uppercase;margin:0">Card one</h3>
+          <p style="margin:8px 0 0;font-size:0.875rem;color:var(--fog-500)">Replace with your own panel content — stats, links, anything.</p>
+        </div>
+        <div style="background:var(--surface-card);border:1px solid var(--border-card);border-radius:0.75rem;padding:20px">
+          <h3 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;text-transform:uppercase;margin:0">Card two</h3>
+          <p style="margin:8px 0 0;font-size:0.875rem;color:var(--fog-500)">Replace with your own panel content — stats, links, anything.</p>
+        </div>
+        <div style="background:var(--surface-card);border:1px solid var(--border-card);border-radius:0.75rem;padding:20px">
+          <h3 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;text-transform:uppercase;margin:0">Card three</h3>
+          <p style="margin:8px 0 0;font-size:0.875rem;color:var(--fog-500)">Replace with your own panel content — stats, links, anything.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+</body>
+</html>
