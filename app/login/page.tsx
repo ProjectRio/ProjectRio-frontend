@@ -89,6 +89,12 @@ export default function LoginPage() {
 						Reset it here
 					</Link>
 				</p>
+				<p className="mt-2 text-center text-sm text-fog-500">
+					New to Project Rio?{' '}
+					<Link href="/signup" className="text-rio-400 hover:text-rio-300">
+						Create an account
+					</Link>
+				</p>
 			</div>
 		</div>
 	);

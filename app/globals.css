@@ -199,4 +199,63 @@
 		color: var(--color-fog-300);
 		margin-bottom: 0.375rem;
 	}
+
+	/* Scattered pixel mushrooms drifting down the signup page. Each sprite
+	   falls on its own clock and sways side to side for organic motion. */
+	.mushroom-sprite {
+		position: absolute;
+		top: -72px;
+		animation: mushroom-fall var(--fall-dur) linear infinite;
+		animation-delay: var(--fall-delay);
+	}
+
+	.mushroom-sway {
+		animation: mushroom-sway var(--sway-dur) ease-in-out infinite alternate;
+		animation-delay: var(--sway-delay);
+	}
+
+	.float-gently {
+		animation: float-gently 3s ease-in-out infinite;
+	}
+}
+
+@keyframes mushroom-fall {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+	to {
+		transform: translate3d(0, calc(100vh + 144px), 0);
+	}
+}
+
+@keyframes mushroom-sway {
+	from {
+		transform: translateX(calc(-1 * var(--sway-amp)));
+	}
+	to {
+		transform: translateX(var(--sway-amp));
+	}
+}
+
+@keyframes float-gently {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-8px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mushroom-sprite {
+		animation: none;
+		/* Rest each sprite at a fixed point instead of hiding the field */
+		transform: translate3d(0, var(--rest-y, 50vh), 0);
+	}
+
+	.mushroom-sway,
+	.float-gently {
+		animation: none;
+	}
 }
