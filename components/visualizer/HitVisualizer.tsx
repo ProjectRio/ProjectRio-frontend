@@ -5,11 +5,12 @@
 // simulation. Replays a stored contact event exactly, then lets every input be
 // modified in a "what-if" lab: swing type, contact spot, charge, swing frame,
 // stick direction, chemistry, stars, pitch type, batter, and the RNG itself.
+//
+// The three.js core lives in ./scene (shared with TrajectoryLab); this modal
+// composes its own camera presets and visual layers via the scene options.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { characterName } from '@/lib/data/characters';
 import { stadiums } from '@/lib/data/characters';
 import { atBatResultName } from '@/lib/mssb/constants';
@@ -26,321 +27,35 @@ import {
 	simulateRandomLandings,
 	type SimulationOutput
 } from '@/lib/mssb/BattingSimulation/simulatePaths';
-import { COLLISION_TYPE_KEYS, getTheme3D, type StadiumTheme3D } from './stadiumThemes';
+import { getTheme3D } from './stadiumThemes';
+import {
+	VisualizerScene,
+	fetchStadium,
+	type CameraPresetName,
+	type VisualizerLook
+} from './scene';
 
 const METERS_TO_FEET = 3.28084;
-const PATH_COLORS = [0xffffff, 0xffd24d, 0x6ecbff, 0xff8fe1, 0x9dff8f];
 
-// ---------------------------------------------------------------------------
-// three.js scene manager (imperative core, owned by the React component)
-// ---------------------------------------------------------------------------
+// The modal's default look: full showcase.
+const MODAL_LOOK: VisualizerLook = {
+	bloom: true,
+	trail: true,
+	impact: true,
+	distanceRings: false,
+	apexMarker: true,
+	fielderMarkers: true,
+	skyDome: true,
+	ground: true
+};
 
-const stadiumCache = new Map<number, Promise<any>>();
-
-function fetchStadium(stadiumId: number): Promise<any> {
-	if (!stadiumCache.has(stadiumId)) {
-		stadiumCache.set(
-			stadiumId,
-			fetch(`/stadiums/${stadiumId}.json`).then((r) => {
-				if (!r.ok) throw new Error(`stadium ${stadiumId} fetch failed`);
-				return r.json();
-			})
-		);
-	}
-	return stadiumCache.get(stadiumId)!;
-}
-
-function makeGlowTexture(): THREE.CanvasTexture {
-	const c = document.createElement('canvas');
-	c.width = c.height = 64;
-	const ctx = c.getContext('2d')!;
-	const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-	g.addColorStop(0, 'rgba(255,255,255,1)');
-	g.addColorStop(0.35, 'rgba(255,255,255,0.55)');
-	g.addColorStop(1, 'rgba(255,255,255,0)');
-	ctx.fillStyle = g;
-	ctx.fillRect(0, 0, 64, 64);
-	return new THREE.CanvasTexture(c);
-}
-
-function makeRainbowTexture(): THREE.CanvasTexture {
-	const c = document.createElement('canvas');
-	c.width = c.height = 128;
-	const ctx = c.getContext('2d')!;
-	const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-	const stops = ['#7a2fd4', '#2f55d4', '#2fb8d4', '#2fd45a', '#e8e02f', '#e8862f', '#d42b2b'];
-	stops.forEach((color, i) => g.addColorStop(i / (stops.length - 1), color));
-	ctx.fillStyle = g;
-	ctx.fillRect(0, 0, 128, 128);
-	return new THREE.CanvasTexture(c);
-}
-
-class VisualizerScene {
-	private renderer: THREE.WebGLRenderer;
-	private scene = new THREE.Scene();
-	private camera: THREE.PerspectiveCamera;
-	private controls: OrbitControls;
-	private hemiLight = new THREE.HemisphereLight(0xffffff, 0x404040, 1);
-	private sunLight = new THREE.DirectionalLight(0xffffff, 1);
-	private world = new THREE.Group();
-	private stadiumGroup = new THREE.Group();
-	private hitGroup = new THREE.Group();
-	private pulsingMaterials: THREE.MeshBasicMaterial[] = [];
-	private animatedBalls: { mesh: THREE.Mesh; points: [number, number, number][] }[] = [];
-	private glowTexture = makeGlowTexture();
-	private raf = 0;
-	private startTime = performance.now();
-	private container: HTMLElement;
-	private resizeObserver: ResizeObserver;
-
-	constructor(container: HTMLElement) {
-		this.container = container;
-		this.camera = new THREE.PerspectiveCamera(70, 1, 0.1, 2000);
-		this.camera.position.set(0, 55, -70);
-
-		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		container.appendChild(this.renderer.domElement);
-
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.target.set(0, 0, 40);
-		this.controls.enableDamping = true;
-		this.controls.update();
-
-		this.scene.add(this.hemiLight, this.sunLight);
-
-		// The game's coordinate system is mirrored relative to three.js (1B is +X
-		// but should appear on the right from behind home plate), so everything
-		// renders inside a group with X flipped. Materials are DoubleSide.
-		this.world.scale.x = -1;
-		this.scene.add(this.world);
-		this.world.add(this.stadiumGroup, this.hitGroup);
-
-		this.resizeObserver = new ResizeObserver(() => this.resize());
-		this.resizeObserver.observe(container);
-		this.resize();
-
-		const animate = () => {
-			this.raf = requestAnimationFrame(animate);
-			const now = performance.now();
-			const frame = Math.floor(((now - this.startTime) * 60) / 1000);
-			for (const { mesh, points } of this.animatedBalls) {
-				const p = points[frame % points.length];
-				mesh.position.set(p[0], p[1], p[2]);
-			}
-			const pulse = 0.82 + 0.18 * Math.sin(now / 280);
-			for (const mat of this.pulsingMaterials) {
-				mat.color.copy(mat.userData.baseColor as THREE.Color).multiplyScalar(pulse);
-			}
-			this.controls.update();
-			this.renderer.render(this.scene, this.camera);
-		};
-		animate();
-	}
-
-	private resize() {
-		const w = this.container.clientWidth;
-		const h = this.container.clientHeight;
-		if (w === 0 || h === 0) return;
-		this.camera.aspect = w / h;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(w, h);
-	}
-
-	private disposeGroup(group: THREE.Group) {
-		group.traverse((obj: any) => {
-			if (obj.geometry) obj.geometry.dispose();
-			if (obj.material) {
-				if (Array.isArray(obj.material)) obj.material.forEach((m: any) => m.dispose());
-				else obj.material.dispose();
-			}
-		});
-		group.clear();
-	}
-
-	applyEnvironment(theme: StadiumTheme3D) {
-		this.container.style.background = `linear-gradient(${theme.skyTop}, ${theme.skyBottom})`;
-		this.scene.fog = new THREE.FogExp2(new THREE.Color(theme.fog), theme.fogDensity);
-		this.hemiLight.color.set(theme.hemi.sky);
-		this.hemiLight.groundColor.set(theme.hemi.ground);
-		this.hemiLight.intensity = theme.hemi.intensity;
-		this.sunLight.color.set(theme.sun.color);
-		this.sunLight.intensity = theme.sun.intensity;
-		this.sunLight.position.set(...theme.sun.position);
-	}
-
-	buildStadium(stadiumJson: any, theme: StadiumTheme3D) {
-		this.disposeGroup(this.stadiumGroup);
-		this.pulsingMaterials = [];
-		this.applyEnvironment(theme);
-
-		const positions: number[] = [];
-		const colors: number[] = [];
-		const emissivePositions: Record<string, number[]> = {};
-
-		const streamColor = (t: number) => {
-			const key = COLLISION_TYPE_KEYS[t & 0x0f];
-			const hex = theme.palette[key] || '#ff00ff';
-			const c = new THREE.Color(hex);
-			if ((t & 0xf0) === 0x80) c.multiplyScalar(theme.foulMult);
-			return [c.r, c.g, c.b];
-		};
-
-		const pushTri = (pa: any, pb: any, pc: any, collisionType: number) => {
-			// stadium data is y-down; flip to y-up
-			const tri = [pa, pb, pc].map((p) => [p.X, -p.Y, p.Z]);
-			const key = COLLISION_TYPE_KEYS[collisionType & 0x0f];
-			const glow = theme.emissive[key];
-			if (glow) {
-				(emissivePositions[glow] ||= []).push(...tri[0], ...tri[1], ...tri[2]);
-				return;
-			}
-			const c = streamColor(collisionType);
-			for (const v of tri) {
-				positions.push(...v);
-				colors.push(...c);
-			}
-		};
-
-		for (const box of stadiumJson['Triangle Collections']) {
-			for (const coll of box['Triangles']) {
-				const pts = coll['Points'];
-				if (coll['CollectionType'] === 0) {
-					for (let i = 0; i + 2 < pts.length; i += 3) {
-						pushTri(pts[i].Point, pts[i + 1].Point, pts[i + 2].Point, pts[i + 2].CollisionType);
-					}
-				} else {
-					for (let i = 0; i + 2 < pts.length; i++) {
-						pushTri(pts[i].Point, pts[i + 1].Point, pts[i + 2].Point, pts[i + 2].CollisionType);
-					}
-				}
-			}
-		}
-
-		const geo = new THREE.BufferGeometry();
-		geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-		geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-		geo.computeVertexNormals();
-		this.stadiumGroup.add(
-			new THREE.Mesh(
-				geo,
-				new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })
-			)
-		);
-
-		for (const [hex, pos] of Object.entries(emissivePositions)) {
-			const eg = new THREE.BufferGeometry();
-			eg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-			const mat = new THREE.MeshBasicMaterial({ color: hex, side: THREE.DoubleSide });
-			mat.userData.baseColor = new THREE.Color(hex);
-			this.pulsingMaterials.push(mat);
-			this.stadiumGroup.add(new THREE.Mesh(eg, mat));
-		}
-
-		for (const d of theme.decals ?? []) {
-			const mat =
-				d.color === 'rainbow'
-					? new THREE.MeshBasicMaterial({ map: makeRainbowTexture(), side: THREE.DoubleSide })
-					: new THREE.MeshBasicMaterial({ color: d.color, side: THREE.DoubleSide });
-			const pad = new THREE.Mesh(new THREE.CircleGeometry(d.r, 48), mat);
-			pad.rotation.x = -Math.PI / 2;
-			pad.position.set(d.x, 0.06, d.z);
-			this.stadiumGroup.add(pad);
-		}
-	}
-
-	buildHit(
-		sim: SimulationOutput,
-		theme: StadiumTheme3D,
-		actualLanding: [number, number] | null,
-		randomLandings: [number, number, number][]
-	) {
-		this.disposeGroup(this.hitGroup);
-		this.animatedBalls = [];
-
-		sim.paths.forEach((path, idx) => {
-			const color = PATH_COLORS[idx % PATH_COLORS.length];
-			const lineGeo = new THREE.BufferGeometry().setFromPoints(
-				path.points.map((p) => new THREE.Vector3(p[0], p[1], p[2]))
-			);
-			this.hitGroup.add(
-				new THREE.Line(
-					lineGeo,
-					new THREE.LineBasicMaterial({ color: sim.paths.length > 1 ? color : theme.lineGlow })
-				)
-			);
-
-			const ball = new THREE.Mesh(
-				new THREE.SphereGeometry(0.18, 12, 12),
-				new THREE.MeshBasicMaterial({ color: 0xffffff })
-			);
-			const glow = new THREE.Sprite(
-				new THREE.SpriteMaterial({
-					map: this.glowTexture,
-					color,
-					transparent: true,
-					depthWrite: false,
-					blending: THREE.AdditiveBlending
-				})
-			);
-			glow.scale.set(2.2, 2.2, 1);
-			ball.add(glow);
-			this.hitGroup.add(ball);
-			this.animatedBalls.push({ mesh: ball, points: path.points });
-
-			const [fx, , fz] = path.final;
-			const ring = new THREE.Mesh(
-				new THREE.RingGeometry(0.35, 0.55, 32),
-				new THREE.MeshBasicMaterial({
-					color,
-					side: THREE.DoubleSide,
-					transparent: true,
-					opacity: 0.9
-				})
-			);
-			ring.rotation.x = -Math.PI / 2;
-			ring.position.set(fx, 0.03, fz);
-			this.hitGroup.add(ring);
-		});
-
-		// Actual landing spot from the stored event, for comparison with what-ifs.
-		if (actualLanding) {
-			const [ax, az] = actualLanding;
-			const ring = new THREE.Mesh(
-				new THREE.RingGeometry(0.55, 0.8, 4),
-				new THREE.MeshBasicMaterial({
-					color: 0xe60012,
-					side: THREE.DoubleSide,
-					transparent: true,
-					opacity: 0.95
-				})
-			);
-			ring.rotation.x = -Math.PI / 2;
-			ring.rotation.z = Math.PI / 4;
-			ring.position.set(ax, 0.05, az);
-			this.hitGroup.add(ring);
-		}
-
-		if (randomLandings.length > 0) {
-			const geo = new THREE.BufferGeometry().setFromPoints(
-				randomLandings.map((p) => new THREE.Vector3(p[0], Math.max(p[1], 0.05), p[2]))
-			);
-			this.hitGroup.add(
-				new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xfff4c8, size: 0.35 }))
-			);
-		}
-	}
-
-	dispose() {
-		cancelAnimationFrame(this.raf);
-		this.resizeObserver.disconnect();
-		this.disposeGroup(this.hitGroup);
-		this.disposeGroup(this.stadiumGroup);
-		this.controls.dispose();
-		this.renderer.dispose();
-		this.renderer.domElement.remove();
-	}
-}
+const CAMERA_PRESETS: { value: CameraPresetName; label: string }[] = [
+	{ value: 'broadcast', label: 'Broadcast' },
+	{ value: 'chase', label: 'Chase' },
+	{ value: 'catcher', label: 'Catcher' },
+	{ value: 'blimp', label: 'Blimp' },
+	{ value: 'landing', label: 'Landing' }
+];
 
 // ---------------------------------------------------------------------------
 // UI
@@ -369,6 +84,29 @@ function Segmented<T extends string | number>({
 				</button>
 			))}
 		</div>
+	);
+}
+
+function Chip({
+	active,
+	label,
+	onClick
+}: {
+	active: boolean;
+	label: string;
+	onClick: () => void;
+}) {
+	return (
+		<button
+			className={`rounded border px-2 py-1 font-display text-[10px] font-bold uppercase tracking-wider transition-colors ${
+				active
+					? 'border-rio-400 bg-night-950/70 text-rio-300'
+					: 'border-night-600 bg-night-950/70 text-fog-500 hover:text-fog-300'
+			}`}
+			onClick={onClick}
+		>
+			{label}
+		</button>
 	);
 }
 
@@ -448,6 +186,11 @@ export default function HitVisualizer({
 	const [useFeet, setUseFeet] = useState(false);
 	const [cloudSeed, setCloudSeed] = useState(0);
 
+	// Camera + looks (scene owns the behavior; this state mirrors it for the UI).
+	const [preset, setPreset] = useState<CameraPresetName>('broadcast');
+	const [look, setLook] = useState<VisualizerLook>(MODAL_LOOK);
+	const [slowMo, setSlowMo] = useState(false);
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const sceneRef = useRef<VisualizerScene | null>(null);
 	const [stadiumReady, setStadiumReady] = useState(false);
@@ -493,7 +236,11 @@ export default function HitVisualizer({
 	// --- scene lifecycle ---
 	useEffect(() => {
 		if (!containerRef.current) return;
-		const scene = new VisualizerScene(containerRef.current);
+		const scene = new VisualizerScene(containerRef.current, {
+			...MODAL_LOOK,
+			cameraPreset: 'broadcast',
+			introFlyIn: true
+		});
 		sceneRef.current = scene;
 		return () => {
 			scene.dispose();
@@ -508,6 +255,7 @@ export default function HitVisualizer({
 			.then((json) => {
 				if (cancelled || !sceneRef.current) return;
 				sceneRef.current.buildStadium(json, getTheme3D(stadiumId));
+				sceneRef.current.buildFielderMarkers();
 				setStadiumReady(true);
 			})
 			.catch(() => setStadiumReady(false));
@@ -524,6 +272,10 @@ export default function HitVisualizer({
 		sceneRef.current.buildHit(sim, getTheme3D(stadiumId), actual, cloud);
 	}, [sim, cloud, stadiumId, baseContact, stadiumReady]);
 
+	useEffect(() => {
+		sceneRef.current?.setUnits(useFeet);
+	}, [useFeet]);
+
 	if (!baseInputs || !effectiveInputs || !baseContact) return null;
 
 	const fmt = (m: number) => (useFeet ? `${(m * METERS_TO_FEET).toFixed(1)} ft` : `${m.toFixed(1)} m`);
@@ -535,6 +287,24 @@ export default function HitVisualizer({
 	const resultName = atBatResultName(event.result_of_ab);
 
 	const set = (patch: Partial<HitBallInputs>) => setInputs((prev) => ({ ...prev!, ...patch }));
+
+	const pickPreset = (p: CameraPresetName) => {
+		setPreset(p);
+		sceneRef.current?.setCameraPreset(p);
+	};
+	const toggleLook = (key: keyof VisualizerLook) => {
+		setLook((prev) => {
+			const next = { ...prev, [key]: !prev[key] };
+			sceneRef.current?.setLook({ [key]: next[key] });
+			return next;
+		});
+	};
+	const toggleSlowMo = () => {
+		setSlowMo((v) => {
+			sceneRef.current?.setPlaybackSpeed(v ? 1 : 0.25);
+			return !v;
+		});
+	};
 
 	// Portal to <body>: an ancestor with transform/filter would otherwise
 	// capture this fixed-position overlay and offset it.
@@ -581,6 +351,36 @@ export default function HitVisualizer({
 							Loading stadium…
 						</div>
 					)}
+					{/* Camera + looks controls */}
+					<div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
+						<div className="flex flex-wrap justify-end gap-1">
+							{CAMERA_PRESETS.map((p) => (
+								<Chip
+									key={p.value}
+									active={preset === p.value}
+									label={p.label}
+									onClick={() => pickPreset(p.value)}
+								/>
+							))}
+							<Chip active={slowMo} label="¼×" onClick={toggleSlowMo} />
+						</div>
+						<div className="flex flex-wrap justify-end gap-1">
+							<Chip active={look.bloom} label="Bloom" onClick={() => toggleLook('bloom')} />
+							<Chip active={look.trail} label="Trail" onClick={() => toggleLook('trail')} />
+							<Chip active={look.impact} label="FX" onClick={() => toggleLook('impact')} />
+							<Chip
+								active={look.distanceRings}
+								label="Rings"
+								onClick={() => toggleLook('distanceRings')}
+							/>
+							<Chip active={look.apexMarker} label="Apex" onClick={() => toggleLook('apexMarker')} />
+							<Chip
+								active={look.fielderMarkers}
+								label="Fielders"
+								onClick={() => toggleLook('fielderMarkers')}
+							/>
+						</div>
+					</div>
 					{/* Readout strip */}
 					<div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-wrap gap-2 p-3">
 						<Stat label="Distance" value={fmt(distance)} accent={isModified} />
