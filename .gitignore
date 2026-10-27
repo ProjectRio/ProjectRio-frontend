@@ -10,3 +10,7 @@ node_modules
 next-env.d.ts
 *.tsbuildinfo
 .wrangler
+
+# Build output from the SvelteKit/Vercel era, still produced locally
+/.svelte-kit
+/.vercel
