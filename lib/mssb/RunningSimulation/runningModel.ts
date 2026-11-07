@@ -483,4 +483,26 @@ export function batterBoxRect(charId: number, side: BoxSide): [number, number, n
 	return [Math.min(...xs), Math.max(...xs), front + offZ, back + offZ];
 }
 
+/**
+ * Distance covered from a standing start, frame by frame, with no mashing and full stamina
+ * (running_calcSpeedVariables on a straight line). dist[0] = 0; topFrame is the first frame at the velocity cap.
+ */
+export function standingStart(speed: number, frames: number): { k: SpeedConstants; dist: number[]; topFrame: number } {
+	const k = speedConstants(speed);
+	let v = F(0);
+	let d = F(0);
+	let topFrame = 0;
+	const dist = [0];
+	for (let f = 1; f <= frames; f++) {
+		v = F(v + k.accel);
+		if (v > k.maxV) {
+			v = k.maxV;
+			if (!topFrame) topFrame = f;
+		}
+		d = F(d + v);
+		dist.push(d);
+	}
+	return { k, dist, topFrame };
+}
+
 export const framesToSeconds = (frames: number) => (frames / 60).toFixed(2);

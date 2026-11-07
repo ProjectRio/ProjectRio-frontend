@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react';
 import { PageHeader, Panel, PanelHeader } from '@/components/ui';
 import RunningCalculator from '@/components/running/RunningCalculator';
+import AccelerationChart from '@/components/running/AccelerationChart';
 import FramesBySpeedChart, { type SpeedScenario } from '@/components/running/FramesBySpeedChart';
 import { SERIES } from '@/components/running/chartUtils';
+import BasicsTab from '@/components/running/BasicsTab';
+import Tabs from '@/components/Tabs';
 import { characters } from '@/lib/data/characters';
 import {
 	batterPosition,
@@ -11,6 +14,7 @@ import {
 	legLength,
 	simulateHomeToFirst,
 	simulateRun,
+	standingStart,
 	BASE_NAMES,
 	speedConstants,
 	type BoxSide,
@@ -22,6 +26,7 @@ import {
 	BASE_COORDS,
 	BATTER_BOX,
 	CHARACTER_SPEED,
+	MASH_HOLD_FRAMES,
 	RUNNER_AUTO_START_FRAME,
 	SPEED_STAT_CAP,
 	SUPERSTAR_SPEED_BONUS
@@ -102,8 +107,8 @@ export default function RunningAnalysisPage() {
 	const { best, worst } = extremeSpots();
 	const scenarioDefs = [
 		{ key: 'best', label: `Closest spot (${charName(best.charId)}, left)`, shortLabel: 'Closest spot', color: SERIES.blue, pos: best.pos },
-		{ key: 'lc', label: 'Middle of box, left (Mario)', shortLabel: 'Middle, left', color: SERIES.aqua, pos: batterPosition(0, 'L', 'center') },
-		{ key: 'rc', label: 'Middle of box, right (Mario)', shortLabel: 'Middle, right', color: SERIES.gold, pos: batterPosition(0, 'R', 'center') },
+		{ key: 'lc', label: 'Middle of box, left-handed (Mario)', shortLabel: 'Middle, left', color: SERIES.aqua, pos: batterPosition(0, 'L', 'center') },
+		{ key: 'rc', label: 'Middle of box, right-handed (Mario)', shortLabel: 'Middle, right', color: SERIES.gold, pos: batterPosition(0, 'R', 'center') },
 		{ key: 'worst', label: `Farthest spot (${charName(worst.charId)}, right)`, shortLabel: 'Farthest spot', color: SERIES.orange, pos: worst.pos }
 	].map((d) => ({ ...d, L: legLength(d.pos) }));
 	const scenarios: (SpeedScenario & { L: number; human: number[]; pos: [number, number] })[] = scenarioDefs.map((s) => ({
@@ -127,11 +132,11 @@ export default function RunningAnalysisPage() {
 	const fastestBase = Math.max(...CHARACTER_SPEED);
 	const namesAt = (sp: number) => CHARACTER_SPEED.flatMap((v, id) => (v === sp ? [charName(id)] : [])).join(', ');
 	const speedNotes: Record<number, string> = {
-		[slowest]: `Slowest characters: ${namesAt(slowest)}`,
+		[slowest]: `Slowest characters`,
 		[slowest + SUPERSTAR_SPEED_BONUS]: 'The slowest characters when starred',
 		[fastestBase]: `Fastest unstarred: ${namesAt(fastestBase)}`,
 		100: 'Acceleration stops falling here',
-		[fastestBase + SUPERSTAR_SPEED_BONUS]: 'Starred Yoshi, Toadette: the fastest in the game',
+		[fastestBase + SUPERSTAR_SPEED_BONUS]: `Starred ${namesAt(fastestBase)}: the fastest in the game`,
 		[SPEED_STAT_CAP]: 'The most the game will calculate without mods (initializeInMemRunner caps the stat at 200)'
 	};
 
@@ -163,6 +168,11 @@ export default function RunningAnalysisPage() {
 	const marioMid = (speed: number) => runAt(0, 'R', 'center', 'tas', speed).frame;
 	const perTenSpeed = ((marioMid(slowest) - marioMid(fastestBase)) / ((fastestBase - slowest) / 10)).toFixed(1);
 	const starGain = runAt(YOSHI, 'R', 'center', 'tas', CHARACTER_SPEED[YOSHI]).frame - runAt(YOSHI, 'R', 'center', 'tas', yoshiSpeed).frame;
+	// Standing-start comparison: the slowest stat against Mario, the fastest unstarred and starred Yoshi.
+	const accelSeries = [slowest, CHARACTER_SPEED[0], fastestBase, yoshiSpeed].map((speed) => ({ speed, label: `Speed ${speed}` }));
+	const accelRuns = accelSeries.map((s) => standingStart(s.speed, 100));
+	const accelBehind = accelRuns.map((r) => Math.max(...r.dist.map((d, f) => accelRuns[0].dist[f] - d)));
+	const accelLevel = accelRuns.map((r) => r.dist.findIndex((d, f) => f > 0 && d > accelRuns[0].dist[f]));
 	const accelFrames = (speed: number) => {
 		const k = speedConstants(speed);
 		return Math.ceil(k.maxV / k.accel - 1e-6);
@@ -214,11 +224,10 @@ export default function RunningAnalysisPage() {
 		{ label: 'Fixed start delay', value: '30', unit: 'frames', sub: 'The batter is held for half a second after contact, whatever their speed.' }
 	];
 
-	return (
+	const analysis = (
 		<div className="space-y-12">
 			<div>
-				<PageHeader kicker="Tools" title="Running Analysis" />
-				<p className="-mt-4 max-w-3xl text-fog-300">
+				<p className="max-w-3xl text-fog-300">
 					How many frames a runner needs to reach each base after contact, from the batter&apos;s box or from a base. The figures come
 					from a frame-by-frame model that copies the game&apos;s runner update in single-precision floats. Every rule is traced to the
 					mssb-dtk decompilation, and the model runs live in the calculator below. The runner always goes forward and is sent to the next
@@ -237,33 +246,35 @@ export default function RunningAnalysisPage() {
 								{leftyGain} frames from the middle of the box at each character&apos;s own speed.
 							</li>
 							<li>
-								<b className="text-fog-100">Move toward 1B in the box if you need the run.</b> Standing in the corner nearest 1B
+								<b className="text-fog-100">Move toward 1B in the box to maximize chance of being safe.</b> Standing in the corner nearest 1B
 								instead of the default spot saves {cornerGain} frames. Moving in the box also moves where you hit the ball, so it
 								is a trade-off.
 							</li>
 							<li>
-								<b className="text-fog-100">Mash once the runner is at full speed.</b> Presses only count from top speed, which a
-								batter reaches {topSpeedFrame} frames after contact. Presses before then do nothing. A full mash meter is worth{' '}
+								<b className="text-fog-100">Mash once the runner is at full speed.</b> Mashes only count from top speed, which a
+								batter reaches {topSpeedFrame} frames after contact, since presses before then do nothing. A full mash meter is worth{' '}
 								{mashGain} frames on the way to 1B.
 							</li>
 							<li>
-								<b className="text-fog-100">About 20 presses a second is enough.</b> A press every 3 frames lands within{' '}
-								{humanGap} frame{humanGap === 1 ? '' : 's'} of a perfect TAS in every case here. Any A, B, X or Y press counts, so
-								alternating two buttons makes it easier.
+								<b className="text-fog-100">Mash fast to fill the meter, then ease off.</b> A press every 3 frames (about 20 per second)
+								fills the meter in 13 frames and lands within {humanGap} frame{humanGap === 1 ? '' : 's'} of a perfect TAS in every case
+								here. Once it&apos;s full, each press holds the bonus for {MASH_HOLD_FRAMES} frames before it starts to drain, so one press
+								every {MASH_HOLD_FRAMES + 1} frames, about {(60 / (MASH_HOLD_FRAMES + 1)).toFixed(1)} per second, keeps the runner at full
+								speed. Any A, B, X or Y press counts, so alternating two buttons makes it easier.
 							</li>
 							<li>
 								<b className="text-fog-100">Keep the control stick neutral while mashing.</b> Presses made while holding a
 								direction aren&apos;t counted.
 							</li>
 							<li>
-								<b className="text-fog-100">Starring is a big speed boost.</b> It adds 50 to the speed stat: starred Yoshi reaches
+								<b className="text-fog-100">Starring adds 50 to the speed stat.</b> Starred Yoshi reaches
 								1B {starGain} frames sooner than unstarred Yoshi.
 							</li>
 							<li>
 								<b className="text-fog-100">Rounding pays off over two or more bases.</b> A runner who rounds keeps their speed
-								through each base; one who doesn&apos;t stops on 1B or slides into the next base, then starts again from zero. Mario goes
-								1B to 3B in {firstToThirdRound.frame} frames rounding and {firstToThirdStraight.frame} without, and an inside-the-park
-								home run takes {trotRound.frame} against {trotStraight.frame}. For a single base it barely matters: 1B to 2B takes{' '}
+								through each base, while one who doesn&apos;t stops on 1B or slides into the next base, then starts again from zero. Mario goes from
+								1B to 3B in {firstToThirdRound.frame} frames rounding and {firstToThirdStraight.frame} without rounding, and an inside-the-park
+								home run takes {trotRound.frame} compared to {trotStraight.frame}. For a single base it barely matters - 1B to 2B takes{' '}
 								{firstToSecondRound.frame} rounding and {firstToSecondStraight.frame} straight, because the wider rounding path costs
 								about as much as the slide.
 							</li>
@@ -273,21 +284,21 @@ export default function RunningAnalysisPage() {
 						<h2 className="text-lg uppercase text-fog-100">How running works</h2>
 						<ul className="space-y-2.5 text-sm leading-relaxed text-fog-300">
 							<li>
-								<b className="text-fog-100">Every batter waits 30 frames.</b> Half a second after contact before moving,
-								whatever their speed or the type of hit.
+								<b className="text-fog-100">Every batter waits 30 frames before moving.</b> It takes half a second after contact before moving,
+								no matter their speed or the type of hit.
 							</li>
 							<li>
-								<b className="text-fog-100">The run starts where the batter stands,</b> not at home plate, so the distance to 1B
-								depends on the character&apos;s box and where they moved in it.
+								<b className="text-fog-100">The run starts where the batter hits the ball,</b> not at home plate, so the distance to 1B
+								depends on the character&apos;s range in the batter's box and where they moved in it for the hit.
 							</li>
 							<li>
 								<b className="text-fog-100">Faster characters accelerate more slowly.</b> A speed-{slowest} runner reaches top
 								speed in {accelFrames(slowest)} frames; a speed-{fastestBase} runner takes {accelFrames(fastestBase)}. Top speed
-								still wins: each 10 points of speed is worth about {perTenSpeed} frames to 1B.
+								still matters more: each 10 points of speed is worth about {perTenSpeed} frames to 1B.
 							</li>
 							<li>
-								<b className="text-fog-100">You are safe at 97% of the way.</b> The game counts the runner as on 1B about 0.8 m
-								before the base.
+								<b className="text-fog-100">You are considered safe at 97% of the baseline.</b> The game counts the runner as on a base about 0.8 m
+								before its centred coordinate.
 							</li>
 							<li>
 								<b className="text-fog-100">Ties go to the fielder.</b> The force-out check runs before the runner moves each
@@ -295,20 +306,19 @@ export default function RunningAnalysisPage() {
 							</li>
 							<li>
 								<b className="text-fog-100">Running to 1B is simple.</b> The batter never slides into 1B, overrunning only starts
-								after the base, and stamina costs about 1% of top speed by the time the runner arrives.
+								after the base, and stamina drops top speed by about 1% by the time the runner reaches the base.
 							</li>
 							<li>
-								<b className="text-fog-100">Runners on base start with a lead.</b> Every runner leads off 13% of the way to the next
-								base during each pitch, and the game sends them all forward automatically on frame {RUNNER_AUTO_START_FRAME}, long
-								before the batter can move.
+								<b className="text-fog-100">Runners on base start with a lead-off.</b> Every runner leads off 13% of the way to the next
+								base during each pitch, and the game sends them all forward automatically on frame {RUNNER_AUTO_START_FRAME}, earlier than the batter can move.
 							</li>
 							<li>
 								<b className="text-fog-100">Rounding takes a wider path.</b> Rounding starts halfway along a baseline and swings the runner
-								wide, so the game measures each baseline as up to {roundingExtra}% longer. It still wins, because the runner never stops.
+								wide, so the game measures each baseline as up to {roundingExtra}% longer. It still is faster, because the runner never stops.
 							</li>
 							<li>
 								<b className="text-fog-100">Runners slide when they aren&apos;t rounding.</b> Into 2B, 3B or home the slide starts 16–22
-								frames out and costs a 25-frame recovery. A runner starting on 3rd never rounds, so they always slide home (
+								frames out and has a 25-frame recovery. A runner starting on 3rd never rounds, so they always slide home (
 								{thirdHome.frame} frames for Mario).
 							</li>
 						</ul>
@@ -338,7 +348,7 @@ export default function RunningAnalysisPage() {
 				<div className="space-y-3 p-5">
 					<p className="text-sm text-fog-300">
 						Four starting spots. Solid lines are TAS mashing, dashed lines are no mashing. The extremes are the closest and farthest spots
-						any character&apos;s box allows. The middle-of-box lines use Mario&apos;s box.
+						any character&apos;s hitbox allows. The middle-of-box lines use Mario&apos;s hitbox.
 					</p>
 					<FramesBySpeedChart speeds={SPEEDS} scenarios={scenarios} />
 					<div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fog-300">
@@ -379,7 +389,7 @@ export default function RunningAnalysisPage() {
 						<C>framesInGameStatus ≥ liveBallInputDelayFrames</C> (20 frames, or 10 for a high fly to the outfield).
 					</li>
 					<li>
-						<b className="text-fog-100">Frame 30:</b> the batter&apos;s first frame with movement. Velocity becomes one frame of
+						<b className="text-fog-100">Frame 30</b> is the batter&apos;s first frame with movement. Velocity becomes one frame of
 						acceleration.
 					</li>
 					<li>
@@ -531,6 +541,21 @@ mashHoldFrames        = runnerTimingConsts.mashHoldFrames                     //
 						];
 					})}
 				/>
+			</Panel>
+
+			<Panel>
+				<PanelHeader title="Acceleration from a standing start" />
+				<div className="space-y-3 p-5">
+					<p className="max-w-3xl text-sm leading-relaxed text-fog-300">
+						Lower speed stats accelerate harder, so slow runners get away quicker. Here a speed-{fastestBase} runner falls up to{' '}
+						{accelBehind[2].toFixed(2)} m behind a speed-{slowest} runner and only draws level on frame {accelLevel[2]}, about{' '}
+						{(accelLevel[2] / 60).toFixed(1)} s after starting to move; starred Yoshi (speed {yoshiSpeed}) draws level on frame{' '}
+						{accelLevel[3]}. Over a full baseline top speed decides it, but on short bursts, like a runner on base reacting to a hit,
+						the slower runner&apos;s quicker start counts for more. Frames here count from the first frame of movement: frame 30 after
+						contact for the batter, frame 5 for runners on base.
+					</p>
+					<AccelerationChart series={accelSeries} />
+				</div>
 			</Panel>
 
 			<Section
@@ -804,6 +829,18 @@ L         = |position − currentBase| + |nextBase − position|                
 					</li>
 				</ul>
 			</Section>
+		</div>
+	);
+
+	return (
+		<div>
+			<PageHeader kicker="Tools" title="Running Analysis" />
+			<Tabs
+				tabs={[
+					{ id: 'analysis', label: 'Full Analysis', content: analysis },
+					{ id: 'basics', label: 'Basics', content: <BasicsTab /> }
+				]}
+			/>
 		</div>
 	);
 }
