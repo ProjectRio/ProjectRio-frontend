@@ -151,7 +151,7 @@ export default function AccelerationChart({ series }: { series: AccelerationSeri
 
 			{/* gap to the first runner */}
 			<div>
-				<p className="pl-1 text-xs uppercase tracking-widest text-fog-500">Ahead of (+) or behind (−) the {base.label} runner (m)</p>
+				<p className="pl-1 text-xs uppercase tracking-widest text-fog-500">M ahead of (+) or behind (−) the {base.label} runner</p>
 				<svg viewBox={`0 0 ${W} ${H_GAP + 14}`} className="block h-auto w-full" role="img" aria-label="Distance ahead of or behind the slowest runner">
 					{niceTicks(gMin * 1.15, gMax * 1.15, 5).map((v) => (
 						<g key={v}>
@@ -231,8 +231,7 @@ export default function AccelerationChart({ series }: { series: AccelerationSeri
 			</div>
 			<p className="text-xs text-fog-500">
 				Dots on the top chart mark when each runner reaches top speed. On the lower chart, dots on the zero line mark the frame each faster
-				runner draws level with the {base.label} runner, with the frame number underneath in that runner&apos;s colour. Standing start, no
-				mashing, full stamina.
+				runner draws level with the {base.label} runner, with the frame number underneath in that runner&apos;s colour.
 			</p>
 		</div>
 	);

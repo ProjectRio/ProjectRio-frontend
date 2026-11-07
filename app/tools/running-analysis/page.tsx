@@ -5,6 +5,13 @@ import AccelerationChart from '@/components/running/AccelerationChart';
 import FramesBySpeedChart, { type SpeedScenario } from '@/components/running/FramesBySpeedChart';
 import { SERIES } from '@/components/running/chartUtils';
 import BasicsTab from '@/components/running/BasicsTab';
+import RunningToFirstTab from '@/components/running/RunningToFirstTab';
+import RoundingTab from '@/components/running/RoundingTab';
+import ActionsTab from '@/components/running/ActionsTab';
+import RundownsTab from '@/components/running/RundownsTab';
+import StealingTab from '@/components/running/StealingTab';
+import CpuTab from '@/components/running/CpuTab';
+import MiscTab from '@/components/running/MiscTab';
 import Tabs from '@/components/Tabs';
 import { characters } from '@/lib/data/characters';
 import {
@@ -838,7 +845,14 @@ L         = |position − currentBase| + |nextBase − position|                
 			<Tabs
 				tabs={[
 					{ id: 'analysis', label: 'Full Analysis', content: analysis },
-					{ id: 'basics', label: 'Basics', content: <BasicsTab /> }
+					{ id: 'basics', label: 'Basics', content: <BasicsTab /> },
+					{ id: 'first-base', label: 'Running to 1B', content: <RunningToFirstTab /> },
+					{ id: 'rounding', label: 'Rounding the Bases', content: <RoundingTab /> },
+					{ id: 'actions', label: 'Actions', content: <ActionsTab /> },
+					{ id: 'rundowns', label: 'Rundowns', content: <RundownsTab /> },
+					{ id: 'stealing', label: 'Stealing', content: <StealingTab /> },
+					{ id: 'cpu', label: 'CPU', content: <CpuTab /> },
+					{ id: 'misc', label: 'Misc', content: <MiscTab /> }
 				]}
 			/>
 		</div>

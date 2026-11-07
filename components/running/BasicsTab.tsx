@@ -1,18 +1,9 @@
-import type { ReactNode } from 'react';
-import { Panel, PanelHeader } from '@/components/ui';
+import TabSection from '@/components/running/TabSection';
 import TopSpeedChart from '@/components/running/TopSpeedChart';
 import { characters } from '@/lib/data/characters';
 import { batterPosition, simulateHomeToFirst, speedConstants } from '@/lib/mssb/RunningSimulation/runningModel';
 import { BATTER_RUN_DELAY_FRAMES, CHARACTER_SPEED, SPEED_STAT_CAP } from '@/lib/mssb/RunningSimulation/runningConstants';
 
-function BasicsSection({ title, children }: { title: string; children: ReactNode }) {
-	return (
-		<Panel>
-			<PanelHeader title={title} />
-			<div className="max-w-3xl space-y-3 p-5 text-sm leading-relaxed text-fog-300">{children}</div>
-		</Panel>
-	);
-}
 
 const FPS = 60;
 const SPEED_ROWS = Array.from({ length: SPEED_STAT_CAP / 10 + 1 }, (_, i) => i * 10);
@@ -78,11 +69,11 @@ function SpeedTable() {
 	);
 }
 
-/** The "Basics" tab of the running analysis page. Write each section's text inside its <BasicsSection>. */
+/** The "Basics" tab of the running analysis page. Write each section's text inside its <TabSection>. */
 export default function BasicsTab() {
 	return (
 		<div className="space-y-8">
-			<BasicsSection title="Running Speed">
+			<TabSection title="Running Speed">
 				<p>Each character has a running speed stat that determines their top speed.
 					Characters are assigned stats in multiples of 10, but the game accepts values in between and uses linear interpolation when mapping to the top speed.
 					When a character is superstarred, they get 50 added to their regular speed stat. 
@@ -97,9 +88,9 @@ export default function BasicsTab() {
 				</p>
 				<SpeedTable />
 				<TopSpeedChart />
-			</BasicsSection>
+			</TabSection>
 
-			<BasicsSection title="Sprinting">
+			<TabSection title="Sprinting">
 				<p>Mashing A, B, X, or Y on the controller increases the character's top speed by up to 1.2m/s.
 					It takes 5 mashes to reach the maximum bonus, so each mash adds 20% of that bonus.
 					The game holds the current sprint bonus for 6 frames before decreasing by 5% per frame, so one press every 7 frames is enough to keep the bonus at 100%.
@@ -110,9 +101,9 @@ export default function BasicsTab() {
 					This means that it only takes 5 frames to achieve the maximum bonus if you use different buttons for each mash.
 				</p>
 				<p>The maximum sprint bonus (1.2m/s) is worth more than the gap between 10 and 90 speed (1.14m/s).</p>
-			</BasicsSection>
+			</TabSection>
 
-			<BasicsSection title="Stamina">
+			<TabSection title="Stamina">
 				<p>Each baserunner tracks their stamina, and as they get tired, decreases their top speed and accelerations.
 					The stamina value starts at 4000 for each play. For every frame running faster than 6m/s (roughly after 10-20 frames of movement), the character loses 1 point of stamina.
 					This minimum means faster players tire out a little less since they take longer to reach 6m/s due to their worse acceleration.
@@ -123,13 +114,16 @@ export default function BasicsTab() {
 					These penalties are applied linearly by multiplying top speed/acceleration by this factor: 1 - [max penalty] * (1 - stamina / 4000).
 				</p>
 				<p>The sprint bonus is not impacted by stamina since it is applied after the stamina reduces the top speed.</p>
-			</BasicsSection>
+			</TabSection>
 
-			<BasicsSection title="Running Calculation">
-				<p>Ignoring details, the baserunner's speed is generally calculated as follows.
+			<TabSection title="Running Calculation">
+				<p>Very generally, the baserunner velocity is generally calculated as follows.
 				</p>
 				<p>New Velocity = min(Old Velocity + Acceleration * Acceleration Stamina Penalty, Top Speed * Speed Stamina Penalty + Sprint Bonus)</p>
-			</BasicsSection>
+				<p>When getting up to speed, the acceleration is directly added to the current velocity.</p>
+				<p>At top speed, the sprint bonus can start to kick in.</p>
+				<p>Stamina penalties apply to the acceleration and top speed only.</p>
+			</TabSection>
 		</div>
 	);
 }

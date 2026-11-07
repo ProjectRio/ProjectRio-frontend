@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { characters } from '@/lib/data/characters';
 import {
 	BASE_NAMES,
@@ -97,10 +97,18 @@ const W = 640;
 const H = 250;
 const M = { l: 52, r: 14, t: 22, b: 40 };
 
-function VelocityChart({ runs, selected }: { runs: Record<MashMode, RunResult>; selected: MashMode }) {
+/** A second character's run, drawn dashed over the main runs. */
+export interface CompareRun {
+	run: RunResult;
+	label: string;
+}
+
+const COMPARE_COLOR = SERIES.gold;
+
+function VelocityChart({ runs, selected, compare }: { runs: Record<MashMode, RunResult>; selected: MashMode; compare?: CompareRun }) {
 	const [hover, setHover] = useState<{ f: number; left: number; top: number } | null>(null);
-	const fMax = Math.max(...MASH_MODES.map((m) => runs[m.value].frame));
-	const vMax = Math.max(...runs.tas.trace.map((t) => t.v)) * 1.08;
+	const fMax = Math.max(...MASH_MODES.map((m) => runs[m.value].frame), compare?.run.frame ?? 0);
+	const vMax = Math.max(...runs.tas.trace.map((t) => t.v), ...(compare ? compare.run.trace.map((t) => t.v) : [])) * 1.08;
 	const { X, Y } = makeScales(W, H, M, 0, fMax, 0, vMax);
 	const line = (r: RunResult) => r.trace.map((t) => `${X(t.f).toFixed(1)},${Y(t.v).toFixed(1)}`).join(' ');
 	const at = (r: RunResult, f: number) => r.trace.find((t) => t.f === f) ?? r.trace[r.trace.length - 1];
@@ -160,6 +168,14 @@ function VelocityChart({ runs, selected }: { runs: Record<MashMode, RunResult>; 
 						opacity={m.value === selected ? 1 : 0.55}
 					/>
 				))}
+				{compare && (
+					<g>
+						{compare.run.bases.map((b) => (
+							<line key={b.base} x1={X(b.frame)} x2={X(b.frame)} y1={M.t} y2={H - M.b} stroke={COMPARE_COLOR} strokeDasharray="3 3" opacity={0.8} />
+						))}
+						<polyline points={line(compare.run)} fill="none" stroke={COMPARE_COLOR} strokeWidth={2.5} strokeDasharray="6 4" />
+					</g>
+				)}
 				{hover && <line x1={X(hover.f)} x2={X(hover.f)} y1={M.t} y2={H - M.b} stroke={AXIS_LABEL} opacity={0.5} />}
 				<rect
 					x={M.l}
@@ -192,6 +208,21 @@ function VelocityChart({ runs, selected }: { runs: Record<MashMode, RunResult>; 
 							</div>
 						);
 					})}
+					{compare &&
+						(() => {
+							const t = at(compare.run, hover.f);
+							return (
+								<div className="flex items-center justify-between gap-4 text-fog-300">
+									<span className="flex items-center gap-1.5">
+										<span className="inline-block h-2 w-2 rounded-full" style={{ background: COMPARE_COLOR }} />
+										{compare.label}
+									</span>
+									<span className="font-mono tabular-nums text-fog-100">
+										{t.v.toFixed(4)} m/frame · {t.fbr.toFixed(2)} bases
+									</span>
+								</div>
+							);
+						})()}
 				</div>
 			)}
 		</div>
@@ -377,7 +408,12 @@ function WorkedExample({
 	);
 }
 
-export default function RunningCalculator() {
+/**
+ * Frame-by-frame run calculator. With firstBaseOnly, the start, destination and path controls are hidden and the run is
+ * always the batter to 1B.
+ */
+export default function RunningCalculator({ firstBaseOnly = false }: { firstBaseOnly?: boolean }) {
+	const uid = useId();
 	const [charId, setCharId] = useState(0);
 	const [speed, setSpeed] = useState(CHARACTER_SPEED[0]);
 	const [side, setSide] = useState<BoxSide>('R');
@@ -400,6 +436,16 @@ export default function RunningCalculator() {
 		};
 	}, [speed, charId, side, spot, effectivePath, startBase, endBase]);
 	const run = runs[mash];
+	// Comparison character (1B mode only): their own speed, the same box side, spot and mashing, batter to 1B.
+	const [compareId, setCompareId] = useState(-1);
+	const compare = useMemo<CompareRun | undefined>(() => {
+		if (!firstBaseOnly || compareId < 0) return undefined;
+		const compareSpeed = CHARACTER_SPEED[compareId];
+		return {
+			label: `${characters[String(compareId)]} (${compareSpeed})`,
+			run: simulateRun({ speed: compareSpeed, mash, path: 'straight', startBase: 0, endBase: 1, batterPos: batterPosition(compareId, side, spot) })
+		};
+	}, [firstBaseOnly, compareId, side, spot, mash]);
 	const baseSpeed = CHARACTER_SPEED[charId];
 	const isBatter = startBase === 0;
 	const selColor = MASH_MODES.find((m) => m.value === mash)!.color;
@@ -409,11 +455,11 @@ export default function RunningCalculator() {
 		<div className="grid gap-6 p-5 lg:grid-cols-[300px_1fr]">
 			<div className="space-y-4">
 				<div>
-					<label className="label" htmlFor="ra-char">
+					<label className="label" htmlFor={`${uid}-char`}>
 						Character
 					</label>
 					<select
-						id="ra-char"
+						id={`${uid}-char`}
 						className="input"
 						value={charId}
 						onChange={(e) => {
@@ -430,12 +476,28 @@ export default function RunningCalculator() {
 					</select>
 					<p className="mt-1 text-xs text-fog-500">Sets the speed stat, and the batter&apos;s box when starting at home.</p>
 				</div>
+				{firstBaseOnly && (
+					<div>
+						<label className="label" htmlFor={`${uid}-compare`}>
+							Compare with
+						</label>
+						<select id={`${uid}-compare`} className="input" value={compareId} onChange={(e) => setCompareId(Number(e.target.value))}>
+							<option value={-1}>None</option>
+							{BATTER_BOX.map((_, id) => (
+								<option key={id} value={id}>
+									{characters[String(id)]} · speed {CHARACTER_SPEED[id]}
+								</option>
+							))}
+						</select>
+						<p className="mt-1 text-xs text-fog-500">Runs at their own speed, from the same box side and spot, with the same mashing.</p>
+					</div>
+				)}
 				<div>
-					<label className="label" htmlFor="ra-speed">
+					<label className="label" htmlFor={`${uid}-speed`}>
 						Speed stat: <span className="font-mono text-fog-100">{speed}</span>
 					</label>
 					<input
-						id="ra-speed"
+						id={`${uid}-speed`}
 						type="range"
 						min={0}
 						max={SPEED_STAT_CAP}
@@ -453,59 +515,63 @@ export default function RunningCalculator() {
 						</button>
 					</div>
 				</div>
-				<div className="grid grid-cols-2 gap-3">
-					<div>
-						<label className="label" htmlFor="ra-start">
-							Start
-						</label>
-						<select
-							id="ra-start"
-							className="input"
-							value={startBase}
-							onChange={(e) => {
-								const s = Number(e.target.value);
-								setStartBase(s);
-								if (endBase <= s) setEndBase(s + 1);
-							}}
-						>
-							{START_OPTIONS.map((o) => (
-								<option key={o.value} value={o.value}>
-									{o.label}
-								</option>
-							))}
-						</select>
-					</div>
-					<div>
-						<label className="label" htmlFor="ra-end">
-							Run to
-						</label>
-						<select id="ra-end" className="input" value={endBase} onChange={(e) => setEndBase(Number(e.target.value))}>
-							{endOptions.map((b) => (
-								<option key={b} value={b}>
-									{BASE_NAMES[b]}
-								</option>
-							))}
-						</select>
-					</div>
-				</div>
-				<div>
-					<span className="label">Path</span>
-					<Toggle
-						label="Path"
-						value={path}
-						onChange={setPath}
-						disabled={!pathMatters}
-						options={[
-							{ value: 'round', label: 'Round the bases' },
-							{ value: 'straight', label: 'Straight' }
-						]}
-					/>
-					<p className="mt-1 text-xs text-fog-500">
-						{pathMatters
-							? 'Round: ball in the outfield, speed carries through each base. Straight: ball in the infield, stop on 1B and slide into the rest.'
-							: 'Home to 1B always runs straight; the 1B overrun logic handles that baseline.'}
-					</p>
-				</div>
+				{!firstBaseOnly && (
+					<>
+						<div className="grid grid-cols-2 gap-3">
+							<div>
+								<label className="label" htmlFor={`${uid}-start`}>
+									Start
+								</label>
+								<select
+									id={`${uid}-start`}
+									className="input"
+									value={startBase}
+									onChange={(e) => {
+										const s = Number(e.target.value);
+										setStartBase(s);
+										if (endBase <= s) setEndBase(s + 1);
+									}}
+								>
+									{START_OPTIONS.map((o) => (
+										<option key={o.value} value={o.value}>
+											{o.label}
+										</option>
+									))}
+								</select>
+							</div>
+							<div>
+								<label className="label" htmlFor={`${uid}-end`}>
+									Run to
+								</label>
+								<select id={`${uid}-end`} className="input" value={endBase} onChange={(e) => setEndBase(Number(e.target.value))}>
+									{endOptions.map((b) => (
+										<option key={b} value={b}>
+											{BASE_NAMES[b]}
+										</option>
+									))}
+								</select>
+							</div>
+						</div>
+						<div>
+							<span className="label">Path</span>
+							<Toggle
+								label="Path"
+								value={path}
+								onChange={setPath}
+								disabled={!pathMatters}
+								options={[
+									{ value: 'round', label: 'Round the bases' },
+									{ value: 'straight', label: 'Straight' }
+								]}
+							/>
+							<p className="mt-1 text-xs text-fog-500">
+								{pathMatters
+									? 'Round: ball in the outfield, speed carries through each base. Straight: ball in the infield, stop on 1B and slide into the rest.'
+									: 'Home to 1B always runs straight; the 1B overrun logic handles that baseline.'}
+							</p>
+						</div>
+					</>
+				)}
 				<div className={isBatter ? '' : 'opacity-40'}>
 					<span className="label">Batter&apos;s box side</span>
 					<Toggle
@@ -520,10 +586,10 @@ export default function RunningCalculator() {
 					/>
 				</div>
 				<div className={isBatter ? '' : 'opacity-40'}>
-					<label className="label" htmlFor="ra-spot">
+					<label className="label" htmlFor={`${uid}-spot`}>
 						Spot in the box
 					</label>
-					<select id="ra-spot" className="input" value={spot} disabled={!isBatter} onChange={(e) => setSpot(e.target.value as BoxSpot)}>
+					<select id={`${uid}-spot`} className="input" value={spot} disabled={!isBatter} onChange={(e) => setSpot(e.target.value as BoxSpot)}>
 						{SPOTS.map((s) => (
 							<option key={s.value} value={s.value}>
 								{spotLabel(s.value, side)}
@@ -574,9 +640,18 @@ export default function RunningCalculator() {
 								</div>
 							);
 						})}
+						{compare && (
+							<>
+								<dt className="text-fog-500">{compare.label}</dt>
+								<dd className="text-right font-mono tabular-nums">
+									{compare.run.frame} ({compare.run.frame - run.frame > 0 ? '+' : ''}
+									{compare.run.frame - run.frame})
+								</dd>
+							</>
+						)}
 					</dl>
 				</div>
-				<VelocityChart runs={runs} selected={mash} />
+				<VelocityChart runs={runs} selected={mash} compare={compare} />
 				<div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fog-500">
 					{MASH_MODES.map((m) => (
 						<span key={m.value} className="flex items-center gap-2">
@@ -584,25 +659,33 @@ export default function RunningCalculator() {
 							{m.name}
 						</span>
 					))}
+					{compare && (
+						<span className="flex items-center gap-2">
+							<span className="inline-block w-5 border-t-2 border-dashed" style={{ borderColor: COMPARE_COLOR }} />
+							{compare.label}
+						</span>
+					)}
 					<span>Dashed lines: when the selected run reaches each base. Hover for the frame.</span>
 				</div>
 			</div>
 
-			<div className="space-y-2 lg:col-span-2">
-				<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">The runner&apos;s path</h3>
-				<div className="rounded-lg border border-night-700 bg-night-850 p-3">
-					<RunPathChart run={run} color={selColor} charId={charId} side={side} startBase={startBase} />
+			{!firstBaseOnly && (
+				<div className="space-y-2 lg:col-span-2">
+					<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">The runner&apos;s path</h3>
+					<div className="rounded-lg border border-night-700 bg-night-850 p-3">
+						<RunPathChart run={run} color={selColor} charId={charId} side={side} startBase={startBase} />
+					</div>
+					<p className="text-xs text-fog-500">
+						Top-down, from behind home plate. The thick line is the simulated path for the selected mashing mode. Numbered circles mark each
+						second since contact, and the time under each base is when the runner reaches it. Callouts show the lead, where rounding starts,
+						any slide, and the overrun past the final base when the runner stops there: past 1B, or past 2B or 3B after rounding.
+						Slides and overruns are drawn dashed. The dotted curve and small circles are the full rounding spline and its control points; dashed
+						lines are the straight baselines. Home plate is drawn at the game&apos;s size with its back point at the origin, where the foul lines meet; the small dot
+						beside it is the point runners actually run to and from (0.4, 0.3), which the game places slightly toward 1st, so the
+						baselines start there. The inset at the bottom right zooms in on the selected character&apos;s batter&apos;s boxes.
+					</p>
 				</div>
-				<p className="text-xs text-fog-500">
-					Top-down, from behind home plate. The thick line is the simulated path for the selected mashing mode. Numbered circles mark each
-					second since contact, and the time under each base is when the runner reaches it. Callouts show the lead, where rounding starts,
-					any slide, and the overrun past the final base when the runner stops there: past 1B, or past 2B or 3B after rounding.
-					Slides and overruns are drawn dashed. The dotted curve and small circles are the full rounding spline and its control points; dashed
-					lines are the straight baselines. Home plate is drawn at the game&apos;s size with its back point at the origin, where the foul lines meet; the small dot
-					beside it is the point runners actually run to and from (0.4, 0.3), which the game places slightly toward 1st, so the
-					baselines start there. The inset at the bottom right zooms in on the selected character&apos;s batter&apos;s boxes.
-				</p>
-			</div>
+			)}
 
 			<WorkedExample
 				charId={charId}

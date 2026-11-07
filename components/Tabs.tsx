@@ -28,7 +28,7 @@ export default function Tabs({ tabs }: { tabs: TabDef[] }) {
 
 	return (
 		<div className="space-y-8">
-			<div role="tablist" className="flex gap-1 border-b border-night-700">
+			<div role="tablist" className="flex flex-wrap gap-x-1 border-b border-night-700">
 				{tabs.map((t) => (
 					<button
 						key={t.id}
@@ -38,7 +38,7 @@ export default function Tabs({ tabs }: { tabs: TabDef[] }) {
 						aria-selected={active === t.id}
 						aria-controls={`panel-${t.id}`}
 						onClick={() => select(t.id)}
-						className={`-mb-px border-b-2 px-4 py-2 font-display text-sm font-bold uppercase tracking-widest transition-colors ${
+						className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-2 font-display text-sm font-bold uppercase tracking-widest transition-colors ${
 							active === t.id ? 'border-star-400 text-fog-100' : 'border-transparent text-fog-500 hover:text-fog-300'
 						}`}
 					>
