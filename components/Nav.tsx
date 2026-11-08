@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useUsername } from '@/lib/useUsername';
+import { useRioStaff } from '@/lib/useRioStaff';
 
 const NAV_LINKS = [
 	{ href: '/games/recent', label: 'Games' },
@@ -12,7 +13,7 @@ const NAV_LINKS = [
 	{ href: '/modes', label: 'Ranked' },
 	{ href: '/users', label: 'Players' },
 	{ href: '/characters', label: 'Characters' },
-	{ href: '/community', label: 'Community' },
+	{ href: '/communities', label: 'Communities' },
 	{ href: '/tools', label: 'Tools' }
 ];
 
@@ -22,10 +23,69 @@ const SOCIAL_LINKS = [
 	{ href: 'https://github.com/ProjectRio?tab=repositories', label: 'GitHub' }
 ];
 
+function AccountMenu({ username }: { username: string }) {
+	const [open, setOpen] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const { isStaff } = useRioStaff();
+
+	useEffect(() => {
+		if (!open) return;
+		function onClick(event: MouseEvent) {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) setOpen(false);
+		}
+		window.addEventListener('mousedown', onClick);
+		return () => window.removeEventListener('mousedown', onClick);
+	}, [open]);
+
+	const items = [
+		{ href: `/users/${encodeURIComponent(username)}`, label: 'My Profile' },
+		{ href: '/communities?filter=mine', label: 'My Communities' },
+		...(isStaff ? [{ href: '/admin', label: 'Rio Admin' }] : []),
+		{ href: '/logout', label: 'Log Out' }
+	];
+
+	return (
+		<div className="relative" ref={menuRef}>
+			<button
+				type="button"
+				aria-haspopup="menu"
+				aria-expanded={open}
+				title={username}
+				className="flex h-9 w-9 items-center justify-center rounded-full bg-rio-500 font-display font-bold uppercase transition-colors hover:bg-rio-400"
+				onClick={() => setOpen(!open)}
+			>
+				{username.slice(0, 2)}
+			</button>
+			{open && (
+				<div
+					role="menu"
+					className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-night-700 bg-night-900 shadow-lg"
+				>
+					<p className="border-b border-night-700 bg-night-850 px-4 py-2 text-xs font-medium text-fog-500">
+						Signed in as <span className="text-fog-100">{username}</span>
+					</p>
+					{items.map((item) => (
+						<Link
+							key={item.href}
+							href={item.href}
+							role="menuitem"
+							className="block px-4 py-2 font-display text-sm font-semibold uppercase tracking-wider text-fog-300 transition-colors hover:bg-night-800 hover:text-fog-100"
+							onClick={() => setOpen(false)}
+						>
+							{item.label}
+						</Link>
+					))}
+				</div>
+			)}
+		</div>
+	);
+}
+
 export default function Nav() {
 	const [open, setOpen] = useState(false);
 	const pathname = usePathname();
 	const username = useUsername();
+	const { isStaff } = useRioStaff();
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-night-700 bg-night-950/90 backdrop-blur">
@@ -67,11 +127,7 @@ export default function Nav() {
 						</a>
 					))}
 					{username ? (
-						<Link href="/logout" className="flex items-center gap-2" title="Log out">
-							<span className="flex h-9 w-9 items-center justify-center rounded-full bg-rio-500 font-display font-bold uppercase">
-								{username.slice(0, 2)}
-							</span>
-						</Link>
+						<AccountMenu username={username} />
 					) : (
 						<Link href="/login" className="btn-primary !px-4 !py-2 text-sm">
 							Log In
@@ -105,6 +161,28 @@ export default function Nav() {
 								</Link>
 							</li>
 						))}
+						{username && isStaff && (
+							<li>
+								<Link
+									href="/admin"
+									className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-fog-300 hover:text-fog-100"
+									onClick={() => setOpen(false)}
+								>
+									Rio Admin
+								</Link>
+							</li>
+						)}
+						{username && (
+							<li>
+								<Link
+									href={`/users/${encodeURIComponent(username)}`}
+									className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-fog-300 hover:text-fog-100"
+									onClick={() => setOpen(false)}
+								>
+									My Profile
+								</Link>
+							</li>
+						)}
 						<li>
 							<Link
 								href={username ? '/logout' : '/login'}

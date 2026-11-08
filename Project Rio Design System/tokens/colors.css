@@ -1,0 +1,67 @@
+/* ============================================================
+   Project Rio — Color tokens
+   Derived from app/globals.css @theme (the Rio mushroom: red /
+   white / black) plus the ranked-tier palette from lib/ladder.ts.
+   ============================================================ */
+:root {
+	/* --- Rio red — the brand core (the mushroom cap) --- */
+	--rio-300: #ff6b78;
+	--rio-400: #ff3d4e;
+	--rio-500: #e60012; /* primary brand red */
+	--rio-600: #c4000f;
+	--rio-700: #9a000c;
+
+	/* --- Star gold — accent for ratings, tiers, highlights --- */
+	--star-400: #ffd23f;
+	--star-500: #f5bb00;
+
+	/* --- Night — the dark arena background scale --- */
+	--night-950: #07070b; /* page base */
+	--night-900: #0b0b12; /* panel surface */
+	--night-850: #10101a; /* raised header / input */
+	--night-800: #161624; /* hairline row borders */
+	--night-700: #1f1f30; /* panel borders */
+	--night-600: #2b2b40; /* strong borders / dividers */
+
+	/* --- Fog — text on night --- */
+	--fog-100: #f5f5f8; /* primary text */
+	--fog-300: #c9c9d6; /* secondary text */
+	--fog-500: #8f8fa3; /* muted / captions */
+
+	/* --- Emerald — "win / positive" signal (ELO gains) --- */
+	--emerald-300: #6ee7b7;
+	--emerald-400: #34d399;
+	--emerald-500: #10b981;
+
+	/* ---------- Semantic aliases ---------- */
+	--bg-page: var(--night-950);
+	--surface-card: var(--night-900);
+	--surface-raised: var(--night-850);
+	--border-card: var(--night-700);
+	--border-strong: var(--night-600);
+	--border-hairline: var(--night-800);
+
+	--text-primary: var(--fog-100);
+	--text-secondary: var(--fog-300);
+	--text-muted: var(--fog-500);
+
+	--accent: var(--rio-500);
+	--accent-hover: var(--rio-400);
+	--accent-press: var(--rio-600);
+	--accent-soft: rgb(230 0 18 / 0.06); /* table row hover wash */
+	--accent-glow: rgb(230 0 18 / 0.12);
+
+	--positive: var(--emerald-400);
+	--negative: var(--rio-400);
+	--highlight: var(--star-400);
+
+	--focus-ring: rgb(230 0 18 / 0.15);
+
+	/* ---------- Ranked tier colors (lib/ladder.ts, division I) ---------- */
+	--tier-shell: #8bbf8c;
+	--tier-mushroom: #ff4949;
+	--tier-flower: #ff6700;
+	--tier-star: #fff25c;
+	--tier-special: #775587;
+	--tier-legend: #af9146;
+}

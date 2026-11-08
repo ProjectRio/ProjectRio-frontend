@@ -1,0 +1,88 @@
+<!-- @dsCard group="Components" viewport="760x640" name="Stats & Games" subtitle="Page header, ladder table, box-score table, game score cards." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 24px; }
+	.stack { display: flex; flex-direction: column; gap: 24px; }
+	.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.sec { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--fog-500); margin-bottom: 10px; }
+</style>
+</head>
+<body>
+	<div id="root"></div>
+	<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+	<script src="../../_ds_bundle.js"></script>
+	<script type="text/babel">
+		const NS = window.ProjectRioDesignSystem_6fbb66;
+		const { PageHeader, LadderTable, StatTable, GameScoreCard, Button, Panel, PanelHeader } = NS;
+		const ladder = [
+			{ username: 'DingerCity', rating: 2014, wins: 142, losses: 38 },
+			{ username: 'JoeBaseball', rating: 1876, wins: 110, losses: 51 },
+			{ username: 'Roeming', rating: 1542, wins: 88, losses: 64 },
+			{ username: 'NokiMain', rating: 1180, wins: 54, losses: 60 },
+			{ username: 'ShellLeague', rating: 720, wins: 12, losses: 40 }
+		];
+		const batters = [
+			{ name: 'Mario', ab: 5, h: 3, hr: 1, rbi: 4, avg: '.600' },
+			{ name: 'Peach', ab: 4, h: 2, hr: 0, rbi: 1, avg: '.500' },
+			{ name: 'DK', ab: 5, h: 1, hr: 1, rbi: 2, avg: '.200' },
+			{ name: 'Toad(R)', ab: 4, h: 0, hr: 0, rbi: 0, avg: '.000' }
+		];
+		function Demo() {
+			return (
+				<div className="stack">
+					<PageHeader kicker="Ranked play" title="Standard Ladder">
+						<Button variant="secondary" size="sm">Season 4</Button>
+					</PageHeader>
+					<div>
+						<div className="sec">LadderTable</div>
+						<Panel><LadderTable rows={ladder} highlightUser="Roeming" /></Panel>
+					</div>
+					<div>
+						<div className="sec">StatTable — box score</div>
+						<Panel>
+							<PanelHeader title="DingerCity (Away)" />
+							<StatTable
+								rowKey="name"
+								highlightKey="Mario"
+								columns={[
+									{ key: 'name', label: 'Batters' },
+									{ key: 'ab', label: 'AB' },
+									{ key: 'h', label: 'H' },
+									{ key: 'hr', label: 'HR' },
+									{ key: 'rbi', label: 'RBI' },
+									{ key: 'avg', label: 'AVG', align: 'right' }
+								]}
+								rows={batters}
+							/>
+						</Panel>
+					</div>
+					<div>
+						<div className="sec">GameScoreCard</div>
+						<div className="cards">
+							<GameScoreCard
+								status="Final" timeAgo="12m ago" mode="Big Balls Brawl" stadium="Mario Stadium"
+								away={{ user: 'DingerCity', score: 7, sprite: '../../assets/characters/Mario.png', elo: { before: 1180, after: 1198 } }}
+								home={{ user: 'JoeBaseball', score: 4, sprite: '../../assets/characters/Bowser.png', elo: { before: 1210, after: 1192 } }}
+								onBoxScore={() => {}}
+							/>
+							<GameScoreCard
+								status="Final / 7" timeAgo="1h ago" mode="Standard" stadium="Bowser Castle"
+								away={{ user: 'NokiMain', score: 2, sprite: '../../assets/characters/Peach.png', elo: { before: 1190, after: 1175 } }}
+								home={{ user: 'Roeming', score: 9, sprite: '../../assets/characters/DK.png', elo: { before: 1500, after: 1518 } }}
+								onBoxScore={() => {}}
+							/>
+						</div>
+					</div>
+				</div>
+			);
+		}
+		ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+	</script>
+</body>
+</html>

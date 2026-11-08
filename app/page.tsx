@@ -120,8 +120,8 @@ export default function HomePage() {
 						<a href="https://discord.gg/c3r9PabfRU" target="_blank" rel="noreferrer" className="btn-primary">
 							Join the Discord
 						</a>
-						<Link href="/community/create" className="btn-secondary">
-							Create a Community
+						<Link href="/communities" className="btn-secondary">
+							Browse Communities
 						</Link>
 					</div>
 				</div>

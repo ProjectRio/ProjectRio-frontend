@@ -1,0 +1,24 @@
+<!-- @dsCard group="Spacing" viewport="700x170" name="Radii & Button Shape" subtitle="Panel radii plus the signature angled clip-path button." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 22px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+	.box { width: 72px; height: 64px; background: var(--surface-card); border: 1px solid var(--border-strong); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+	.t { font-family: var(--font-mono); font-size: 10px; color: var(--fog-500); }
+</style>
+</head>
+<body>
+	<div class="box" style="border-radius:var(--radius-sm)"><span class="t">sm 4</span></div>
+	<div class="box" style="border-radius:var(--radius-md)"><span class="t">md 8</span></div>
+	<div class="box" style="border-radius:var(--radius-lg)"><span class="t">lg 12</span></div>
+	<div class="box" style="border-radius:var(--radius-xl)"><span class="t">xl 16</span></div>
+	<div class="box" style="border-radius:var(--radius-full)"><span class="t">full</span></div>
+	<div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+		<button class="btn-primary">Get Rio</button>
+		<span class="t">--clip-button</span>
+	</div>
+</body>
+</html>

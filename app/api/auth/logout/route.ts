@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { BACKEND, USER_ENDPOINTS } from '@/lib/api';
+import { JWT_COOKIE, CSRF_COOKIE } from '@/lib/session';
 
 export async function POST() {
+	// The backend JWT is stateless — logging out is just dropping our cookies.
 	const cookieStore = await cookies();
-	if (cookieStore.get('jwt')) {
-		// Best effort — the cookie is cleared regardless of backend response.
-		try {
-			await fetch(BACKEND + USER_ENDPOINTS.LOGOUT);
-		} catch {
-			// ignore
-		}
-		cookieStore.delete('jwt');
-	}
+	cookieStore.delete(JWT_COOKIE);
+	cookieStore.delete(CSRF_COOKIE);
 	return NextResponse.json({ success: true });
 }

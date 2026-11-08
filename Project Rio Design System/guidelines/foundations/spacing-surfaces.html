@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Surfaces & Red Glow" subtitle="The panel surface, hairline borders, and panel-glow hover." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 22px; display: flex; gap: 18px; align-items: stretch; }
+	.demo { flex: 1; padding: 16px; }
+	.demo .panel-header { margin: -16px -16px 12px; }
+	.cap { font-family: var(--font-mono); font-size: 11px; color: var(--fog-500); margin-top: 8px; }
+	.glow { border-color: rgb(230 0 18 / 0.55); box-shadow: var(--glow-red); }
+</style>
+</head>
+<body>
+	<div class="panel demo">
+		<div class="panel-header">Panel</div>
+		<div style="font-size:13px;color:var(--fog-300)">Standard card surface — night-900 on a night-700 border, 12px radius.</div>
+		<div class="cap">.panel · --surface-card</div>
+	</div>
+	<div class="panel demo glow">
+		<div class="panel-header">Panel · hover</div>
+		<div style="font-size:13px;color:var(--fog-300)">On hover the border lights red and a soft glow blooms behind the card.</div>
+		<div class="cap">.panel-glow:hover · --glow-red</div>
+	</div>
+</body>
+</html>

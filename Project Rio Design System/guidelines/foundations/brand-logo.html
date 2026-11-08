@@ -1,0 +1,29 @@
+<!-- @dsCard group="Brand" viewport="700x230" name="Logo — Rio Mushroom" subtitle="Pixel-art mushroom cap with baseball stitching. Never blur it." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 24px; display: flex; gap: 32px; align-items: center; }
+	.lockup { display: flex; align-items: center; gap: 14px; }
+	.wordmark { font-family: var(--font-display); font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fog-100); }
+	.wordmark span { color: var(--rio-500); }
+	.cap { font-family: var(--font-mono); font-size: 11px; color: var(--fog-500); margin-top: 14px; }
+	.col { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+	<div class="col">
+		<div class="lockup">
+			<img src="../../assets/logos/mushroom.png" width="64" height="64" class="pixelated" alt="Project Rio mushroom" />
+			<span class="wordmark">Project<span>Rio</span></span>
+		</div>
+		<span class="cap">assets/logos/mushroom.png · image-rendering: pixelated</span>
+	</div>
+	<div class="col" style="align-items:center">
+		<img src="../../assets/logos/mushroom.png" width="96" height="96" class="pixelated" alt="" />
+		<span class="cap">96px mark</span>
+	</div>
+</body>
+</html>

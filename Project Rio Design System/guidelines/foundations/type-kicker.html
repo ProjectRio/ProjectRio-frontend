@@ -1,0 +1,26 @@
+<!-- @dsCard group="Type" viewport="700x150" name="Kicker, Label & Mono" subtitle="Uppercase kickers, form labels, and tabular stat numerals." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+	body { margin: 0; padding: 22px; display: flex; gap: 48px; align-items: flex-start; }
+	.col { display: flex; flex-direction: column; gap: 8px; }
+	.note { font-family: var(--font-mono); font-size: 10px; color: var(--fog-500); }
+	.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--fog-100); }
+</style>
+</head>
+<body>
+	<div class="col">
+		<p class="kicker">Around the league</p>
+		<span class="label">Player Name</span>
+		<span class="note">.kicker · .label</span>
+	</div>
+	<div class="col">
+		<span class="mono" style="font-size:32px;font-weight:700">.347</span>
+		<span class="mono" style="font-size:18px">12&ndash;3 &middot; 2.41 ERA</span>
+		<span class="note">--font-mono · tabular-nums</span>
+	</div>
+</body>
+</html>
