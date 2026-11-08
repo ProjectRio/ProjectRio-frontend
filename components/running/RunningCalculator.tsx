@@ -21,11 +21,13 @@ import {
 	MAX_STAMINA,
 	RUNNER_AUTO_START_FRAME,
 	SLIDE_RECOVERY_FRAMES,
-	SPEED_STAT_CAP
+	SPEED_STAT_CAP,
+	SUPERSTAR_SPEED_BONUS
 } from '@/lib/mssb/RunningSimulation/runningConstants';
 import { AXIS_LABEL, AXIS_TEXT, GRID, SERIES, makeScales, niceTicks, pointerToViewX } from './chartUtils';
 import RunPathChart from './RunPathChart';
 import RaceChart from './RaceChart';
+import StartHeatMap from './StartHeatMap';
 import BoxPicker, { spotBatterPosition, spotBoxPosition, type StartSpot } from './BoxPicker';
 
 const SPOTS: { value: BoxSpot; label: string }[] = [
@@ -39,6 +41,7 @@ const SPOTS: { value: BoxSpot; label: string }[] = [
 /** Front = toward the pitcher, inside = next to the plate. The closest corner to 1B depends on the side. */
 const CLOSEST: Record<BoxSide, BoxSpot> = { R: 'fi', L: 'fo' };
 const FARTHEST: Record<BoxSide, BoxSpot> = { R: 'bo', L: 'bi' };
+const HANDED: Record<BoxSide, string> = { R: 'right-handed', L: 'left-handed' };
 const spotLabel = (spot: BoxSpot, side: BoxSide) =>
 	SPOTS.find((s) => s.value === spot)!.label +
 	(spot === CLOSEST[side] ? ' (closest to 1B)' : spot === FARTHEST[side] ? ' (farthest from 1B)' : '');
@@ -437,17 +440,39 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 		};
 	}, [speed, charId, side, spot, effectivePath, startBase, endBase]);
 	const run = runs[mash];
+	// The same run starred (or unstarred, when the speed already includes the star bonus), with the selected mashing.
+	const baseSpeed = CHARACTER_SPEED[charId];
+	const starAlt = useMemo(() => {
+		const unstar = speed >= baseSpeed + SUPERSTAR_SPEED_BONUS;
+		const altSpeed = unstar ? speed - SUPERSTAR_SPEED_BONUS : Math.min(speed + SUPERSTAR_SPEED_BONUS, SPEED_STAT_CAP);
+		const batterPos = spotBatterPosition(charId, side, spot);
+		return {
+			label: `${unstar ? 'Unstarred' : 'Starred'} (${altSpeed})`,
+			run: simulateRun({ speed: altSpeed, mash, path: effectivePath, startBase, endBase, batterPos })
+		};
+	}, [speed, baseSpeed, charId, side, spot, mash, effectivePath, startBase, endBase]);
 	// Comparison character (1B mode only): their own speed and start spot, the same box side and mashing, batter to 1B.
 	const [compareId, setCompareId] = useState(-1);
+	const [compareBox, setCompareBox] = useState<'same' | 'other'>('same');
+	const [compareStar, setCompareStar] = useState<'off' | 'on'>('off');
+	const compareSide: BoxSide = compareBox === 'same' ? side : side === 'R' ? 'L' : 'R';
+	// When the runners use different boxes, every label says which box, so the same character can be compared with itself.
+	const boxSuffix = (sd: BoxSide) => (compareBox === 'other' ? ` · ${HANDED[sd]}` : '');
 	const compare = useMemo<CompareRun | undefined>(() => {
 		if (!firstBaseOnly || compareId < 0) return undefined;
-		const compareSpeed = CHARACTER_SPEED[compareId];
+		const compareSpeed = Math.min(CHARACTER_SPEED[compareId] + (compareStar === 'on' ? SUPERSTAR_SPEED_BONUS : 0), SPEED_STAT_CAP);
 		return {
-			label: `${characters[String(compareId)]} (${compareSpeed})`,
-			run: simulateRun({ speed: compareSpeed, mash, path: 'straight', startBase: 0, endBase: 1, batterPos: spotBatterPosition(compareId, side, compareSpot) })
+			label: `${characters[String(compareId)]} (${compareSpeed})${compareBox === 'other' ? ` · ${HANDED[compareSide]}` : ''}`,
+			run: simulateRun({
+				speed: compareSpeed,
+				mash,
+				path: 'straight',
+				startBase: 0,
+				endBase: 1,
+				batterPos: spotBatterPosition(compareId, compareSide, compareSpot)
+			})
 		};
-	}, [firstBaseOnly, compareId, side, compareSpot, mash]);
-	const baseSpeed = CHARACTER_SPEED[charId];
+	}, [firstBaseOnly, compareId, compareStar, compareSide, compareBox, compareSpot, mash]);
 	const isBatter = startBase === 0;
 	const selColor = MASH_MODES.find((m) => m.value === mash)!.color;
 	const endOptions = [1, 2, 3, 4].filter((b) => b > startBase);
@@ -477,25 +502,9 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 					</select>
 					<p className="mt-1 text-xs text-fog-500">Sets the speed stat, and the batter&apos;s box when starting at home.</p>
 				</div>
-				{firstBaseOnly && (
-					<div>
-						<label className="label" htmlFor={`${uid}-compare`}>
-							Compare with
-						</label>
-						<select id={`${uid}-compare`} className="input" value={compareId} onChange={(e) => setCompareId(Number(e.target.value))}>
-							<option value={-1}>None</option>
-							{BATTER_BOX.map((_, id) => (
-								<option key={id} value={id}>
-									{characters[String(id)]} · speed {CHARACTER_SPEED[id]}
-								</option>
-							))}
-						</select>
-						<p className="mt-1 text-xs text-fog-500">Runs at their own speed from the same box side, with the same mashing. Drag the pink point to move their start.</p>
-					</div>
-				)}
 				<div>
 					<label className="label" htmlFor={`${uid}-speed`}>
-						Speed stat: <span className="font-mono text-fog-100">{speed}</span>
+						Speed stat override: <span className="font-mono text-fog-100">{speed}</span>
 					</label>
 					<input
 						id={`${uid}-speed`}
@@ -516,6 +525,44 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 						</button>
 					</div>
 				</div>
+				{firstBaseOnly && (
+					<div>
+						<label className="label" htmlFor={`${uid}-compare`}>
+							Compare with
+						</label>
+						<select id={`${uid}-compare`} className="input" value={compareId} onChange={(e) => setCompareId(Number(e.target.value))}>
+							<option value={-1}>None</option>
+							{BATTER_BOX.map((_, id) => (
+								<option key={id} value={id}>
+									{characters[String(id)]} · speed {CHARACTER_SPEED[id]}
+								</option>
+							))}
+						</select>
+						<p className="mt-1 text-xs text-fog-500">Runs at their own speed, with the same mashing. Drag the pink point to move their start.</p>
+						{compareId >= 0 && (
+							<div className="mt-2 space-y-2">
+								<Toggle
+									label="Comparison starred"
+									value={compareStar}
+									onChange={setCompareStar}
+									options={[
+										{ value: 'off', label: `Unstarred (${CHARACTER_SPEED[compareId]})` },
+										{ value: 'on', label: `Starred (${Math.min(CHARACTER_SPEED[compareId] + SUPERSTAR_SPEED_BONUS, SPEED_STAT_CAP)})` }
+									]}
+								/>
+								<Toggle
+									label="Comparison's batter's box"
+									value={compareBox}
+									onChange={setCompareBox}
+									options={[
+										{ value: 'same', label: 'Same box' },
+										{ value: 'other', label: 'Other box' }
+									]}
+								/>
+							</div>
+						)}
+					</div>
+				)}
 				{!firstBaseOnly && (
 					<>
 						<div className="grid grid-cols-2 gap-3">
@@ -620,10 +667,20 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 				</div>
 				{isBatter && (
 					<BoxPicker
-						side={side}
 						runners={[
-							{ charId, spot, color: selColor, label: characters[String(charId)] },
-							...(compare ? [{ charId: compareId, spot: compareSpot, color: COMPARE_COLOR, label: characters[String(compareId)], dashed: true }] : [])
+							{ charId, side, spot, color: selColor, label: characters[String(charId)] + boxSuffix(side) },
+							...(compare
+								? [
+										{
+											charId: compareId,
+											side: compareSide,
+											spot: compareSpot,
+											color: COMPARE_COLOR,
+											label: characters[String(compareId)] + boxSuffix(compareSide),
+											dashed: true
+										}
+									]
+								: [])
 						]}
 						onChange={(i, next) => (i === 0 ? setSpot(next) : setCompareSpot(next))}
 					/>
@@ -668,6 +725,11 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 								</div>
 							);
 						})}
+						<dt className="text-fog-500">{starAlt.label}</dt>
+						<dd className="text-right font-mono tabular-nums">
+							{starAlt.run.frame} ({starAlt.run.frame - run.frame > 0 ? '+' : ''}
+							{starAlt.run.frame - run.frame})
+						</dd>
 						{compare && (
 							<>
 								<dt className="text-fog-500">{compare.label}</dt>
@@ -700,7 +762,7 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 						<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">Race to 1B</h3>
 						<RaceChart
 							racers={[
-								{ run, label: `${characters[String(charId)]} (${speed})`, color: selColor },
+								{ run, label: `${characters[String(charId)]} (${speed})${boxSuffix(side)}`, color: selColor },
 								...(compare ? [{ run: compare.run, label: compare.label, color: COMPARE_COLOR, dashed: true }] : [])
 							]}
 						/>
@@ -709,6 +771,25 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 							their own distance from the box to the base, so a runner who starts farther away has a higher line to reach. With a
 							comparison, the lower panel shows the lead: how much less distance one runner has left to cover than the other.
 						</p>
+					</div>
+				)}
+				{firstBaseOnly && (
+					<div className="space-y-2">
+						<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">
+							Frames to 1B across {characters[String(charId)]}&apos;s range
+						</h3>
+						<StartHeatMap
+							charId={charId}
+							side={side}
+							speed={speed}
+							mash={mash}
+							spot={spot}
+							color={selColor}
+							onPick={(sd, next) => {
+								setSide(sd);
+								setSpot(next);
+							}}
+						/>
 					</div>
 				)}
 			</div>

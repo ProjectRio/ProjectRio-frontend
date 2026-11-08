@@ -53,7 +53,8 @@ function raceEvents(run: RunResult): RaceEvent[] {
 	return out;
 }
 
-const shortName = (label: string) => label.replace(/ \(.*\)$/, '');
+/** The label without its speed, e.g. "Mario (50) · left-handed" → "Mario · left-handed". */
+const shortName = (label: string) => label.replace(/ \(\d+\)/, '');
 
 function eventText(name: string, e: RaceEvent) {
 	return e.kind === 'top' ? `${name} reaches top speed` : `${name}: stamina drops progress from ${e.from} to ${e.to} ten-thousandths per frame`;

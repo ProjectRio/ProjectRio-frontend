@@ -28,7 +28,7 @@ export function spotBatterPosition(charId: number, side: BoxSide, spot: StartSpo
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /** The custom spot nearest to a field position, clamped to the character's range. */
-function spotFromField(charId: number, side: BoxSide, [x, z]: Pt): { u: number; v: number } {
+export function spotFromField(charId: number, side: BoxSide, [x, z]: Pt): { u: number; v: number } {
 	const [near, far, front, back, offX, offZ] = BATTER_BOX[charId];
 	const p = (side === 'L' ? -x : x) - offX;
 	const q = z - offZ;
@@ -57,11 +57,19 @@ function sideView(side: BoxSide) {
 	return { x0, x1, z0, z1 };
 }
 const VIEWS = { L: sideView('L'), R: sideView('R') };
+/** Both boxes, for runners in different boxes. */
+const BOTH_VIEW = {
+	x0: Math.min(VIEWS.L.x0, VIEWS.R.x0),
+	x1: Math.max(VIEWS.L.x1, VIEWS.R.x1),
+	z0: Math.min(VIEWS.L.z0, VIEWS.R.z0),
+	z1: Math.max(VIEWS.L.z1, VIEWS.R.z1)
+};
 const S = 80; // viewBox units per metre
 const KEY_STEP = 0.05;
 
 export interface PickerRunner {
 	charId: number;
+	side: BoxSide;
 	spot: StartSpot;
 	color: string;
 	label: string;
@@ -69,19 +77,17 @@ export interface PickerRunner {
 }
 
 /**
- * Top-down view of the active batter's box. Each runner's range is drawn as a rectangle, and their start point can be
- * dragged (or moved with the arrow keys) anywhere inside it.
+ * Top-down view of the batter's box in use (both boxes when the runners are in different ones). Each runner's range is
+ * drawn as a rectangle, and their start point can be dragged (or moved with the arrow keys) anywhere inside it.
  */
 export default function BoxPicker({
-	side,
 	runners,
 	onChange
 }: {
-	side: BoxSide;
 	runners: PickerRunner[];
 	onChange: (index: number, spot: { u: number; v: number }) => void;
 }) {
-	const view = VIEWS[side];
+	const view = runners.every((r) => r.side === runners[0].side) ? VIEWS[runners[0].side] : BOTH_VIEW;
 	const W = (view.x1 - view.x0) * S;
 	const H = (view.z1 - view.z0) * S;
 	const sx = (x: number) => (x - view.x0) * S;
@@ -89,8 +95,8 @@ export default function BoxPicker({
 	const dragging = useRef<number | null>(null);
 
 	const items = runners.map((r) => {
-		const pos = spotBatterPosition(r.charId, side, r.spot);
-		return { ...r, pos, rect: batterBoxRect(r.charId, side), L: legLength(pos) };
+		const pos = spotBatterPosition(r.charId, r.side, r.spot);
+		return { ...r, pos, rect: batterBoxRect(r.charId, r.side), L: legLength(pos) };
 	});
 
 	function toField(e: React.PointerEvent<SVGSVGElement>): Pt {
@@ -99,7 +105,7 @@ export default function BoxPicker({
 	}
 
 	function moveTo(i: number, p: Pt) {
-		onChange(i, spotFromField(items[i].charId, side, p));
+		onChange(i, spotFromField(items[i].charId, items[i].side, p));
 	}
 
 	function onPointerDown(e: React.PointerEvent<SVGSVGElement>) {

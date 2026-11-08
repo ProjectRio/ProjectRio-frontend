@@ -50,7 +50,25 @@ export default function RunningToFirstTab() {
 			</Panel>
 
 			<TabSection title="Overrunning 1B">
-				<Placeholder />
+				<p>The batter will overrun first base if they are not set to round the base and the runner is in the last 20% of the baseline without being put out yet.</p>
+				<p>If any of the following are true during the whole last-half of the baseline, the runner will overrun first base:</p>
+				<ul className="list-disc pl-5">
+					<li>Fly ball with another runner on or near first.</li>
+					<li>Ground ball or low line drive, including:</li>
+					<ul className="list-disc pl-5">
+						<li>Ball still in the infield.</li>
+						<li>Ball in shallow outfield and moving slowly.</li>
+						<li>Fielder has a ball within 25m of 1B.</li>
+						<li>The right fielder has the ball while the batter is less than 75% towards 1B.</li>
+						<li>Close play: The ball is being thrown to 1B and will arrive less than 0.5s after the batter reaches 1B.</li>
+					</ul>
+				</ul>
+				<p>The length of the overrun is the same for every character.
+					Going past the base is 6.89m over 60 frames on a curved line, and coming back is a straight line over 120 frames.
+				</p>
+				<p>While past the base, the runner can decide to run towards 2B, and that gets rid of their immunity. 
+					When advancing, the momentum from the overrun is cancelled and it's like the runner is starting from a stand-still. 
+					The runner's path is a straight line to 2B from wherever they are along the overun.</p>
 			</TabSection>
 		</div>
 	);
