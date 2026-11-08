@@ -5,7 +5,9 @@ export const SERIES = {
 	blue: '#3987e5',
 	orange: '#d95926',
 	aqua: '#199e70',
-	gold: '#c98500'
+	gold: '#c98500',
+	/** Comparison runs in the running calculator: kept clear of orange, aqua and blue, including under colour-blindness simulation. */
+	pink: '#ff8fd0'
 } as const;
 
 export const AXIS_TEXT = 'var(--color-fog-500)';

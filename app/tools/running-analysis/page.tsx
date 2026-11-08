@@ -44,7 +44,7 @@ export const metadata = { title: 'Running Analysis' };
 const SPEEDS = Array.from({ length: SPEED_STAT_CAP / 10 + 1 }, (_, i) => i * 10);
 const SPOT_NAMES: Record<BoxSpot, string> = {
 	def: 'Default start',
-	center: 'Middle',
+	center: 'Middle of range',
 	best: 'Closest corner',
 	worst: 'Farthest corner',
 	fi: 'Front-inside corner',
@@ -114,8 +114,8 @@ export default function RunningAnalysisPage() {
 	const { best, worst } = extremeSpots();
 	const scenarioDefs = [
 		{ key: 'best', label: `Closest spot (${charName(best.charId)}, left)`, shortLabel: 'Closest spot', color: SERIES.blue, pos: best.pos },
-		{ key: 'lc', label: 'Middle of box, left-handed (Mario)', shortLabel: 'Middle, left', color: SERIES.aqua, pos: batterPosition(0, 'L', 'center') },
-		{ key: 'rc', label: 'Middle of box, right-handed (Mario)', shortLabel: 'Middle, right', color: SERIES.gold, pos: batterPosition(0, 'R', 'center') },
+		{ key: 'lc', label: "Middle of Mario's range, left-handed", shortLabel: 'Middle, left', color: SERIES.aqua, pos: batterPosition(0, 'L', 'center') },
+		{ key: 'rc', label: "Middle of Mario's range, right-handed", shortLabel: 'Middle, right', color: SERIES.gold, pos: batterPosition(0, 'R', 'center') },
 		{ key: 'worst', label: `Farthest spot (${charName(worst.charId)}, right)`, shortLabel: 'Farthest spot', color: SERIES.orange, pos: worst.pos }
 	].map((d) => ({ ...d, L: legLength(d.pos) }));
 	const scenarios: (SpeedScenario & { L: number; human: number[]; pos: [number, number] })[] = scenarioDefs.map((s) => ({
@@ -185,7 +185,7 @@ export default function RunningAnalysisPage() {
 		return Math.ceil(k.maxV / k.accel - 1e-6);
 	};
 
-	// Running the bases: Mario (speed 50) from the middle of the right-handed box, TAS mashing.
+	// Running the bases: Mario (speed 50) from the middle of his range in the right-handed box, TAS mashing.
 	const marioPos = batterPosition(0, 'R', 'center');
 	const route = (startBase: number, endBase: number, path: PathMode, speed = CHARACTER_SPEED[0]) =>
 		simulateRun({ speed, mash: 'tas', path, startBase, endBase, batterPos: marioPos });
@@ -217,7 +217,7 @@ export default function RunningAnalysisPage() {
 			sub: `${framesToSeconds(fastest.frame)} s from contact, from the closest corner of Yoshi's box. At the ${SPEED_STAT_CAP} cap from the closest spot any box allows: ${atCap.frame} frames.`
 		},
 		{
-			label: 'Speed 100, right-handed, middle of box',
+			label: "Speed 100, right-handed, middle of Mario's range",
 			value: `${typical.frame}`,
 			unit: `/ ${typicalNone.frame} frames`,
 			sub: `TAS mashing / no mashing (${framesToSeconds(typical.frame)} s / ${framesToSeconds(typicalNone.frame)} s)`
@@ -250,7 +250,7 @@ export default function RunningAnalysisPage() {
 						<ul className="space-y-2.5 text-sm leading-relaxed text-fog-300">
 							<li>
 								<b className="text-fog-100">Left-handed batters get to 1B sooner.</b> The left-handed box is about 3 m closer, worth{' '}
-								{leftyGain} frames from the middle of the box at each character&apos;s own speed.
+								{leftyGain} frames from the middle of each character&apos;s range at their own speed.
 							</li>
 							<li>
 								<b className="text-fog-100">Move toward 1B in the box to maximize chance of being safe.</b> Standing in the corner nearest 1B
@@ -355,7 +355,7 @@ export default function RunningAnalysisPage() {
 				<div className="space-y-3 p-5">
 					<p className="text-sm text-fog-300">
 						Four starting spots. Solid lines are TAS mashing, dashed lines are no mashing. The extremes are the closest and farthest spots
-						any character&apos;s hitbox allows. The middle-of-box lines use Mario&apos;s hitbox.
+						any character&apos;s hitbox allows. The middle-of-range lines use Mario&apos;s range.
 					</p>
 					<FramesBySpeedChart speeds={SPEEDS} scenarios={scenarios} />
 					<div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fog-300">
@@ -446,7 +446,7 @@ start of each at-bat: boxPosition = initialBoxPosition = (0, ·, 0.4), clamped`}
 						stick.
 					</li>
 					<li>
-						<b className="text-fog-100">Middle of the box:</b> the midpoint of both ranges.
+						<b className="text-fog-100">Middle of character&apos;s range:</b> the midpoint of both ranges.
 					</li>
 					<li>
 						<b className="text-fog-100">Closest corner:</b> both coordinates pushed toward 1st (+x, +z after mirroring). For a
@@ -606,7 +606,7 @@ if (maxedOut) {
 						<b className="text-fog-100">Human viable</b> assumes a press every 3 frames. The fastest known mashing is Ludwig&apos;s 20.1
 						presses per second, about one every 3 frames. A press holds the bonus for 6 frames, so a 3-frame gap never lets the meter
 						decay; it just fills in 13 frames instead of 5. Over those frames the slower fill adds up to about 0.08 m of lost travel, less
-						than half a frame of running, so it rarely changes the arrival frame. At speed 100 from the middle of the right-handed box,
+						than half a frame of running, so it rarely changes the arrival frame. At speed 100 from the middle of Mario&apos;s range in the right-handed box,
 						human viable reaches 1B{' '}
 						{typicalHuman.frame === typical.frame
 							? 'on the same frame as TAS'
@@ -753,7 +753,7 @@ L         = |position − currentBase| + |nextBase − position|                
 					<h2 className="text-2xl uppercase">Every base run by speed stat</h2>
 					<p className="mt-2 max-w-3xl text-sm text-fog-300">
 						Each cell is the frame the runner reaches the base, rounding / straight, with TAS mashing. Batter runs start from the middle of
-						Mario&apos;s right-handed box; runners on base start from a full lead. Batter to 1B has one number because it always runs
+						Mario&apos;s range in the right-handed box; runners on base start from a full lead. Batter to 1B has one number because it always runs
 						straight, and 3B to home is the same both ways because a runner starting on 3rd never starts rounding.{' '}
 						<span className="font-semibold text-star-400">Gold</span> marks a straight run that beats rounding, by a frame or a few. It
 						happens at many speeds on single-base runs (1B to 2B, 2B to 3B), and for the batter going to 2B at low speeds, because one stop
@@ -789,7 +789,7 @@ L         = |position − currentBase| + |nextBase − position|                
 					Character reference: speed stat and distance to 1B
 				</summary>
 				<p className="border-t border-night-700 px-4 py-3 text-xs text-fog-300">
-					Speed is the unstarred stat (starring adds 50). Frames to 1B use that speed from the middle of the box with TAS mashing. Distances
+					Speed is the unstarred stat (starring adds 50). Frames to 1B use that speed from the middle of each character&apos;s range with TAS mashing. Distances
 					are in metres; RHB and LHB are right- and left-handed batters.
 				</p>
 				<div className="max-h-[520px] overflow-auto border-t border-night-700">
@@ -827,7 +827,7 @@ L         = |position − currentBase| + |nextBase − position|                
 						counter at contact. Presses only count from top speed (frame 43 at the earliest), so this never changes the results.
 					</li>
 					<li>
-						&quot;Middle of the box&quot; is the midpoint of the character&apos;s movement ranges. The default start is the clamped{' '}
+						&quot;Middle of character&apos;s range&quot; is the midpoint of the character&apos;s movement ranges. The default start is the clamped{' '}
 						<C>(0, 0.4)</C>.
 					</li>
 					<li>

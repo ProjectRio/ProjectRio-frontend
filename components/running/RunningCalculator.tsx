@@ -4,8 +4,6 @@ import { useId, useMemo, useState } from 'react';
 import { characters } from '@/lib/data/characters';
 import {
 	BASE_NAMES,
-	batterPosition,
-	boxPosition,
 	framesToSeconds,
 	simulateRun,
 	type BoxSide,
@@ -27,10 +25,12 @@ import {
 } from '@/lib/mssb/RunningSimulation/runningConstants';
 import { AXIS_LABEL, AXIS_TEXT, GRID, SERIES, makeScales, niceTicks, pointerToViewX } from './chartUtils';
 import RunPathChart from './RunPathChart';
+import RaceChart from './RaceChart';
+import BoxPicker, { spotBatterPosition, spotBoxPosition, type StartSpot } from './BoxPicker';
 
 const SPOTS: { value: BoxSpot; label: string }[] = [
 	{ value: 'def', label: 'Default start (no movement)' },
-	{ value: 'center', label: 'Middle of the box' },
+	{ value: 'center', label: "Middle of character's range" },
 	{ value: 'fi', label: 'Front-inside corner' },
 	{ value: 'fo', label: 'Front-outside corner' },
 	{ value: 'bi', label: 'Back-inside corner' },
@@ -103,7 +103,7 @@ export interface CompareRun {
 	label: string;
 }
 
-const COMPARE_COLOR = SERIES.gold;
+const COMPARE_COLOR = SERIES.pink;
 
 function VelocityChart({ runs, selected, compare }: { runs: Record<MashMode, RunResult>; selected: MashMode; compare?: CompareRun }) {
 	const [hover, setHover] = useState<{ f: number; left: number; top: number } | null>(null);
@@ -248,7 +248,7 @@ function WorkedExample({
 }: {
 	charId: number;
 	side: BoxSide;
-	spot: BoxSpot;
+	spot: StartSpot;
 	speed: number;
 	mash: MashMode;
 	path: PathMode;
@@ -314,12 +314,12 @@ function WorkedExample({
 	const route = `${BASE_NAMES[startBase]} to ${BASE_NAMES[endBase]}`;
 	let startText: React.ReactNode;
 	if (startBase === 0) {
-		const [p, q] = boxPosition(charId, side, spot);
+		const [p, q] = spotBoxPosition(charId, side, spot);
 		const [, , , , offX, offZ] = BATTER_BOX[charId];
-		const [x, z] = batterPosition(charId, side, spot);
+		const [x, z] = spotBatterPosition(charId, side, spot);
 		startText = (
 			<>
-				{characters[String(charId)]}&apos;s box at the {spotLabel(spot, side).toLowerCase()} gives{' '}
+				{characters[String(charId)]}&apos;s box at {typeof spot === 'string' ? `the ${spotLabel(spot, side).toLowerCase()}` : 'the dragged spot'} gives{' '}
 				<Code>
 					boxPosition = ({f2(p)}, {f2(q)})
 				</Code>
@@ -417,7 +417,8 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 	const [charId, setCharId] = useState(0);
 	const [speed, setSpeed] = useState(CHARACTER_SPEED[0]);
 	const [side, setSide] = useState<BoxSide>('R');
-	const [spot, setSpot] = useState<BoxSpot>('center');
+	const [spot, setSpot] = useState<StartSpot>('center');
+	const [compareSpot, setCompareSpot] = useState<StartSpot>('center');
 	const [mash, setMash] = useState<MashMode>('tas');
 	const [startBase, setStartBase] = useState(0);
 	const [endBase, setEndBase] = useState(1);
@@ -427,7 +428,7 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 	const pathMatters = !(startBase === 0 && endBase === 1);
 	const effectivePath: PathMode = pathMatters ? path : 'straight';
 	const runs = useMemo(() => {
-		const batterPos = batterPosition(charId, side, spot);
+		const batterPos = spotBatterPosition(charId, side, spot);
 		const base = { speed, path: effectivePath, startBase, endBase, batterPos };
 		return {
 			tas: simulateRun({ ...base, mash: 'tas' }),
@@ -436,16 +437,16 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 		};
 	}, [speed, charId, side, spot, effectivePath, startBase, endBase]);
 	const run = runs[mash];
-	// Comparison character (1B mode only): their own speed, the same box side, spot and mashing, batter to 1B.
+	// Comparison character (1B mode only): their own speed and start spot, the same box side and mashing, batter to 1B.
 	const [compareId, setCompareId] = useState(-1);
 	const compare = useMemo<CompareRun | undefined>(() => {
 		if (!firstBaseOnly || compareId < 0) return undefined;
 		const compareSpeed = CHARACTER_SPEED[compareId];
 		return {
 			label: `${characters[String(compareId)]} (${compareSpeed})`,
-			run: simulateRun({ speed: compareSpeed, mash, path: 'straight', startBase: 0, endBase: 1, batterPos: batterPosition(compareId, side, spot) })
+			run: simulateRun({ speed: compareSpeed, mash, path: 'straight', startBase: 0, endBase: 1, batterPos: spotBatterPosition(compareId, side, compareSpot) })
 		};
-	}, [firstBaseOnly, compareId, side, spot, mash]);
+	}, [firstBaseOnly, compareId, side, compareSpot, mash]);
 	const baseSpeed = CHARACTER_SPEED[charId];
 	const isBatter = startBase === 0;
 	const selColor = MASH_MODES.find((m) => m.value === mash)!.color;
@@ -489,7 +490,7 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 								</option>
 							))}
 						</select>
-						<p className="mt-1 text-xs text-fog-500">Runs at their own speed, from the same box side and spot, with the same mashing.</p>
+						<p className="mt-1 text-xs text-fog-500">Runs at their own speed from the same box side, with the same mashing. Drag the pink point to move their start.</p>
 					</div>
 				)}
 				<div>
@@ -589,17 +590,44 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 					<label className="label" htmlFor={`${uid}-spot`}>
 						Spot in the box
 					</label>
-					<select id={`${uid}-spot`} className="input" value={spot} disabled={!isBatter} onChange={(e) => setSpot(e.target.value as BoxSpot)}>
+					<select
+						id={`${uid}-spot`}
+						className="input"
+						value={typeof spot === 'string' ? spot : 'custom'}
+						disabled={!isBatter}
+						onChange={(e) => {
+							const preset = e.target.value as BoxSpot;
+							setSpot(preset);
+							setCompareSpot(preset);
+						}}
+					>
 						{SPOTS.map((s) => (
 							<option key={s.value} value={s.value}>
 								{spotLabel(s.value, side)}
 							</option>
 						))}
+						{typeof spot !== 'string' && (
+							<option value="custom" disabled>
+								Custom (dragged)
+							</option>
+						)}
 					</select>
 					<p className="mt-1 text-xs text-fog-500">
-						{isBatter ? 'Front is toward the pitcher; inside is next to the plate.' : 'Only used when the batter is running.'}
+						{isBatter
+							? `Front is toward the pitcher; inside is next to the plate. A preset moves ${compare ? 'both runners' : 'the runner'}; drag a point below to place it anywhere in that character's range.`
+							: 'Only used when the batter is running.'}
 					</p>
 				</div>
+				{isBatter && (
+					<BoxPicker
+						side={side}
+						runners={[
+							{ charId, spot, color: selColor, label: characters[String(charId)] },
+							...(compare ? [{ charId: compareId, spot: compareSpot, color: COMPARE_COLOR, label: characters[String(compareId)], dashed: true }] : [])
+						]}
+						onChange={(i, next) => (i === 0 ? setSpot(next) : setCompareSpot(next))}
+					/>
+				)}
 				<div>
 					<span className="label">Mashing</span>
 					<Toggle label="Mashing" value={mash} onChange={setMash} options={MASH_MODES} />
@@ -667,6 +695,22 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 					)}
 					<span>Dashed lines: when the selected run reaches each base. Hover for the frame.</span>
 				</div>
+				{firstBaseOnly && (
+					<div className="space-y-2">
+						<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">Race to 1B</h3>
+						<RaceChart
+							racers={[
+								{ run, label: `${characters[String(charId)]} (${speed})`, color: selColor },
+								...(compare ? [{ run: compare.run, label: compare.label, color: COMPARE_COLOR, dashed: true }] : [])
+							]}
+						/>
+						<p className="text-xs text-fog-500">
+							Distance covered toward 1B on each frame. The dotted horizontal lines are where each runner counts as on 1B: 97% of
+							their own distance from the box to the base, so a runner who starts farther away has a higher line to reach. With a
+							comparison, the lower panel shows the lead: how much less distance one runner has left to cover than the other.
+						</p>
+					</div>
+				)}
 			</div>
 
 			{!firstBaseOnly && (
