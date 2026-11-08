@@ -15,6 +15,11 @@ const TOOLS = [
 		description: 'Frame-accurate pitch trajectory simulation straight from the game engine decompilation.'
 	},
 	{
+		href: '/tools/running-analysis',
+		title: 'Running Analysis',
+		description: 'How many frames a runner needs to reach each base by speed stat, box position and mashing, matched to the decompilation.'
+	},
+	{
 		href: '/muddyball',
 		title: 'Muddyball Draft Board',
 		description: 'Build a budget roster, arrange your lineup and field, and share it with a link.'
