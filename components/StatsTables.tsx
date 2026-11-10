@@ -15,7 +15,7 @@ export interface StatRow {
 function RowTitle({ row }: { row: StatRow }) {
 	const className = `font-semibold ${row.highlight ? 'text-star-400' : 'text-fog-100'}`;
 	return row.href ? (
-		<Link href={row.href} className={`${className} hover:text-rio-300`}>
+		<Link href={row.href} className={`${className} hover:text-fog-100 hover:underline`}>
 			{row.title}
 		</Link>
 	) : (
@@ -49,7 +49,7 @@ export function BattingStatsTable({ label, rows }: { label: string; rows: StatRo
 				</thead>
 				<tbody>
 					{rows.map((row) => (
-						<tr key={row.title} className={row.highlight ? 'bg-night-850' : undefined}>
+						<tr key={row.title} className={row.highlight ? 'bg-black/40' : undefined}>
 							<td>
 								<RowTitle row={row} />
 							</td>
@@ -95,7 +95,7 @@ export function PitchingStatsTable({ label, rows }: { label: string; rows: StatR
 				</thead>
 				<tbody>
 					{rows.map((row) => (
-						<tr key={row.title} className={row.highlight ? 'bg-night-850' : undefined}>
+						<tr key={row.title} className={row.highlight ? 'bg-black/40' : undefined}>
 							<td>
 								<RowTitle row={row} />
 							</td>

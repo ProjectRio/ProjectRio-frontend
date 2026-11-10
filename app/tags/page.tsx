@@ -45,7 +45,7 @@ export default function TagsPage() {
 										<td>
 											{tag.gecko_code ? (
 												<details>
-													<summary className="cursor-pointer text-rio-400 hover:text-rio-300">View code</summary>
+													<summary className="cursor-pointer text-fog-300 hover:text-fog-100">View code</summary>
 													<pre className="mt-2 max-w-md overflow-x-auto whitespace-pre-wrap rounded bg-night-950 p-3 text-xs text-fog-300">
 														{tag.gecko_code}
 													</pre>

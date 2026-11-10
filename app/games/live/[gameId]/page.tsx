@@ -3,16 +3,17 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { use, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getLiveGames, getMatchups } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
-import { tagSetName, outsDisplay, ordinal } from '@/lib/gameDisplay';
+import { tagSetName, ordinal } from '@/lib/gameDisplay';
 import { characterImage, stadiums } from '@/lib/data/characters';
 import { teamNameFromLogo, logoImage } from '@/lib/data/logoToTeam';
 import { parseLiveTeam, handLabel, inningsPitched, slotStatus, type LiveTeam, type LiveRosterSlot } from '@/lib/liveGame';
 import LiveFieldView from '@/components/LiveFieldView';
-import LineScore, { MetaItem } from '@/components/LineScore';
+import Scoreboard, { type ScoreboardTeam } from '@/components/game/Scoreboard';
+import { BaseDiamond, CaptainMark, OutPips, StarOrbs } from '@/components/game/hud';
+import { useGamePark } from '@/lib/useGamePark';
 import { Spinner, EmptyState, Badge, Panel, PanelHeader, PlayerLink, LiveDot } from '@/components/ui';
 
 const REFRESH_MS = 10_000;
@@ -20,75 +21,30 @@ const REFRESH_MS = 10_000;
 // that's been running a while still resolves from a direct link.
 const LOOKBACK_SECONDS = 24 * 60 * 60;
 
-function StarMeter({ stars }: { stars: number }) {
+/** One row of counting stats, set like the back of a baseball card. */
+function StatLine({ stats }: { stats: [string, string | number][] }) {
 	return (
-		<p className="text-sm tracking-wide text-star-400" title={`${stars} team star${stars === 1 ? '' : 's'}`}>
-			{'★'.repeat(Math.min(stars, 5)) + '☆'.repeat(Math.max(5 - stars, 0))}
-		</p>
-	);
-}
-
-function TeamHero({ team, batting, align }: { team: LiveTeam; batting: boolean; align: 'left' | 'right' }) {
-	const right = align === 'right';
-	return (
-		<div className={`flex items-center gap-4 ${right ? 'flex-row-reverse text-right' : ''}`}>
-			<img src={logoImage(team.logoId)} alt={teamNameFromLogo(team.logoId)} className="h-16 w-16 object-contain" />
-			<div className="min-w-0">
-				<p className="truncate font-display text-xs font-semibold uppercase tracking-widest text-fog-500">
-					{teamNameFromLogo(team.logoId)}
-				</p>
-				<div className={`flex flex-wrap items-center gap-2 ${right ? 'justify-end' : ''}`}>
-					<PlayerLink username={team.player} className="font-display text-xl font-bold" />
-					{batting && <span className="text-xs font-semibold text-star-400">AT BAT</span>}
-				</div>
-				<div className={`flex flex-wrap items-center gap-2 ${right ? 'justify-end' : ''}`}>
-					<StarMeter stars={team.stars} />
-					{team.allSuperstars && <Badge color="gold">All Superstars</Badge>}
-				</div>
-			</div>
-			<span className={`font-display text-5xl font-bold tabular-nums text-fog-100 ${right ? 'mr-auto' : 'ml-auto'}`}>
-				{team.score}
-			</span>
-		</div>
-	);
-}
-
-function MiniLineScore({ game, away, home, mode }: { game: any; away: LiveTeam; home: LiveTeam; mode: string }) {
-	const awayScores: number[] = game.away_inning_scores ?? [];
-	const homeScores: number[] = game.home_inning_scores ?? [];
-	const innings = Math.max(game.innings_selected ?? 0, game.inning ?? 0, awayScores.length, homeScores.length);
-	const minutesAgo = Math.max(0, Math.round((Date.now() / 1000 - game.start_time) / 60));
-	const startedAt = new Date(game.start_time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-
-	// 0 = away, 1 = home; the batting side is set by half_inning.
-	const battingSide = game.half_inning === 0 ? 0 : 1;
-
-	return (
-		<LineScore
-			innings={innings}
-			regulationInnings={game.innings_selected}
-			cellHighlight={(inning, side) => inning === game.inning && side === battingSide}
-			teams={[
-				{ label: away.player, runs: awayScores, total: away.score },
-				{ label: home.player, runs: homeScores, total: home.score }
-			]}
-			meta={
-				<>
-					{mode && <MetaItem label="Mode" value={mode} />}
-					<MetaItem label="Stadium" value={stadiums[game.stadium_id] ?? 'Unknown'} />
-					<MetaItem label="Format" value={`${game.innings_selected} innings`} />
-					<MetaItem label="Started" value={`${startedAt} · ${minutesAgo} min ago`} />
-				</>
-			}
-		/>
-	);
-}
-
-function StatCell({ label, value }: { label: string; value: string | number }) {
-	return (
-		<div className="rounded bg-night-850 px-2 py-1.5 text-center">
-			<p className="text-[10px] font-semibold uppercase tracking-wider text-fog-500">{label}</p>
-			<p className="font-display text-base font-bold tabular-nums text-fog-100">{value}</p>
+		<div className="overflow-x-auto">
+			<table className="w-full text-center">
+				<thead>
+					<tr className="font-display text-xs font-semibold uppercase tracking-[0.1em] text-fog-500">
+						{stats.map(([label]) => (
+							<th key={label} className="px-2 pb-1 font-semibold">
+								{label}
+							</th>
+						))}
+					</tr>
+				</thead>
+				<tbody>
+					<tr className="font-mono text-lg font-semibold tabular-nums text-fog-100">
+						{stats.map(([label, value]) => (
+							<td key={label} className={`px-2 ${value === 0 ? 'text-fog-500' : ''}`}>
+								{value}
+							</td>
+						))}
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	);
 }
@@ -96,11 +52,7 @@ function StatCell({ label, value }: { label: string; value: string | number }) {
 function PlayerBadges({ slot, allSuperstars }: { slot: LiveRosterSlot; allSuperstars: boolean }) {
 	return (
 		<>
-			{slot.isCaptain && (
-				<span className="text-sm leading-none" title="Captain">
-					👑
-				</span>
-			)}
+			{slot.isCaptain && <CaptainMark />}
 			{slot.isSuperstar && !allSuperstars && (
 				<span className="text-star-400" title="Superstar">
 					★
@@ -120,10 +72,7 @@ function BatterCard({ game, batting }: { game: any; batting: LiveTeam }) {
 
 	return (
 		<Panel>
-			<PanelHeader
-				title="At Bat"
-				action={game.star_chance ? <Badge color="gold">★ Star Chance</Badge> : undefined}
-			/>
+			<PanelHeader title="At Bat" />
 			<div className="space-y-3 p-4">
 				<div className="flex items-center gap-3">
 					<img src={characterImage(slot.name)} alt={slot.name} className="h-14 w-14 object-contain" />
@@ -133,24 +82,24 @@ function BatterCard({ game, batting }: { game: any; batting: LiveTeam }) {
 							<PlayerBadges slot={slot} allSuperstars={batting.allSuperstars} />
 						</p>
 						<p className="text-xs text-fog-500">
-							{batting.player} · Bats {handLabel(game.batter_hand)} · {hits}-{ab} today
+							{batting.player} · Bats {handLabel(game.batter_hand)}
 						</p>
 					</div>
 				</div>
-				<div className="grid grid-cols-4 gap-1.5">
-					<StatCell label="H" value={hits} />
-					<StatCell label="AB" value={ab} />
-					<StatCell label="HR" value={stats['Homeruns'] ?? 0} />
-					<StatCell label="RBI" value={stats['RBI'] ?? 0} />
-					<StatCell label="2B" value={stats['Doubles'] ?? 0} />
-					<StatCell label="3B" value={stats['Triples'] ?? 0} />
-					<StatCell label="BB" value={walks} />
-					<StatCell label="K" value={stats['Strikeouts'] ?? 0} />
-					<StatCell label="SB" value={stats['Bases Stolen'] ?? 0} />
-					<StatCell label="Bunts" value={stats['Successful Bunts'] ?? 0} />
-					<StatCell label="Sac Fly" value={stats['Sac Flys'] ?? 0} />
-					<StatCell label="Star Hits" value={stats['Star Hits'] ?? 0} />
-				</div>
+				<StatLine
+					stats={[
+						['AB', ab],
+						['H', hits],
+						['2B', stats['Doubles'] ?? 0],
+						['3B', stats['Triples'] ?? 0],
+						['HR', stats['Homeruns'] ?? 0],
+						['RBI', stats['RBI'] ?? 0],
+						['BB', walks],
+						['K', stats['Strikeouts'] ?? 0],
+						['SB', stats['Bases Stolen'] ?? 0],
+						['Star', stats['Star Hits'] ?? 0]
+					]}
+				/>
 			</div>
 		</Panel>
 	);
@@ -158,16 +107,18 @@ function BatterCard({ game, batting }: { game: any; batting: LiveTeam }) {
 
 function StaminaBar({ stamina }: { stamina: number }) {
 	const pct = Math.max(0, Math.min(stamina, 10)) * 10;
-	const color = stamina >= 6 ? 'bg-emerald-400' : stamina >= 3 ? 'bg-star-400' : 'bg-rio-500';
+	// Fill, and the same hue darkened for the outline — the game's gauge recipe.
+	const [fill, edge] = stamina >= 6 ? ['#4aad10', '#1f5c00'] : stamina >= 3 ? ['#ffbd00', '#8a5a00'] : ['#e63e3e', '#7c1017'];
 	return (
-		<div>
-			<div className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-fog-500">
-				<span>Stamina</span>
-				<span>{stamina}/10</span>
+		<div className="flex items-center gap-3">
+			<span className="font-display text-xs font-semibold uppercase tracking-[0.12em] text-fog-500">Stamina</span>
+			<div className="h-3.5 flex-1 overflow-hidden rounded-full border border-[var(--rim)] bg-black/50">
+				<div
+					className="h-full rounded-full border [box-shadow:inset_0_2px_0_rgb(255_255_255/0.35)]"
+					style={{ width: `${pct}%`, backgroundColor: fill, borderColor: edge }}
+				/>
 			</div>
-			<div className="h-2 overflow-hidden rounded-full bg-night-700">
-				<div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-			</div>
+			<span className="font-mono text-sm font-semibold tabular-nums text-fog-100">{stamina}</span>
 		</div>
 	);
 }
@@ -195,16 +146,18 @@ function PitcherCard({ game, fielding }: { game: any; fielding: LiveTeam }) {
 					</div>
 				</div>
 				<StaminaBar stamina={stats['Stamina'] ?? 0} />
-				<div className="grid grid-cols-4 gap-1.5">
-					<StatCell label="Pitches" value={stats['Pitches Thrown'] ?? 0} />
-					<StatCell label="K" value={stats['Strikeouts'] ?? 0} />
-					<StatCell label="BF" value={stats['Batters Faced'] ?? 0} />
-					<StatCell label="H" value={stats['Hits Allowed'] ?? 0} />
-					<StatCell label="R" value={stats['Runs Allowed'] ?? 0} />
-					<StatCell label="ER" value={stats['Earned Runs'] ?? 0} />
-					<StatCell label="HR" value={stats['HRs Allowed'] ?? 0} />
-					<StatCell label="BB" value={walks} />
-				</div>
+				<StatLine
+					stats={[
+						['P', stats['Pitches Thrown'] ?? 0],
+						['BF', stats['Batters Faced'] ?? 0],
+						['H', stats['Hits Allowed'] ?? 0],
+						['R', stats['Runs Allowed'] ?? 0],
+						['ER', stats['Earned Runs'] ?? 0],
+						['HR', stats['HRs Allowed'] ?? 0],
+						['BB', walks],
+						['K', stats['Strikeouts'] ?? 0]
+					]}
+				/>
 			</div>
 		</Panel>
 	);
@@ -230,8 +183,8 @@ function RosterPanel({ game, team }: { game: any; team: LiveTeam }) {
 					{team.slots.map((slot) => {
 						const status = slotStatus(game, team, slot.rosterIdx);
 						return (
-							<tr key={slot.rosterIdx} className={status ? 'bg-rio-500/5' : ''}>
-								<td className="text-fog-500">{slot.rosterIdx + 1}</td>
+							<tr key={slot.rosterIdx} className={status ? 'bg-star-400/5' : ''}>
+								<td className="font-mono tabular-nums text-fog-500">{slot.rosterIdx + 1}</td>
 								<td>
 									<span className="flex items-center gap-2">
 										<img src={characterImage(slot.name)} alt="" className="h-6 w-6 object-contain" />
@@ -242,7 +195,7 @@ function RosterPanel({ game, team }: { game: any; team: LiveTeam }) {
 								<td className="text-fog-300">{slot.position}</td>
 								<td>
 									{status && (
-										<span className="font-display text-[10px] font-bold uppercase tracking-wider text-rio-300">
+										<span className="font-display text-[10px] font-bold uppercase tracking-wider text-star-400">
 											{status}
 										</span>
 									)}
@@ -265,6 +218,7 @@ export default function LiveGamePage({ params }: { params: Promise<{ gameId: str
 	const tagsets = useTagsets();
 	const router = useRouter();
 	const gameRef = useRef<any | null>(null);
+	useGamePark(game?.stadium_id);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -329,51 +283,71 @@ export default function LiveGamePage({ params }: { params: Promise<{ gameId: str
 	const batting = battingSide === 'away' ? away : home;
 	const fielding = battingSide === 'away' ? home : away;
 	const mode = tagSetName(tagsets, game.tag_set);
+	const awayScores: number[] = game.away_inning_scores ?? [];
+	const homeScores: number[] = game.home_inning_scores ?? [];
+	const startedAt = new Date(game.start_time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-wrap items-center justify-between gap-2">
-				<Link href="/games/live" className="text-sm text-fog-500 transition-colors hover:text-rio-300">
-					← All live games
-				</Link>
-				<div className="flex items-center gap-2">
+			{(game._devFixture || ended) && (
+				<div className="flex flex-wrap items-center gap-2">
 					{game._devFixture && <Badge color="gold">Example data (dev)</Badge>}
 					{ended && <Badge color="gray">Game ended — taking you to the final box score once it posts…</Badge>}
 				</div>
-			</div>
+			)}
 
-			{/* Scoreboard — sticks under the nav so the score stays visible while scrolling */}
-			<div className="panel sticky top-16 z-40 overflow-hidden p-6 shadow-lg shadow-night-950/50">
-				<div
-					className="pointer-events-none absolute inset-0"
-					style={{ backgroundImage: 'radial-gradient(ellipse 70% 120% at 50% -20%, rgb(230 0 18 / 0.18), transparent)' }}
-				/>
-				<div className="relative grid items-center gap-6 sm:grid-cols-[1fr_auto_1fr]">
-					<TeamHero team={away} batting={battingSide === 'away'} align="left" />
-					<div className="space-y-2 text-center">
-						<p className="flex items-center justify-center gap-2 font-display text-sm font-bold uppercase tracking-widest text-rio-400">
-							<LiveDot /> {game.half_inning === 0 ? 'Top' : 'Bot'} {ordinal(game.inning)}
-						</p>
-						<p className="font-mono text-sm text-fog-300" title={`${game.outs} out${game.outs === 1 ? '' : 's'}`}>
-							{outsDisplay(game.outs)}
-						</p>
-						{game.star_chance && (
-							<p className="animate-pulse font-display text-sm font-bold uppercase tracking-widest text-star-400">
-								★ Star Chance ★
-							</p>
-						)}
-					</div>
-					<TeamHero team={home} batting={battingSide === 'home'} align="right" />
+			<Scoreboard
+				innings={Math.max(game.innings_selected ?? 0, game.inning ?? 0, awayScores.length, homeScores.length)}
+				regulationInnings={game.innings_selected}
+				cellHighlight={(inning, side) => inning === game.inning && side === (battingSide === 'away' ? 0 : 1)}
+				status={
+					<span className="flex items-center gap-2 text-rio-400">
+						<LiveDot /> {game.half_inning === 0 ? 'Top' : 'Bot'} {ordinal(game.inning)}
+					</span>
+				}
+				header={
+					<>
+						{mode && <span className="text-fog-100">{mode}</span>}
+						<span>{stadiums[game.stadium_id] ?? 'Unknown'}</span>
+						<span>First pitch {startedAt}</span>
+					</>
+				}
+				teams={[away, home].map((team, side) => ({
+					name: <PlayerLink username={team.player} className="!font-normal" />,
+					detail: (
+						<span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+							{teamNameFromLogo(team.logoId)}
+							<StarOrbs stars={team.stars} />
+							{team.allSuperstars && <span className="text-star-400">All superstars</span>}
+						</span>
+					),
+					image: logoImage(team.logoId),
+					tag:
+						(side === 0) === (battingSide === 'away') ? (
+							<span className="flex-none font-display text-xs font-bold uppercase tracking-[0.12em] text-star-400">
+								At bat
+							</span>
+						) : undefined,
+					runs: side === 0 ? awayScores : homeScores,
+					total: team.score
+				})) as [ScoreboardTeam, ScoreboardTeam]}
+			>
+				<div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-[var(--rim)] bg-black/35 px-4 py-2.5">
+					<BaseDiamond
+						first={!!Number(game.runner_on_first)}
+						second={!!Number(game.runner_on_second)}
+						third={!!Number(game.runner_on_third)}
+					/>
+					<OutPips outs={game.outs} />
+					{game.star_chance && (
+						<span className="font-title text-lg text-star-400 [text-shadow:0_2px_0_rgb(0_0_0/0.5)]">Star Chance!</span>
+					)}
 				</div>
-			</div>
-
-			{/* Line score + game meta — scrolls normally */}
-			<MiniLineScore game={game} away={away} home={home} mode={mode} />
+			</Scoreboard>
 
 			{/* Field + current matchup */}
 			<div className="grid gap-6 lg:grid-cols-[1.25fr_1fr]">
 				<Panel>
-					<PanelHeader title={stadiums[game.stadium_id] ?? 'Field'} />
 					<LiveFieldView game={game} batting={batting} fielding={fielding} />
 				</Panel>
 				<div className="space-y-6">

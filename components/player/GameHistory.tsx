@@ -94,7 +94,7 @@ export default function GameHistory({
 					<option value="w">Wins only</option>
 					<option value="l">Losses only</option>
 				</select>
-				<span className="ml-auto text-sm text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+				<span className="ml-auto text-sm tabular-nums text-fog-500">
 					{filtered.length} games
 				</span>
 			</div>
@@ -126,8 +126,8 @@ export default function GameHistory({
 								const delta = elo ? elo.after - elo.before : null;
 								return (
 									<tr key={game.game_id}>
-										<td className="whitespace-nowrap" style={{ fontVariantNumeric: 'tabular-nums' }}>
-											<Link href={`/games/${game.game_id}`} className="text-fog-300 hover:text-rio-300">
+										<td className="whitespace-nowrap font-mono tabular-nums">
+											<Link href={`/games/${game.game_id}`} className="text-fog-300 hover:text-fog-100">
 												{game.date_time_start
 													? new Date(game.date_time_start * 1000).toLocaleDateString()
 													: '—'}
@@ -145,16 +145,13 @@ export default function GameHistory({
 												{won ? 'W' : 'L'}
 											</span>
 										</td>
-										<td
-											className="whitespace-nowrap font-semibold text-fog-100"
-											style={{ fontVariantNumeric: 'tabular-nums' }}
-										>
+										<td className="whitespace-nowrap font-mono font-semibold tabular-nums text-fog-100">
 											{forScore}–{againstScore}
 										</td>
 										<td className="whitespace-nowrap">
 											<Link
 												href={`/users/${encodeURIComponent(opponent ?? '')}`}
-												className="font-medium text-fog-100 hover:text-rio-300"
+												className="font-medium text-fog-100 hover:underline"
 											>
 												{opponent ?? '—'}
 											</Link>
@@ -167,10 +164,9 @@ export default function GameHistory({
 											</span>
 										</td>
 										<td
-											className={`whitespace-nowrap text-right font-semibold ${
+											className={`whitespace-nowrap text-right font-mono font-semibold tabular-nums ${
 												delta == null ? 'text-fog-500' : delta >= 0 ? 'text-emerald-300' : 'text-rio-300'
 											}`}
-											style={{ fontVariantNumeric: 'tabular-nums' }}
 										>
 											{delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta}`}
 										</td>

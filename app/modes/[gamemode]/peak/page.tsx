@@ -77,8 +77,8 @@ export default function PeakPage({ params }: { params: Promise<{ gamemode: strin
 							<tbody>
 								{peaks.map((peak, i) => (
 									<tr key={peak.player}>
-										<td className="font-display font-bold text-fog-500">{i + 1}</td>
-										<td className="font-display font-bold tabular-nums text-star-400">{peak.score}</td>
+										<td className="font-mono font-bold tabular-nums text-fog-500">{i + 1}</td>
+										<td className="font-mono font-bold tabular-nums text-star-400">{peak.score}</td>
 										<td>
 											<PlayerLink username={peak.player} />
 										</td>

@@ -23,7 +23,7 @@ export default function ModesPage() {
 				<label className="flex items-center gap-2 text-sm text-fog-300">
 					<input
 						type="checkbox"
-						className="accent-rio-500"
+						className="accent-star-400"
 						checked={showUnofficial}
 						onChange={(event) => setShowUnofficial(event.target.checked)}
 					/>
@@ -32,7 +32,7 @@ export default function ModesPage() {
 				<label className="flex items-center gap-2 text-sm text-fog-300">
 					<input
 						type="checkbox"
-						className="accent-rio-500"
+						className="accent-star-400"
 						checked={showEnded}
 						onChange={(event) => setShowEnded(event.target.checked)}
 					/>
@@ -51,8 +51,8 @@ export default function ModesPage() {
 							className="panel panel-glow block p-5"
 						>
 							<div className="flex items-start justify-between gap-2">
-								<h2 className="font-display text-lg font-bold uppercase tracking-wide">{tagset.name}</h2>
-								<Badge color={tagset.comm_type === 'Official' ? 'red' : 'gray'}>
+								<h2 className="text-lg">{tagset.name}</h2>
+								<Badge color={tagset.comm_type === 'Official' ? 'gold' : 'gray'}>
 									{tagset.comm_type ?? 'Mode'}
 								</Badge>
 							</div>

@@ -47,13 +47,13 @@ export default function TagsTab({ context }: { context: CommunityContext }) {
 									<tr key={tag.id}>
 										<td className="font-semibold text-fog-100">{tag.name}</td>
 										<td>
-											<Badge color={tag.type === 'Gecko Code' ? 'red' : 'gray'}>{tag.type}</Badge>
+											<Badge color={tag.type === 'Gecko Code' ? 'gold' : 'gray'}>{tag.type}</Badge>
 										</td>
 										<td className="max-w-md whitespace-normal text-fog-500">{tag.desc}</td>
 										<td>
 											{tag.gecko_code ? (
 												<details>
-													<summary className="cursor-pointer text-rio-400 hover:text-rio-300">View</summary>
+													<summary className="cursor-pointer text-fog-300 hover:text-fog-100">View</summary>
 													<pre className="mt-2 max-w-md overflow-x-auto whitespace-pre-wrap rounded bg-night-950 p-3 text-xs text-fog-300">
 														{tag.gecko_code}
 													</pre>
@@ -67,7 +67,7 @@ export default function TagsTab({ context }: { context: CommunityContext }) {
 												{editable(tag) && (
 													<Link
 														href={`${communityPath}/tags/${tag.id}/edit`}
-														className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+														className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
 													>
 														Edit
 													</Link>

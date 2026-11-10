@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
 	return (
 		<div className="mx-auto max-w-md">
 			<div className="panel p-8">
-				<h1 className="text-center text-3xl uppercase">Password Reset</h1>
+				<h1 className="text-center text-3xl">Password Reset</h1>
 				{sent ? (
 					<p className="mt-6 text-center text-sm text-fog-300">
 						Reset link sent — check your email for the link.

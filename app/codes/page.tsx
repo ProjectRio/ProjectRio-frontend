@@ -67,10 +67,10 @@ function GeckoCodeCard({ tag, communityName }: { tag: RioTag; communityName: str
 	return (
 		<div className="panel flex flex-col p-5">
 			<div className="flex flex-wrap items-start justify-between gap-2">
-				<h2 className="font-display text-lg font-bold uppercase tracking-wide text-fog-100">{tag.name}</h2>
+				<h2 className="text-lg text-fog-100">{tag.name}</h2>
 				<div className="flex gap-1.5">
 					{communityName && <Badge color="gray">{communityName}</Badge>}
-					{!tag.active && <Badge color="red">Inactive</Badge>}
+					{!tag.active && <Badge color="gray">Inactive</Badge>}
 				</div>
 			</div>
 			{tag.desc && <p className="mt-2 text-sm text-fog-500">{tag.desc}</p>}
@@ -83,7 +83,7 @@ function GeckoCodeCard({ tag, communityName }: { tag: RioTag; communityName: str
 			<div className="mt-3 flex flex-wrap items-center gap-2">
 				<CopyButton text={code} label="Copy Code" primary />
 				<CopyButton text={dolphinFormat(tag)} label="Copy for Dolphin" />
-				<span className="ml-auto text-xs text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+				<span className="ml-auto text-xs text-fog-500 tabular-nums">
 					{lineCount} {lineCount === 1 ? 'line' : 'lines'}
 				</span>
 			</div>
@@ -170,7 +170,7 @@ export default function GeckoCodesPage() {
 								</option>
 							))}
 						</select>
-						<span className="self-center text-sm text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<span className="self-center text-sm text-fog-500 tabular-nums">
 							{filtered.length} of {tags.length} codes
 						</span>
 					</div>

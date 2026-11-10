@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Three Registers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Project Rio — design language v3
+
+   Built from measurements, not impressions. Every rule below traces to a
+   texture id, a string table row or a decomp symbol.
+
+   The page obeys its own law: chrome everywhere, exactly one loud element,
+   map register only where terrain is shown.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  color-scheme: dark;
+
+  /* ground — #0c2424 is the one colour present in all seven parks (~4.5%) */
+  --ground:    #081817;
+  --field:     #0c2424;
+
+  /* chrome: the game's container is translucent black, 50–71%, 1–2px neutral rim */
+  --chrome:    rgb(0 0 0 / .40);
+  --chrome-2:  rgb(0 0 0 / .58);
+  --rim:       rgb(242 239 224 / .15);
+  --rim-2:     rgb(242 239 224 / .09);
+
+  --ink:       #f3f0e2;
+  --ink-2:     #a9bbb7;
+  --ink-3:     #7a8e89;
+
+  --rio:       #e60012;   /* one job: this is Project Rio, and this is live */
+  --gold:      #fcd20c;   /* the game's ranking colour */
+  --gold-deep: #948408;
+  --up:        #4cc64c;
+  --down:      #e0533a;
+
+  /* chemistry token — measured off entry 810, sections 18 and 24 */
+  --chem-fill: #ffdeef;  --chem-ring: #ff94b5;
+  --anti-fill: #e7ceff;  --anti-ring: #ad4ad6;  --anti-ink: #310042;
+
+  --f-display: "Lilita One","Arial Black",sans-serif;
+  --f-label:   "Barlow Condensed","Arial Narrow",sans-serif;
+  --f-num:     "IBM Plex Mono",ui-monospace,monospace;
+
+  /* 16 cells wide is the logo. 4px is one logo pixel at 64px display. */
+  --u: 4px;
+}
+
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --ground:#e9e5d2; --field:#dcd7c0;
+    --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+    --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+    --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+    --gold:#9c7a00; --gold-deep:#6d5500;
+    --up:#1c7a2a; --down:#b23720;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --ground:#e9e5d2; --field:#dcd7c0;
+  --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+  --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+  --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+  --gold:#9c7a00; --gold-deep:#6d5500;
+  --up:#1c7a2a; --down:#b23720;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-label);font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{
+  max-width:1080px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0}
+p{margin:0 0 1em}p:last-child{margin-bottom:0}
+code{font-family:var(--f-num);font-size:.82em;color:var(--ink-2)}
+.n{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+/* ── CHROME ─────────────────────────────────────────────────────────────────
+   The game's panel is almost nothing: translucent black with a hairline
+   neutral rim. 1744:018 is black @50% with 1px white @30% + 1px grey @50%.
+   2514:028 is black @71% with a 2px tan rim. No bevel. No 9-slice. No rivets.
+   ─────────────────────────────────────────────────────────────────────── */
+.chrome{
+  background:var(--chrome);
+  border:1px solid var(--rim);
+  border-radius:6px;
+}
+.chrome-2{background:var(--chrome-2);border:1px solid var(--rim)}
+
+/* Labels float. They never get plates. (1745:142–145) */
+.lbl{
+  font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink-3);
+}
+.lbl-f{ /* the floating variant: white text, dark outline, no plate */
+  font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;
+  color:#fff;text-shadow:0 0 2px #000,0 1px 0 #000,0 -1px 0 #000,1px 0 0 #000,-1px 0 0 #000;
+}
+
+/* masthead ─────────────────────────────────────────────────────────────── */
+header.top{border-bottom:1px solid var(--rim-2)}
+header.top .wrap{padding-block:clamp(42px,8vw,68px) clamp(34px,6vw,52px)}
+.brandline{display:flex;align-items:center;gap:14px;margin-bottom:26px;flex-wrap:wrap}
+.mark{width:42px;height:42px;image-rendering:pixelated;flex:none;display:block}
+.brandline .t{font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+.brandline .t b{color:var(--ink-2);font-weight:600}
+h1{
+  font-size:clamp(42px,8.6vw,84px);line-height:.92;color:var(--ink);
+  margin-bottom:20px;
+}
+.dek{font-size:clamp(17px,2.4vw,20px);line-height:1.46;max-width:62ch;color:var(--ink-2)}
+.dek b{color:var(--ink);font-weight:600}
+
+section{border-bottom:1px solid var(--rim-2)}
+section > .wrap{padding-block:clamp(36px,6vw,54px)}
+h2{font-size:clamp(26px,4.2vw,38px);line-height:1.05;margin-bottom:8px}
+.kick{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--gold);margin-bottom:10px}
+.intro{max-width:66ch;color:var(--ink-2);margin-bottom:28px}
+h3{font-size:19px;margin-bottom:7px}
+h4{font-size:15px;margin-bottom:5px;letter-spacing:.01em}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(214px,1fr))}
+.pad{padding:20px}
+.src{font-family:var(--f-num);font-size:11px;color:var(--ink-3);letter-spacing:.01em}
+
+/* ── the three registers ───────────────────────────────────────────────── */
+.regs{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(252px,1fr))}
+.reg{padding:0;overflow:hidden}
+.reg .demo{height:112px;display:grid;place-items:center;position:relative;overflow:hidden}
+.reg .body{padding:16px 18px}
+.reg h3{margin-bottom:5px}
+.reg p{font-size:14.5px;color:var(--ink-2);margin-bottom:9px}
+
+/* chrome demo */
+.d-chrome{background:
+  linear-gradient(135deg,#1b4a2c,#2d6a3f)}
+.d-chrome .box{
+  background:rgb(0 0 0 / .55);border:1px solid rgb(255 255 255 / .3);border-radius:5px;
+  padding:9px 16px;color:#fff;font-weight:600;font-size:14px;letter-spacing:.06em}
+/* loud demo — THE one loud element on this page */
+.d-loud{background:#1a1208}
+.stamp{
+  font-family:var(--f-display);font-size:25px;color:#fff;padding:7px 20px;
+  border:3px solid #631000;border-radius:5px;transform:rotate(-4deg);
+  background:linear-gradient(180deg,
+    #ff9400 0 16%,#ffb500 16% 32%,#ffce00 32% 50%,
+    #ffb500 50% 66%,#ff9400 66% 80%,#f77b00 80% 90%,#b54200 90% 100%);
+  text-shadow:0 2px 0 #8a3000;
+}
+/* map demo */
+.d-map{background:#2f8f3a;display:flex!important;gap:0}
+.d-map i{flex:1;height:100%;display:block}
+
+/* ── banded gradient specimens ─────────────────────────────────────────── */
+.bands{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.band{border-radius:5px;overflow:hidden;border:1px solid var(--rim)}
+.band .sw{height:52px;display:block}
+.band .cap{padding:8px 11px;font-size:12.5px;color:var(--ink-3);background:var(--chrome)}
+.sw-badge{background:linear-gradient(180deg,
+  #ff9400 0 16%,#ffb500 16% 32%,#ffce00 32% 50%,
+  #ffb500 50% 66%,#ff9400 66% 80%,#f77b00 80% 90%,#b54200 90% 100%)}
+.sw-smooth{background:linear-gradient(180deg,#ff9400,#ffce00,#b54200)}
+.sw-rail{background:linear-gradient(180deg,
+  #fff721 0 22%,#ffde4a 22% 52%,#ffbd00 52% 86%,#bda500 86% 100%)}
+
+/* ── gauges: capsules, no ticks, no segments, light top cap ────────────── */
+.gauge{height:16px;border-radius:999px;background:rgb(0 0 0 / .45);
+  border:1px solid rgb(255 255 255 / .1);overflow:hidden;position:relative}
+.gauge i{display:block;height:100%;border-radius:999px;position:relative;
+  background:#21639c;box-shadow:inset 0 2px 0 rgb(255 255 255 / .34)}
+.gauge.g-gold i{background:#ffbd00;box-shadow:inset 0 2px 0 rgb(255 255 255 / .5)}
+.grow{display:grid;grid-template-columns:86px 1fr 40px;gap:12px;align-items:center;margin-bottom:11px}
+.grow:last-child{margin-bottom:0}
+.grow .v{font-family:var(--f-num);font-size:13px;color:var(--ink-3);text-align:right}
+
+/* ── focus: the game's own selection bar, cap + tiling middle ──────────── */
+.fx{position:relative;display:inline-block;padding:9px 15px;font-weight:600}
+.fx::before,.fx::after,.fx i::before,.fx i::after{
+  content:"";position:absolute;width:11px;height:11px;border:2px solid #fff;
+}
+.fx::before{top:0;left:0;border-right:0;border-bottom:0}
+.fx::after{top:0;right:0;border-left:0;border-bottom:0}
+.fx i::before{bottom:0;left:0;border-right:0;border-top:0}
+.fx i::after{bottom:0;right:0;border-left:0;border-top:0}
+:root[data-theme="light"] .fx::before,:root[data-theme="light"] .fx::after,
+:root[data-theme="light"] .fx i::before,:root[data-theme="light"] .fx i::after{border-color:var(--ink)}
+.dim{padding:9px 15px;color:var(--ink-3);font-weight:600}
+.selbar{display:inline-block;padding:9px 15px;font-weight:600;border-radius:6px;
+  background:rgb(0 0 0 / .573);border:1px solid #b5ada5;color:var(--ink);
+  box-shadow:inset 0 0 0 1px rgb(136 119 119 / .86), 0 0 0 1px rgb(187 170 170 / .43)}
+
+/* ── THE TOKEN ─────────────────────────────────────────────────────────── */
+.token{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(264px,1fr))}
+.tcard{padding:0;overflow:hidden}
+.tstage{
+  height:188px;display:grid;place-items:center;position:relative;
+  background:
+    repeating-linear-gradient(90deg,rgb(255 255 255 / .022) 0 1px,transparent 1px 13px),
+    repeating-linear-gradient(0deg,rgb(255 255 255 / .022) 0 1px,transparent 1px 13px),
+    linear-gradient(170deg,#143a2b,#0c2424);
+}
+.emote{width:124px;height:124px;position:relative;transform-origin:50% 86%}
+.emote .back,.emote .sym{position:absolute;inset:0;width:100%;height:100%}
+.emote .sym{transform-origin:50% 50%}
+
+/* good: 30f @30fps. 0 → 1.10 @f10 → 1.00 @f15. squash z1.25/y-0.18 @f18. */
+@keyframes chem-good{
+  0%{transform:scale(0)}
+  33.3%{transform:scale(1.10)}
+  50%{transform:scale(1.00)}
+  60%{transform:scale(1.25,.82)}
+  100%{transform:scale(1.00)}
+}
+@keyframes chem-good-sym{
+  0%,25%{transform:rotate(-30deg)}
+  33.3%{transform:rotate(-45deg)}
+  50%,100%{transform:rotate(-30deg)}
+}
+/* bad: 0 → 1.133 @f10 → 0.80 @f20 → 1.00 @f30, symbol flickers f10/f21/f27 */
+@keyframes chem-bad{
+  0%{transform:scale(0)}
+  33.3%{transform:scale(1.133)}
+  66.7%{transform:scale(.80)}
+  100%{transform:scale(1.00)}
+}
+@keyframes chem-bad-sym{
+  0%{transform:rotate(-20deg)}
+  33.3%{transform:rotate(-45deg)}
+  60%{transform:rotate(-20deg)}
+  70%{transform:rotate(-45deg)}
+  80%{transform:rotate(-20deg)}
+  90%{transform:rotate(-45deg)}
+  100%{transform:rotate(-20deg)}
+}
+.play .e-good{animation:chem-good 1s steps(30,end) 1 both}
+.play .e-good .sym{animation:chem-good-sym 1s steps(30,end) 1 both}
+.play .e-bad{animation:chem-bad 1s steps(30,end) 1 both}
+.play .e-bad .sym{animation:chem-bad-sym 1s steps(30,end) 1 both}
+.e-good .sym{transform:rotate(-30deg)}
+.e-bad  .sym{transform:rotate(-20deg)}
+@media (prefers-reduced-motion:reduce){
+  .play .e-good,.play .e-good .sym,.play .e-bad,.play .e-bad .sym{animation:none}
+}
+.replay{
+  position:absolute;right:10px;bottom:10px;z-index:2;
+  font:600 11px/1 var(--f-label);letter-spacing:.11em;text-transform:uppercase;
+  color:#fff;background:rgb(0 0 0 / .5);border:1px solid rgb(255 255 255 / .28);
+  border-radius:4px;padding:7px 11px;cursor:pointer;
+}
+.replay:hover{background:rgb(0 0 0 / .68)}
+.replay:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.tbody{padding:17px 19px}
+.tbody p{font-size:14.5px;color:var(--ink-2);margin-bottom:9px}
+.curve{font-family:var(--f-num);font-size:11.5px;color:var(--ink-3);line-height:1.6}
+
+/* the same token, flat, over a base — HUD element 0x11/0x12 */
+.diamond{position:relative;width:190px;height:190px;margin:4px auto 0}
+.diamond .bag{position:absolute;width:21px;height:21px;background:var(--ink-3);
+  border:1px solid rgb(0 0 0 / .4)}
+.diamond .bag.occ{background:var(--gold)}
+.chip-chem{position:absolute;width:34px;height:34px}
+.pip{display:inline-block;width:13px;height:13px;border-radius:50%}
+.pip.off{background:rgb(0 0 0 / .4);border:1px solid var(--rim)}
+
+/* ── three-state chemistry, never a ramp ───────────────────────────────── */
+.tri{display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid var(--rim)}
+.tri div{flex:1;padding:12px 10px;text-align:center}
+.tri .v{font-family:var(--f-num);font-size:12px;display:block;margin-top:3px;opacity:.75}
+.tri .b{background:color-mix(in srgb,var(--chem-ring) 26%,transparent)}
+.tri .m{background:var(--chrome)}
+.tri .a{background:color-mix(in srgb,var(--anti-ring) 26%,transparent)}
+.tri strong{font-weight:600;font-size:13.5px}
+
+/* ── parks: material, hazard, then colour ──────────────────────────────── */
+.parks{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(246px,1fr))}
+.park{padding:0;overflow:hidden}
+.park .mat{height:104px;display:block;position:relative;border-bottom:1px solid var(--rim)}
+.park .meta{padding:14px 16px}
+.park .nm{font-family:var(--f-display);font-size:19px;line-height:1.1;margin-bottom:2px}
+.park .mats{font-size:12.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+.park .haz{font-size:14px;color:var(--ink-2);margin-bottom:8px}
+.park .haz b{color:var(--ink);font-weight:600}
+.park .hx{font-family:var(--f-num);font-size:10.5px;color:var(--ink-3)}
+
+/* procedural material recipes — generic surfaces, no shipped game art */
+.m-mow{background:
+  repeating-linear-gradient(104deg,#549c0c 0 22px,#4a8a0a 22px 44px);
+  position:relative}
+.m-mow::after{content:"";position:absolute;inset:auto 0 0 0;height:30px;
+  background:linear-gradient(180deg,#cc843c,#b5733a)}
+/* ashlar: staggered block courses. Joint layers sit ABOVE the course fill,
+   with transparent runs, or the opaque fill would bury them. */
+.m-ashlar{background:
+  linear-gradient(0deg,#e46c0c 0 10px,transparent 10px),
+  repeating-linear-gradient(90deg,transparent 0 44px,#3d3d50 44px 47px),
+  repeating-linear-gradient(0deg,#5c5c74 0 23px,#3d3d50 23px 26px);
+  position:relative}
+.m-ashlar::after{ /* every other course, offset half a block */
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,#3d3d50 22px 25px,transparent 25px 66px);
+  -webkit-mask-image:repeating-linear-gradient(0deg,#000 0 23px,transparent 23px 49px);
+  mask-image:repeating-linear-gradient(0deg,#000 0 23px,transparent 23px 49px)}
+.m-dune{background:
+  repeating-linear-gradient(28deg,#ccb49c 0 10px,#bba288 10px 17px,#a68d74 17px 22px),
+  #846c54;
+  position:relative}
+.m-dune::after{content:"";position:absolute;inset:0 0 auto 0;height:12px;
+  background:linear-gradient(180deg,#e4cc84,#c9ad5e)}
+/* storybook flatness: hard-edged painted shapes, no gradient anywhere */
+.m-flat{background:
+  radial-gradient(circle at 74% 26%,#fff 0 13px,transparent 13.5px),
+  radial-gradient(circle at 84% 29%,#fff 0 10px,transparent 10.5px),
+  radial-gradient(circle at 64% 30%,#fff 0 9px,transparent 9.5px),
+  linear-gradient(180deg,#6ccccc 0 46%,#549c3c 46% 100%);
+  position:relative}
+.m-flat::after{ /* flat cut-out bushes along the fence line */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:34px;
+  background:
+    radial-gradient(circle at 14% 100%,#3f7d2c 0 20px,transparent 20.5px),
+    radial-gradient(circle at 38% 100%,#3f7d2c 0 16px,transparent 16.5px),
+    radial-gradient(circle at 66% 100%,#3f7d2c 0 22px,transparent 22.5px),
+    linear-gradient(0deg,#cc3c24 0 5px,transparent 5px)}
+.m-brick{background:
+  repeating-linear-gradient(0deg,#843c3c 0 13px,#6e3232 13px 15px),
+  repeating-linear-gradient(90deg,transparent 0 30px,#5c2a2a 30px 32px);
+  position:relative}
+.m-brick::after{content:"";position:absolute;inset:auto 0 0 0;height:34px;
+  background:repeating-linear-gradient(97deg,#8aa86a 0 14px,#7c9a5e 14px 28px)}
+.m-plank{background:
+  repeating-linear-gradient(90deg,#6c543c 0 26px,#5d4832 26px 28px),
+  repeating-linear-gradient(0deg,rgb(0 0 0 / .14) 0 2px,transparent 2px 11px);
+  position:relative}
+.m-plank::after{content:"";position:absolute;inset:0 0 auto 0;height:34px;
+  background:repeating-linear-gradient(72deg,#245424 0 17px,#1d451d 17px 34px)}
+.m-star{background:
+  radial-gradient(circle at 18% 26%,#fff 0 1.3px,transparent 1.4px),
+  radial-gradient(circle at 63% 15%,#fff 0 1.6px,transparent 1.7px),
+  radial-gradient(circle at 84% 44%,#fff 0 1.2px,transparent 1.3px),
+  radial-gradient(circle at 38% 62%,#fff 0 1.5px,transparent 1.6px),
+  radial-gradient(circle at 72% 78%,#fff 0 1.2px,transparent 1.3px),
+  radial-gradient(circle at 12% 82%,#fff 0 1.4px,transparent 1.5px),
+  #0c249c;
+  position:relative}
+.m-star::after{content:"";position:absolute;inset:auto 0 0 0;height:36px;
+  background:
+    radial-gradient(circle at 12px 50%,rgb(255 255 255 / .35) 0 2px,transparent 2.5px),
+    radial-gradient(circle at 92% 50%,rgb(255 255 255 / .35) 0 2px,transparent 2.5px),
+    linear-gradient(180deg,#fcfc24,#e0e01a)}
+
+/* ── pennant as a device ───────────────────────────────────────────────── */
+.penn{width:100%;height:auto;display:block}
+.pennwrap{padding:18px 20px}
+
+/* ── loader ────────────────────────────────────────────────────────────── */
+.loadbox{
+  border:1px solid var(--rim);border-radius:6px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,#2d6a3f,#17422a);
+  min-height:234px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;padding:26px 18px;
+}
+.loadbox::after{ /* the halftone vignette the real loading screens close with */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgb(0 0 0 / .5) 1.1px,transparent 1.5px);
+  background-size:6px 6px;
+  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 42%,#000 100%);
+  mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 42%,#000 100%);
+}
+.swing{
+  position:relative;z-index:1;width:207px;height:150px;flex:none;
+  background-image:url("bowser-swing.png");
+  background-repeat:no-repeat;background-size:3312px 150px;
+  animation:swing 1.33s steps(16) infinite;
+  filter:drop-shadow(0 6px 5px rgb(0 0 0 / .4));
+}
+@keyframes swing{from{background-position:0 0}to{background-position:-3312px 0}}
+@media (prefers-reduced-motion:reduce){.swing{animation:none}}
+.tiptitle{
+  font-family:var(--f-display);font-size:clamp(19px,3.3vw,26px);color:#fff;
+  text-align:center;position:relative;z-index:1;
+  text-shadow:0 0 3px #000,0 2px 0 #000,0 -2px 0 #000,2px 0 0 #000,-2px 0 0 #000;
+}
+.tipbody{
+  position:relative;z-index:1;max-width:46ch;text-align:center;
+  font-size:14.5px;line-height:1.45;color:rgb(255 255 255 / .9);
+  text-shadow:0 1px 2px rgb(0 0 0 / .8);
+}
+
+/* ── vocabulary table ──────────────────────────────────────────────────── */
+.vocab{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
+.vocab div{padding:11px 13px;background:var(--chrome);border:1px solid var(--rim-2);
+  border-radius:5px;font-size:14px}
+.vocab .no{text-decoration:line-through;color:var(--ink-3);display:block;font-size:12.5px}
+.vocab .yes{color:var(--ink);font-weight:600;display:block}
+
+/* ── drop / keep ───────────────────────────────────────────────────────── */
+.dk{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.dk h3{margin-bottom:3px}
+.dk .v-out h3{color:var(--down)}
+.dk .v-in h3{color:var(--up)}
+.dk .sub{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);margin-bottom:12px}
+.dk ul{margin:0;padding:0;list-style:none}
+.dk li{padding:10px 0;border-top:1px solid var(--rim-2);color:var(--ink-2);font-size:15px}
+.dk li b{color:var(--ink);font-weight:600}
+
+.note{padding:16px 18px;border-radius:5px;background:var(--chrome);
+  border:1px solid var(--rim);font-size:15px;color:var(--ink-2)}
+.note b{color:var(--ink)}
+.note.warn{border-color:color-mix(in srgb,var(--down) 55%,var(--rim))}
+
+/* ── table ─────────────────────────────────────────────────────────────── */
+.tw{overflow-x:auto;border-radius:5px;border:1px solid var(--rim)}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--chrome)}
+th{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);text-align:right;padding:10px 13px;border-bottom:1px solid var(--rim);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 13px;text-align:right;border-bottom:1px solid var(--rim-2);
+  font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:13.5px;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-family:var(--f-label);font-weight:600;font-size:15px;color:var(--ink)}
+
+footer{padding-block:34px 52px;color:var(--ink-3);font-size:14px}
+footer .wrap > div{max-width:74ch}
+footer b{color:var(--ink-2)}
+
+@media (max-width:520px){
+  .grow{grid-template-columns:72px 1fr 36px;gap:9px}
+  .diamond{width:160px;height:160px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandline">
+      <img class="mark" src="RioLogo.png" alt="" width="42" height="42">
+      <span class="t"><b>Project Rio</b> · design language v3 · measured off GYQE01</span>
+    </div>
+    <h1>Three registers<br>and one token</h1>
+    <p class="dek">Mario Superstar Baseball shipped a complete interface system in 2005. Read closely, it is not a style — it is <b>three colour registers the game never mixes</b>, and <b>one symbol it says three different ways</b>. Everything on this page traces to a texture id, a string-table row or a decomp symbol. Where something is our construction rather than the game's, it says so.</p>
+  </div>
+</header>
+
+<!-- ══ THE LAW ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">The law</div>
+    <h2>One register per surface</h2>
+    <p class="intro">Rio red on bright green was not too much colour. It was a <b>register collision</b> — loud treatment applied to chrome. The game does exactly the thing that was wrong, but only in two places, and it quarantines them. Getting this right is most of the work.</p>
+
+    <div class="regs">
+      <div class="chrome reg">
+        <div class="demo d-chrome"><span class="box">BATTING AVG. .347</span></div>
+        <div class="body">
+          <h3>Chrome</h3>
+          <p>Every container, gauge and label. Translucent black 50–71%, a 1–2px <b>neutral</b> rim, no bevel, no ornament. Outlines are the fill hue darkened, never black. Saturated fills are kept apart by a neutral band.</p>
+          <div class="src">1744:018 · 2514:028 · 1745:150</div>
+        </div>
+      </div>
+      <div class="chrome reg">
+        <div class="demo d-loud"><span class="stamp">LAST BALL!</span></div>
+        <div class="body">
+          <h3>Loud</h3>
+          <p>Stacked saturated hues with no separator, banded gradients on a dark keyline. The game uses it for minigame logos, place badges and result stamps — nowhere else. <b>One element per page.</b> The stamp here is this page's only one.</p>
+          <div class="src">2516:027 · 2516:258 · 1745:166–170</div>
+        </div>
+      </div>
+      <div class="chrome reg">
+        <div class="demo d-map">
+          <i style="background:#2f8f3a"></i><i style="background:#d8a641"></i>
+          <i style="background:#2f8f3a"></i><i style="background:#2a6fc4"></i>
+          <i style="background:#2f8f3a"></i>
+        </div>
+        <div class="body">
+          <h3>Map</h3>
+          <p>Flat saturated colour with <b>no outline at all</b>. The challenge-map terrain, and nothing else. On the site this is for actual terrain — the visualizer's collision fills, a park diagram — never for UI.</p>
+          <div class="src">challenge map atlas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px">
+      <b>The budget, written as a rule.</b> A component library can enforce this: one <code>loud</code> slot per route, claimed by whatever matters most — a walk-off, an award, a title. Everything else draws from the chrome set. That single constraint is what keeps the site from drifting back toward generic, because generic is what happens when every component gets to shout.
+    </div>
+  </div>
+</section>
+
+<!-- ══ THE TOKEN ═════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">The token</div>
+    <h2>A bubble with a note in it</h2>
+    <p class="intro">The game states chemistry three independent ways and they all agree. Tip #149 says <i>"♪ is a symbol of friendship."</i> A 3D emote pops over a linked player. A flat badge draws over each occupied base. Same bubble, same note. Its negative twin is a starburst with a scribble — <b>the squiggle you remembered is real</b>, it just belongs to anti-chemistry, which is why the burst read as invented when it was used as decoration.</p>
+
+    <div class="token" id="tok">
+      <div class="chrome tcard">
+        <div class="tstage">
+          <div class="emote e-good">
+            <svg class="back" viewBox="0 0 100 100" aria-hidden="true">
+              <path d="M50 10c22 0 38 12 38 28 0 14-12 24-29 27l-13 17 1-17C32 63 12 53 12 38 12 22 28 10 50 10z"
+                    fill="#ffdeef" stroke="#ff94b5" stroke-width="4" stroke-linejoin="round"/>
+            </svg>
+            <svg class="sym" viewBox="0 0 100 100" role="img" aria-label="Good chemistry">
+              <g stroke="#fff" stroke-width="7" stroke-linejoin="round" fill="none">
+                <path d="M58 24v44"/>
+                <ellipse cx="46" cy="70" rx="13" ry="10"/>
+                <path d="M58 24c13 5 21 11 19 24 7-15-3-25-19-31z"/>
+              </g>
+              <g fill="#111">
+                <rect x="55" y="24" width="6" height="44"/>
+                <ellipse cx="46" cy="70" rx="13" ry="10"/>
+                <path d="M58 24c13 5 21 11 19 24 7-15-3-25-19-31z"/>
+              </g>
+            </svg>
+          </div>
+          <button class="replay" data-play="tok">Replay</button>
+        </div>
+        <div class="tbody">
+          <h3>Good · it pops and squashes</h3>
+          <p>Pink bubble, fill <code>#ffdeef</code>, ring <code>#ff94b5</code>. Black eighth note with a white outline, rotated <b>−30°</b>. Two camera-facing quads — never the symbol alone, never the backing alone.</p>
+          <div class="curve">30f @ 30fps, then hold<br>scale 0 → 1.10 @f10 → 1.00 @f15<br>symbol −15° @f10<br>squash z 1.25 / y −0.18 @f18 → rest @f30</div>
+        </div>
+      </div>
+
+      <div class="chrome tcard">
+        <div class="tstage">
+          <div class="emote e-bad">
+            <svg class="back" viewBox="0 0 100 100" aria-hidden="true">
+              <path d="M50 4 59.6 23.7 79.6 14.8 74.2 36.0 95.3 42.0 77.6 54.9 89.8 73.0 68.0 71.5 65.7 93.2 50 78 34.3 93.2 32.0 71.5 10.2 73.0 22.4 54.9 4.7 42.0 25.8 36.0 20.4 14.8 40.4 23.7Z"
+                    fill="#e7ceff" stroke="#ad4ad6" stroke-width="4" stroke-linejoin="round"/>
+            </svg>
+            <svg class="sym" viewBox="0 0 100 100" role="img" aria-label="Bad chemistry">
+              <path transform="translate(11,6)"
+                    d="M26 66C14 44 36 22 56 30c16 7 12 30-6 28-14-2-14-20 2-19 12 1 13 13 5 16"
+                    fill="none" stroke="#310042" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <button class="replay" data-play="tok">Replay</button>
+        </div>
+        <div class="tbody">
+          <h3>Anti · it shudders</h3>
+          <p>Lilac 9-point starburst, fill <code>#e7ceff</code>, outline <code>#ad4ad6</code>. Dark purple scribble-swirl <code>#310042</code>, roughly three loops, rotated <b>−20°</b>.</p>
+          <div class="curve">30f @ 30fps, then hold<br>scale 0 → 1.133 @f10 → <b>0.80 @f20</b> → 1.00 @f30<br>symbol flickers −25° at f10 / f21 / f27<br>rests at f18 / f24 / f30</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:16px">
+      <b>The asymmetry does the semantic work.</b> Good overshoots and settles. Anti overshoots, <i>sags</i>, then recovers while twitching three times. Strip the colour out entirely and the two states are still distinguishable — which is the test a colour-coded pair usually fails. Both curves above are ported verbatim from the clips in entry <code>810</code> (<code>prop/maxtame</code>), sections 21 and 27, and run on <code>steps(30)</code> at 30fps because the originals are frame-stepped.
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="chrome pad">
+        <h3>Said three ways</h3>
+        <p style="font-size:14.5px;color:var(--ink-2)">The HUD draws the same pairing flat. <code>draw_OnBaseChemLinks</code> puts element <code>0x11</code> (bubble, tex <code>0x118</code>, 36×36) and <code>0x12</code> (note, tex <code>0x119</code>) over each occupied base, bits 0/1/2 for first, second and third. The site inherits a live widget nothing currently shows.</p>
+        <div class="diamond" aria-hidden="true">
+          <div class="bag" style="left:50%;top:84%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag occ" style="left:86%;top:50%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag occ" style="left:50%;top:14%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag" style="left:14%;top:50%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <svg class="chip-chem" style="left:86%;top:50%;transform:translate(-50%,-150%)" viewBox="0 0 100 100">
+            <path d="M50 10c22 0 38 12 38 28 0 14-12 24-29 27l-13 17 1-17C32 63 12 53 12 38 12 22 28 10 50 10z" fill="#ffdeef" stroke="#ff94b5" stroke-width="5"/>
+            <g fill="#111" transform="rotate(-30 50 42) scale(.62) translate(31 12)"><rect x="55" y="24" width="7" height="44"/><ellipse cx="46" cy="70" rx="14" ry="10"/><path d="M59 24c13 5 21 11 19 24 7-15-3-25-19-31z"/></g>
+          </svg>
+          <svg class="chip-chem" style="left:50%;top:14%;transform:translate(-50%,-150%)" viewBox="0 0 100 100">
+            <path d="M50 10c22 0 38 12 38 28 0 14-12 24-29 27l-13 17 1-17C32 63 12 53 12 38 12 22 28 10 50 10z" fill="#ffdeef" stroke="#ff94b5" stroke-width="5"/>
+            <g fill="#111" transform="rotate(-30 50 42) scale(.62) translate(31 12)"><rect x="55" y="24" width="7" height="44"/><ellipse cx="46" cy="70" rx="14" ry="10"/><path d="M59 24c13 5 21 11 19 24 7-15-3-25-19-31z"/></g>
+          </svg>
+        </div>
+      </div>
+      <div class="chrome pad">
+        <h3>Three states, never a ramp</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:14px">The chemistry table thresholds at <b>90</b> and <b>20</b>. Those are hard lines the game draws itself, so every chemistry display gets three bands and no gradient. Saturated rim, neutral core: only the extremes carry hue.</p>
+        <div class="tri">
+          <div class="b"><strong>Buddy</strong><span class="v">≥ 90 · 101 pairs</span></div>
+          <div class="m"><strong>Neutral</strong><span class="v">20–89</span></div>
+          <div class="a"><strong>Anti</strong><span class="v">&lt; 20 · 53 pairs</span></div>
+        </div>
+        <p style="font-size:14px;color:var(--ink-2);margin-top:14px">The table is <code>0x36</code> bytes per character at <code>CharacterStats+0x3B</code>, 54 rows, and it is <b>perfectly symmetric</b> — 0 of 1431 pairs disagree. It renders as a triangle, not a square. With 101 bright and 53 hostile pairs against a mean of 59.9, it has real structure, which makes it the best data visual on the disc.</p>
+      </div>
+    </div>
+
+    <div class="note warn" style="margin-top:16px">
+      <b>Not verified in motion.</b> The emotes above are rebuilt from exported geometry, measured texture colours and the clip keyframes. They were never rendered from the glTF in motion, and the scribble path is a reconstruction of the shape, not a trace of it. The colours, scales, rotations and timings are measured; the two symbol outlines are drawn.
+    </div>
+  </div>
+</section>
+
+<!-- ══ PARKS ═════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">Stadiums</div>
+    <h2>A material and a hazard, then a colour</h2>
+    <p class="intro">Seven accent colours is not seven themes. Each park is a short list of <b>nameable materials</b> and one thing that lives there — both of which the game states outright. The fills below are procedural CSS recipes built from generic surfaces (brick courses, ashlar, plank, dune ripple, mow stripes, starfield), so a theme can carry real texture without shipping any extracted art. Hazards are verbatim from the loading tips.</p>
+
+    <div class="parks">
+      <div class="chrome park">
+        <span class="mat m-mow"></span>
+        <div class="meta">
+          <div class="nm">Mario Stadium</div>
+          <div class="mats">Mown grass · infield clay · blue stand trim</div>
+          <p class="haz"><b>No hazard.</b> It is the clean one, and the game gives it no tip. That absence is its identity — which is exactly why it is the default.</p>
+          <div class="hx">#549c0c · #cc843c · #3c549c</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-ashlar"></span>
+        <div class="meta">
+          <div class="nm">Bowser Castle</div>
+          <div class="mats">Cut stone · castle brick · lava</div>
+          <p class="haz"><b>Thwomps</b> spurn home-run balls. Fiery Bubbles burn fielders. Motif: a spiked arch with a faced keystone.</p>
+          <div class="hx">#6c6c84 · #b40c24 · #e46c0c</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-dune"></span>
+        <div class="meta">
+          <div class="nm">Wario Palace</div>
+          <div class="mats">Sandstone block · dune sand · woven banner · gold trim</div>
+          <p class="haz"><b>Chain Chomps</b> mean business. Sandstorms swallow fly balls. Team Stars are buried in the sand.</p>
+          <div class="hx">#ccb49c · #846c54 · #e4cc84</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-flat"></span>
+        <div class="meta">
+          <div class="nm">Yoshi Park</div>
+          <div class="mats">Painted grass and sand · cut-out bushes · wood fence</div>
+          <p class="haz"><b>Piranha Plants</b> eat the ball and spit it out somewhere else. The yellow one pays a Team Star.</p>
+          <div class="hx">#549c3c · #cc3c24 · #6ccccc</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-brick"></span>
+        <div class="meta">
+          <div class="nm">Peach's Garden</div>
+          <div class="mats">Red brick · mossed ashlar · paved slab · terracotta</div>
+          <p class="haz"><b>Blocks</b>, everywhere. Misplayed balls, or a Team Star. Motif: red carpet with gold lattice trim.</p>
+          <div class="hx">#843c3c · #ccccb4 · #8aa86a</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-plank"></span>
+        <div class="meta">
+          <div class="nm">DK Jungle</div>
+          <div class="mats">Weathered plank · mossy ruin brick · carved stone · canopy</div>
+          <p class="haz"><b>Barrels</b> crash through the outfield. <b>Klaptraps</b> chomp runners crossing the river.</p>
+          <div class="hx">#6c543c · #245424 · #fce454</div>
+        </div>
+      </div>
+      <div class="chrome park">
+        <span class="mat m-star"></span>
+        <div class="meta">
+          <div class="nm">Toy Field</div>
+          <div class="mats">Painted plastic · riveted blue panel · <b>no natural texture anywhere</b></div>
+          <p class="haz">The <b>Star Panel</b>. Hit it and the Team Star is yours. Motif: starfield and starburst.</p>
+          <div class="hx">#0c249c · #fcfc24</div>
+        </div>
+      </div>
+      <div class="chrome park" style="display:flex;align-items:center">
+        <div class="meta">
+          <h3>Extend, don't replace</h3>
+          <p style="font-size:14.5px;color:var(--ink-2)"><code>stadiumThemes.ts</code> is colour-only today — sky, fog, hemi, sun, an 11-key collision palette. Add a <code>materials</code> object, a <code>voice</code> string and a <code>motifs</code> list of <b>recipe kinds</b>, not image paths. The existing labels stay: "Molten Keep" and "Picture-Book Meadow" are doing real work.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note warn" style="margin-top:16px">
+      <b>Two copies of this theme disagree right now.</b> <code>stadiumThemes.ts</code> has drifted from <code>RioVisualizer/web/themes.js</code> — Mario's fog density is 0.0028 against 0.0014, Bowser's hemi and sun are completely different (<code>#5a3a32</code>/0.7 vs <code>#8c88a8</code>/1.3), and Wario differs on six keys. Pick a direction and write down which wins, or the overlay and the match page end up looking like different products.
+    </div>
+  </div>
+</section>
+
+<!-- ══ SURFACES ══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">Chrome, in detail</div>
+    <h2>The container is almost nothing</h2>
+    <p class="intro">This is the correction that reshapes the whole package. The earlier "plaque" — hard dark outline, top bevel, bottom shadow — is not what the game draws. Its panel is a translucent black rectangle with a rim you can barely see, and the content does all the work. Every card on this page is that panel.</p>
+
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="chrome pad">
+        <h3>Gauges</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:16px">Capsules, 9–30px wide, fully rounded ends, a light top cap, a continuous fill, a darker rail behind. <b>No ticks. No segments.</b> Labels float beside them — white text, dark outline, no pill, no chip, no plate.</p>
+        <div class="grow"><span class="lbl-f">Power</span><span class="gauge"><i style="width:78%"></i></span><span class="v">78</span></div>
+        <div class="grow"><span class="lbl-f">Contact</span><span class="gauge"><i style="width:54%"></i></span><span class="v">54</span></div>
+        <div class="grow"><span class="lbl-f">Speed</span><span class="gauge g-gold"><i style="width:91%"></i></span><span class="v">91</span></div>
+        <div class="src" style="margin-top:12px">1745:142–145 labels · 1745:150 fill #21639c, outline #001063</div>
+      </div>
+      <div class="chrome pad">
+        <h3>Focus is a translucent bar</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:14px">Not a glow and not a bracket. The cursor is a rounded rectangle assembled from <b>three slices</b> — a cap, a repeating middle and a mirrored cap — which is why its pieces look like fragments in a texture dump. Black at 57% behind a warm three-row rim, rounded about 5px.</p>
+        <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-start">
+          <span class="selbar">Superstars Off · Season 7</span>
+          <span class="dim">Superstars On · Season 7</span>
+          <span class="dim">Big Balla</span>
+        </div>
+        <div class="note warn" style="margin-top:16px;font-size:13.5px">
+          <b>Two corrections here, not one.</b> This package first said focus was a pair of gold brackets, then four white corners mirrored from <code>1745:037</code>. Both were wrong. Worse, I read <code>1745:027</code> and <code>028</code> as a recessed "slot and lip" and built a principle on it — <i>one mechanical object, for bounded resources</i>. Those two textures are this bar's middle and cap. There is no slot, and that rule is withdrawn.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="chrome pad">
+        <h3>Quantise every gradient</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:14px">The game's gradients step in 1–2px bands. Hard stops, five to seven of them. Almost free to implement, and no other esports site does it — because it looks like a mistake unless it is deliberate and consistent.</p>
+        <div class="bands">
+          <div class="band"><span class="sw sw-badge"></span><span class="cap">Banded · place badge, verbatim</span></div>
+          <div class="band"><span class="sw sw-smooth"></span><span class="cap">Smooth · what we'd have written</span></div>
+        </div>
+      </div>
+      <div class="chrome pad">
+        <h3>Colour lives on the edge</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:14px">Results rings <code>2516:001–005</code> are a 4px coloured ring around a disc of black at 85%. All five differ <b>only</b> in rim hue. That is the mechanism that lets seven park themes and forty-eight team palettes coexist without fighting.</p>
+        <div style="display:flex;gap:11px;flex-wrap:wrap">
+          <span style="width:52px;height:52px;border-radius:50%;background:rgb(0 0 0 / .85);border:4px solid #e0533a;display:grid;place-items:center;font:600 17px var(--f-num);color:#fff">3</span>
+          <span style="width:52px;height:52px;border-radius:50%;background:rgb(0 0 0 / .85);border:4px solid #3c7fd4;display:grid;place-items:center;font:600 17px var(--f-num);color:#fff">0</span>
+          <span style="width:52px;height:52px;border-radius:50%;background:rgb(0 0 0 / .85);border:4px solid #fcd20c;display:grid;place-items:center;font:600 17px var(--f-num);color:#fff">7</span>
+          <span style="width:52px;height:52px;border-radius:50%;background:rgb(0 0 0 / .85);border:4px solid #4cc64c;display:grid;place-items:center;font:600 17px var(--f-num);color:#fff">2</span>
+          <span style="width:52px;height:52px;border-radius:50%;background:rgb(0 0 0 / .85);border:4px solid #9a5ad0;display:grid;place-items:center;font:600 17px var(--f-num);color:#fff">1</span>
+        </div>
+        <p style="font-size:14px;color:var(--ink-2);margin-top:14px">Ready-made as an inning strip. The count sits in the neutral core; the state lives on the rim.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOADING ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">Loading</div>
+    <h2>Seventeen tips, already written</h2>
+    <p class="intro">The part worth pushing hardest on. The disc ships seventeen loading tips with banner titles and bodies, and the frame they sit in is already right: a dimmed park, outlined lettering, a halftone vignette closing the edges. Rio's own tips should be written the same way and sit in the same place — and the swing character should rotate with context, the captain whose page is loading or who won the game being opened.</p>
+
+    <div class="loadbox">
+      <div class="swing" role="img" aria-label="Bowser swinging"></div>
+      <div class="tiptitle" id="tipT">What's chemistry?</div>
+      <div class="tipbody" id="tipB">♪ is a symbol of friendship. Buddies exhibit unpredictable powers when they field and bat.</div>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="chrome pad">
+        <h3>The swing is real</h3>
+        <p style="font-size:14.5px;color:var(--ink-2)">Bowser's body is entry <code>262</code>, his batting bank <code>264</code>, the clip <code>b09_ba_008</code> — his two-second charge swing. Exported as rigged glTF with <code>parts="bat"</code>, which swaps his hands into their bat pose and brings the spiked mace with them, then rendered to sixteen orthographic frames and run on <code>steps(16)</code>. 207×150 per frame, 203 KB, quantised to 128 colours, which is how the game stores its own UI textures.</p>
+      </div>
+      <div class="chrome pad">
+        <h3>The copy register, from the settings screen</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:10px">Short, imperative, a dash between label and explanation, no marketing voice. Three verbatim examples:</p>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:6px"><i>"Mercy — End a game if the score differential reaches 10 runs."</i></p>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:6px"><i>"Innings — Set how many innings you'll play. When a game is in a tie, you can play up to 3 extra innings."</i></p>
+        <p style="font-size:14.5px;color:var(--ink-2)"><i>"Players will join you when you get all their flags."</i></p>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:16px">
+      <b>And 32 finished character bios.</b> Written in the game's own voice, sitting on the disc right now, while the character dashboards ship with placeholder writeups waiting on community content. They won't cover the Rio-specific analysis, but they end the empty state immediately. Mario's, in full: <i>"Everyone's favorite hero. When Peach is in trouble, he always saves the day! A kart racer, tennis player, golf enthusiast, doctor… The list goes on and on, showing he's a jack-of-all-trades. His trademark Fireball will help him in his first foray into baseball."</i>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TEAMS ═════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">Teams</div>
+    <h2>A pennant is a device, not a template</h2>
+    <p class="intro">The game ships <b>48 team names in three renderings each</b> — 144 textures, not 144 teams. Index is <code>captain*4 + slot</code>: wordmarks on their own silhouettes at 153×54, emblems at 90×90, text strips at 250×26. Each wordmark has its own shape, so a pennant per team is the wrong read. The pennant is a <b>section device</b> — a standings banner, a bracket header, a league marker — and the per-team identity is carried by the wordmark and emblem the game already drew.</p>
+
+    <div class="chrome pennwrap" style="margin-bottom:16px">
+      <svg class="penn" viewBox="0 0 860 76" role="img" aria-label="Netplay Superstars 14 — Season 7 standings">
+        <path d="M2 6h856l-34 32 34 32H2z" fill="rgb(0 0 0 / .42)" stroke="rgba(242,239,224,.18)" stroke-width="2"/>
+        <image href="RioLogo.png" x="22" y="18" width="40" height="40" style="image-rendering:pixelated"></image>
+        <text x="80" y="47" font-family="Lilita One" font-size="30" fill="#f3f0e2">Netplay Superstars 14</text>
+        <text x="470" y="46" font-family="Barlow Condensed" font-weight="600" font-size="17" letter-spacing="2.4" fill="#7a8e89">SEASON 7 · SUPERSTARS OFF · 48 TEAMS</text>
+      </svg>
+    </div>
+
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="chrome pad">
+        <h3>Team Stars are a count, not a theme</h3>
+        <p style="font-size:14.5px;color:var(--ink-2)">Five 13×13 orange orbs per team in an orange frame (element <code>0x18</code>, tex <code>0x115</code>) — a finished live-scoreboard widget the site doesn't show. But a count is all it is, and it shouldn't become a site-wide motif.</p>
+      </div>
+      <div class="chrome pad">
+        <h3>Pips, not digits</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:14px">Balls, strikes and outs are drawn as three, two and two pips — always one fewer than the count that ends the state (element <code>0x107</code>). A box score that renders them as pips reads as this game's scoreboard instantly, and as a generic one if it renders digits.</p>
+        <div style="display:flex;gap:22px;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:8px"><span class="lbl">B</span><i class="pip" style="background:#4cc64c"></i><i class="pip" style="background:#4cc64c"></i><i class="pip off"></i></span>
+          <span style="display:flex;align-items:center;gap:8px"><span class="lbl">S</span><i class="pip" style="background:#fcd20c"></i><i class="pip off"></i></span>
+          <span style="display:flex;align-items:center;gap:8px"><span class="lbl">O</span><i class="pip" style="background:#e0533a"></i><i class="pip off"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <b>A live bug, found on the way here.</b> <code>lib/data/logoToTeam.ts</code> and <code>lib/data/teamNames.ts</code> swap two pairs of ids against both the textures and the decomp: <code>0x4</code>/<code>0x5</code> are Leapers and Mansioneers the wrong way round, and so are <code>0x14</code>/<code>0x15</code> for Fans and Bows. Texture <code>100</code> reads "Luigi Leapers"; texture <code>116</code> reads "Birdo Fans". <code>pyrio</code>'s <code>TEAM_NAME</code> has the same swap. Separately, the wordmark spells LILIES where the frontend has "Lillies", and the punctuation is dropped from All-Stars, Smart-Alecks and Jr. This is a standalone fix, not a design change.
+    </div>
+  </div>
+</section>
+
+<!-- ══ WORDS ═════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">Vocabulary</div>
+    <h2>Use the game's nouns</h2>
+    <p class="intro">The HUD's stat wording is fixed and specific, and the records book's index reads better than anything we'd write. <b>No letter grade or star rating exists anywhere on the disc</b> — the game recognises you by naming you MVP and handing you a thing. If the site has or plans performance grades, they're an import from other sports sites.</p>
+
+    <div class="vocab" style="margin-bottom:16px">
+      <div><span class="no">Leaderboard</span><span class="yes">Past Superstars</span></div>
+      <div><span class="no">Awards</span><span class="yes">Trophies Won</span></div>
+      <div><span class="no">Stolen bases</span><span class="yes">Bases Stolen</span></div>
+      <div><span class="no">Defensive plays</span><span class="yes">Big Plays</span></div>
+      <div><span class="no">Special ability</span><span class="yes">Star Skills</span></div>
+      <div><span class="no">Teammate synergy</span><span class="yes">Buddy players</span></div>
+      <div><span class="no">A-tier / S-tier</span><span class="yes">MVP, and a trophy</span></div>
+      <div><span class="no">Clutch moment</span><span class="yes">Star Chance</span></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="chrome pad">
+        <h3>The box-score columns</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:12px">Eighteen abbreviations, verbatim from the scorecard. The <b>set</b> is the game's; the expansions aren't shipped, so what each means would be our inference — worth stating on the page rather than quietly asserting.</p>
+        <div class="n" style="font-size:13px;color:var(--ink-2);line-height:2">B · B.K · D.P · D.S · DB · E · F.C · H · K · O · P · P.S · PH · PR · R · S · T.P · W.P</div>
+      </div>
+      <div class="chrome pad">
+        <h3>Specials have names</h3>
+        <p style="font-size:14.5px;color:var(--ink-2)">Fireball (Mario), green Fireball (Luigi), Banana Ball (DK), Heart Ball (Peach), Flower Ball (Daisy), Killer Ball (Bowser), Garlic (Wario), Liar Ball (Waluigi — "Phony Ball" in the mission text), cursed balls (Dry Bones). An event log that names the pitch is doing something no generic log can.</p>
+      </div>
+    </div>
+
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <caption class="lbl" style="text-align:left;padding:10px 13px">Illustrative rows · the game's column wording, chrome register, no grade column</caption>
+        <thead>
+          <tr><th>Player</th><th>W–L</th><th>Batting Avg.</th><th>Home Runs</th><th>Bases Stolen</th><th>Big Plays</th><th>ERA</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>jonbonjon</td><td>42–11</td><td>.347</td><td>61</td><td>14</td><td>38</td><td>2.18</td></tr>
+          <tr><td>PeacockSlayer</td><td>39–14</td><td>.331</td><td>54</td><td>22</td><td>41</td><td>2.44</td></tr>
+          <tr><td>LittleCoaks</td><td>37–16</td><td>.318</td><td>58</td><td>9</td><td>29</td><td>2.61</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DROP / KEEP ═══════════════════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="kick">The change</div>
+    <h2>What goes, and what replaces it</h2>
+    <div class="dk">
+      <div class="v-out">
+        <h3>Drop</h3>
+        <div class="sub">Including things this package itself got wrong</div>
+        <ul>
+          <li><b>Every invented mushroom.</b> The real mark is already a 16×16 three-colour pixel logo with a mono SVG companion. It needed no redrawing and gets none. <code>mushroom-pixel.svg</code> should come out of <code>public/images/</code>.</li>
+          <li><b>The shell mark and the loose burst.</b> Neither was sourced. The burst is real but it belongs to anti-chemistry and has one negative job.</li>
+          <li><b>Heavy plaques</b> — hard outline, top bevel, drop shadow. The game's container is translucent black with a hairline rim.</li>
+          <li><b>Coloured accent rails on cards</b>, the clearest template signature there is.</li>
+          <li><b>A pennant per team.</b> The pennant is a section device; the team identity is the wordmark.</li>
+          <li><b>Letter grades and star ratings.</b> No grade exists anywhere on the disc.</li>
+          <li><b>Glow on focus.</b> There is none on the disc, anywhere.</li>
+          <li><b>Smooth gradients.</b> The game's are banded in 1–2px steps.</li>
+          <li><b>Team Stars as a site-wide theme.</b> They're a live count, not a motif.</li>
+        </ul>
+      </div>
+      <div class="v-in">
+        <h3>Keep</h3>
+        <div class="sub">Measured, with a source</div>
+        <ul>
+          <li><b>One register per surface</b>, and one loud element per page.</li>
+          <li><b>The bubble and the note</b>, with its shuddering twin — the one token the game says three different ways.</li>
+          <li><b>Per-park materials and hazards</b>, as procedural recipes, so themes carry texture without shipping art.</li>
+          <li><b>Loading tips</b>, in the game's own frame and voice, with the swing rotating by context.</li>
+          <li><b>Banded gradients</b> and <b>saturated rim, neutral core</b>.</li>
+          <li><b>Capsule gauges</b> with no ticks and floating labels.</li>
+          <li><b>The game's nouns</b> — Past Superstars, Star Chance, Buddy players, Big Plays.</li>
+          <li><b>#0c2424</b> as the ground, present in all seven parks at ~4.5%.</li>
+          <li><b>The 16-cell logo grid</b> as the 4px spacing unit.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p><b>Provenance.</b> Colour, geometry and timing measured from textures, models and string tables extracted with MSSB-Editor from <code>Mario Superstar Baseball (USA).iso</code> (GYQE01), read in place. Symbol names and draw logic from <code>mssb-dtk</code>. Chemistry data from the roster table in entry 7. Tips and vocabulary verbatim from text tables T79 and T83. The Rio logo files are the project's own.</p>
+      <p><b>Honest limits.</b> Much of this is decoded rather than observed. No HUD frame-to-texture mapping was verified by running the game; the emotes were exported and measured but never rendered in motion; the two emote symbol outlines are our constructions, and the focus treatment was wrong twice before the selection bar was found. Table figures are illustrative.</p>
+      <p><b>Asset policy.</b> The park fills here are procedural CSS over generic materials specifically so themes carry texture without redistributing Nintendo art. The wordmarks and emblems are a separate decision — the frontend already ships 48 emblems today, while PRSH takes the stricter line because it redistributes as an installer.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // emote replay — restart both clips together so the asymmetry is comparable
+  var tok = document.getElementById('tok');
+  function play(){
+    tok.classList.remove('play');
+    void tok.offsetWidth;
+    tok.classList.add('play');
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.replay'), function(b){
+    b.addEventListener('click', play);
+  });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if (e.isIntersecting){ play(); io.disconnect(); } });
+      }, {threshold:.4});
+      io.observe(tok);
+    } else { play(); }
+  }
+
+  // loading tips — the real seventeen, verbatim
+  var TIPS = [
+    ["Welcome to Mario Superstar Baseball!","Welcome to the world of Mario Superstar Baseball!"],
+    ["What's a Star Chance?","A Star Chance is a chance to earn a Team Star! Team Stars let you hit and pitch the ball with mysterious powers."],
+    ["Star Chance!","A chance to get a Team Star! If you're batting, get a hit! If you're pitching, get the batter out!"],
+    ["What's chemistry?","♪ is a symbol of friendship. Buddies exhibit unpredictable powers when they field and bat."],
+    ["Watch your stamina!","When a pitcher gets tired, his or her pitches slow down and get out of control. Switch to a fresh arm soon!"],
+    ["Hit the ball onto the blocks!","Peach Garden is packed with blocks. It's loaded with surprises: you may misplay balls or see a Team Star appear!"],
+    ["Watch out for barrels!","Huge barrels frequently crash through the outfield in Donkey Kong Jungle. Keep that in mind when you're fielding!"],
+    ["Careful when you cross the river!","Watch out for Klaptraps when you cross the flowing river in Donkey Kong Jungle! If they chomp you, they'll slow you down."],
+    ["Hit the ball onto a Klaptrap!","You'll get a Team Star if you can hit the ball into a Klaptrap!"],
+    ["Stay away from Chain Chomps!","The Chain Chomps guarding Wario Palace mean business! They tend to pounce on you if you get close."],
+    ["Forecast: Sandstorms","When the ball flies into a sandstorm… who knows where it will end up?"],
+    ["Team Stars are hidden in the sand!","Team Stars are buried in Wario Palace. Hit them with the ball to get them!"],
+    ["Piranha Plant Infestation","When Piranha Plants in Yoshi Park eat the ball, they spit it out somewhere else!"],
+    ["Hit the ball onto the Star Piranha Plant!","You'll get a Team Star if you hit the yellow Piranha Plant with the ball."],
+    ["Thwomps can be a pain!","The Thwomps in Bowser Castle spurn home-run balls. Don't rest easy even when you hit a long ball!"],
+    ["Don't get burnt!","You'll burn yourself if you touch the fiery Bubbles! Careful when you're fielding!"],
+    ["Aim for the Star Panel!!","You'll earn a Team Star if you manage to hit the ball against the Star Panel!"]
+  ];
+  var T = document.getElementById('tipT'), B = document.getElementById('tipB'), i = 3;
+  setInterval(function(){
+    i = (i + 1) % TIPS.length;
+    T.textContent = TIPS[i][0];
+    B.textContent = TIPS[i][1];
+  }, 5200);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title"><title id="title">Chemistry</title>
+<defs><linearGradient id="pink" x2=".3" y2="1"><stop stop-color="#fff1f7"/><stop offset="1" stop-color="#ffc5df"/></linearGradient></defs>
+<path d="M69 21 C97 21 115 40 115 66 C115 95 94 115 65 115 C54 115 45 112 39 108 L23 117 L27 98 C17 89 14 78 15 65 C16 39 39 20 69 21Z" fill="url(#pink)" stroke="#f58bb4" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M30 65 C31 43 49 32 69 32" fill="none" stroke="#fff9fc" stroke-width="4" stroke-linecap="round"/>
+<path d="M45 87 L85 18 Q88 13 92 18 L110 59 C119 80 101 88 77 91 L76 84 C97 79 103 73 97 60 L88 38 L59 100 C53 111 30 118 20 109 C7 98 28 82 45 87Z" fill="#14151b" stroke="#fffaf3" stroke-width="5" stroke-linejoin="round" paint-order="stroke fill"/></svg>

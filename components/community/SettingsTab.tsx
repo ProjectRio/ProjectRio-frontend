@@ -101,7 +101,7 @@ export default function SettingsTab({ context }: { context: CommunityContext }) 
 					<label className="flex items-center gap-2 text-sm text-fog-300">
 						<input
 							type="checkbox"
-							className="accent-rio-500"
+							className="accent-star-400"
 							checked={isPrivate}
 							onChange={(event) => setIsPrivate(event.target.checked)}
 						/>
@@ -110,7 +110,7 @@ export default function SettingsTab({ context }: { context: CommunityContext }) 
 					<label className="flex items-center gap-2 text-sm text-fog-300">
 						<input
 							type="checkbox"
-							className="accent-rio-500"
+							className="accent-star-400"
 							checked={hasLink}
 							onChange={(event) => setHasLink(event.target.checked)}
 							disabled={!isPrivate}

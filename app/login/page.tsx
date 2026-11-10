@@ -42,7 +42,7 @@ export default function LoginPage() {
 			<div className="panel p-8">
 				<div className="mb-8 text-center">
 					<Image src="/images/RioLogo.png" alt="" width={56} height={56} className="mx-auto [image-rendering:pixelated]" />
-					<h1 className="mt-4 text-3xl uppercase">Log In</h1>
+					<h1 className="mt-4 text-3xl">Log In</h1>
 					<p className="mt-1 text-sm text-fog-500">Welcome back to Project Rio</p>
 				</div>
 
@@ -85,8 +85,14 @@ export default function LoginPage() {
 
 				<p className="mt-6 text-center text-sm text-fog-500">
 					Forgot your password?{' '}
-					<Link href="/login/reset_password" className="text-rio-400 hover:text-rio-300">
+					<Link href="/login/reset_password" className="text-star-400 hover:text-star-300">
 						Reset it here
+					</Link>
+				</p>
+				<p className="mt-2 text-center text-sm text-fog-500">
+					New to Project Rio?{' '}
+					<Link href="/signup" className="text-star-400 hover:text-star-300">
+						Create an account
 					</Link>
 				</p>
 			</div>

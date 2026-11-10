@@ -53,7 +53,7 @@ export default function GameModePage({ params }: { params: Promise<{ gamemode: s
 						action={
 							<Link
 								href={`/modes/${encodeURIComponent(modeName)}/ladder`}
-								className="font-display text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
+								className="font-display text-xs font-semibold uppercase tracking-wider text-star-400 hover:text-star-300"
 							>
 								Full Ladder →
 							</Link>

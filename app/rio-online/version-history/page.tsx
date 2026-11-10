@@ -13,7 +13,7 @@ export default function VersionHistoryPage() {
 						href="https://github.com/ProjectRio/ProjectRio/releases"
 						target="_blank"
 						rel="noreferrer"
-						className="text-rio-400 hover:text-rio-300"
+						className="text-star-400 hover:text-star-300"
 					>
 						GitHub
 					</a>

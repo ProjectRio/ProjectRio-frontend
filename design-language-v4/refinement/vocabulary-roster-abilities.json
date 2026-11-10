@@ -1,0 +1,416 @@
+{
+  "source": "Original entry 7 character records, big-endian u32 at row * 0xA0 + 0x20; bit names from mssb-dtk include/game/character_stats.h FIELDING_ABILITIES. Retained v3 study JSON has incorrect ability labels.",
+  "characters": {
+    "0": {
+      "name": "Mario",
+      "mask": "0xa",
+      "abilities": [
+        "Wall Jump",
+        "Sliding Catch"
+      ]
+    },
+    "1": {
+      "name": "Luigi",
+      "mask": "0x42",
+      "abilities": [
+        "Wall Jump",
+        "Super Jump"
+      ]
+    },
+    "2": {
+      "name": "DK",
+      "mask": "0x14",
+      "abilities": [
+        "Clamber",
+        "Laser"
+      ]
+    },
+    "3": {
+      "name": "Diddy",
+      "mask": "0x404",
+      "abilities": [
+        "Clamber",
+        "Super Catch"
+      ]
+    },
+    "4": {
+      "name": "Peach",
+      "mask": "0x420",
+      "abilities": [
+        "Quick Throw",
+        "Super Catch"
+      ]
+    },
+    "5": {
+      "name": "Daisy",
+      "mask": "0x28",
+      "abilities": [
+        "Sliding Catch",
+        "Quick Throw"
+      ]
+    },
+    "6": {
+      "name": "Yoshi",
+      "mask": "0x104",
+      "abilities": [
+        "Clamber",
+        "Tongue Catch"
+      ]
+    },
+    "7": {
+      "name": "Baby Mario",
+      "mask": "0x2",
+      "abilities": [
+        "Wall Jump"
+      ]
+    },
+    "8": {
+      "name": "Baby Luigi",
+      "mask": "0x2",
+      "abilities": [
+        "Wall Jump"
+      ]
+    },
+    "9": {
+      "name": "Bowser",
+      "mask": "0x1011",
+      "abilities": [
+        "Wall Splat",
+        "Laser",
+        "Body Check"
+      ]
+    },
+    "10": {
+      "name": "Wario",
+      "mask": "0x1009",
+      "abilities": [
+        "Wall Splat",
+        "Sliding Catch",
+        "Body Check"
+      ]
+    },
+    "11": {
+      "name": "Waluigi",
+      "mask": "0x50",
+      "abilities": [
+        "Laser",
+        "Super Jump"
+      ]
+    },
+    "12": {
+      "name": "Red Koopa",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "13": {
+      "name": "Red Toad",
+      "mask": "0x1000",
+      "abilities": [
+        "Body Check"
+      ]
+    },
+    "14": {
+      "name": "Boo",
+      "mask": "0x2040",
+      "abilities": [
+        "Super Jump",
+        "Super Curve"
+      ]
+    },
+    "15": {
+      "name": "Toadette",
+      "mask": "0xa",
+      "abilities": [
+        "Wall Jump",
+        "Sliding Catch"
+      ]
+    },
+    "16": {
+      "name": "Red Shy Guy",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "17": {
+      "name": "Birdo",
+      "mask": "0x1201",
+      "abilities": [
+        "Wall Splat",
+        "Suction",
+        "Body Check"
+      ]
+    },
+    "18": {
+      "name": "Monty",
+      "mask": "0x801",
+      "abilities": [
+        "Wall Splat",
+        "Ball Dash"
+      ]
+    },
+    "19": {
+      "name": "Bowser Jr.",
+      "mask": "0x1002",
+      "abilities": [
+        "Wall Jump",
+        "Body Check"
+      ]
+    },
+    "20": {
+      "name": "Red Paratroopa",
+      "mask": "0x40",
+      "abilities": [
+        "Super Jump"
+      ]
+    },
+    "21": {
+      "name": "Blue Pianta",
+      "mask": "0x11",
+      "abilities": [
+        "Wall Splat",
+        "Laser"
+      ]
+    },
+    "22": {
+      "name": "Red Pianta",
+      "mask": "0x11",
+      "abilities": [
+        "Wall Splat",
+        "Laser"
+      ]
+    },
+    "23": {
+      "name": "Yellow Pianta",
+      "mask": "0x11",
+      "abilities": [
+        "Wall Splat",
+        "Laser"
+      ]
+    },
+    "24": {
+      "name": "Blue Noki",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "25": {
+      "name": "Red Noki",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "26": {
+      "name": "Green Noki",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "27": {
+      "name": "Hammer Bro",
+      "mask": "0x1001",
+      "abilities": [
+        "Wall Splat",
+        "Body Check"
+      ]
+    },
+    "28": {
+      "name": "Toadsworth",
+      "mask": "0x401",
+      "abilities": [
+        "Wall Splat",
+        "Super Catch"
+      ]
+    },
+    "29": {
+      "name": "Blue Toad",
+      "mask": "0x1000",
+      "abilities": [
+        "Body Check"
+      ]
+    },
+    "30": {
+      "name": "Yellow Toad",
+      "mask": "0x1000",
+      "abilities": [
+        "Body Check"
+      ]
+    },
+    "31": {
+      "name": "Green Toad",
+      "mask": "0x1000",
+      "abilities": [
+        "Body Check"
+      ]
+    },
+    "32": {
+      "name": "Purple Toad",
+      "mask": "0x1000",
+      "abilities": [
+        "Body Check"
+      ]
+    },
+    "33": {
+      "name": "Blue Magikoopa",
+      "mask": "0x80",
+      "abilities": [
+        "Magical Catch"
+      ]
+    },
+    "34": {
+      "name": "Red Magikoopa",
+      "mask": "0x80",
+      "abilities": [
+        "Magical Catch"
+      ]
+    },
+    "35": {
+      "name": "Green Magikoopa",
+      "mask": "0x80",
+      "abilities": [
+        "Magical Catch"
+      ]
+    },
+    "36": {
+      "name": "Yellow Magikoopa",
+      "mask": "0x80",
+      "abilities": [
+        "Magical Catch"
+      ]
+    },
+    "37": {
+      "name": "King Boo",
+      "mask": "0x2041",
+      "abilities": [
+        "Wall Splat",
+        "Super Jump",
+        "Super Curve"
+      ]
+    },
+    "38": {
+      "name": "Petey",
+      "mask": "0x1001",
+      "abilities": [
+        "Wall Splat",
+        "Body Check"
+      ]
+    },
+    "39": {
+      "name": "Dixie",
+      "mask": "0x4",
+      "abilities": [
+        "Clamber"
+      ]
+    },
+    "40": {
+      "name": "Goomba",
+      "mask": "0x800",
+      "abilities": [
+        "Ball Dash"
+      ]
+    },
+    "41": {
+      "name": "Paragoomba",
+      "mask": "0x40",
+      "abilities": [
+        "Super Jump"
+      ]
+    },
+    "42": {
+      "name": "Green Koopa",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "43": {
+      "name": "Green Paratroopa",
+      "mask": "0x40",
+      "abilities": [
+        "Super Jump"
+      ]
+    },
+    "44": {
+      "name": "Blue Shy Guy",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "45": {
+      "name": "Yellow Shy Guy",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "46": {
+      "name": "Green Shy Guy",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "47": {
+      "name": "Black Shy Guy",
+      "mask": "0x8",
+      "abilities": [
+        "Sliding Catch"
+      ]
+    },
+    "48": {
+      "name": "Gray Dry Bones",
+      "mask": "0x9",
+      "abilities": [
+        "Wall Splat",
+        "Sliding Catch"
+      ]
+    },
+    "49": {
+      "name": "Green Dry Bones",
+      "mask": "0x9",
+      "abilities": [
+        "Wall Splat",
+        "Sliding Catch"
+      ]
+    },
+    "50": {
+      "name": "Red Dry Bones",
+      "mask": "0x9",
+      "abilities": [
+        "Wall Splat",
+        "Sliding Catch"
+      ]
+    },
+    "51": {
+      "name": "Blue Dry Bones",
+      "mask": "0x9",
+      "abilities": [
+        "Wall Splat",
+        "Sliding Catch"
+      ]
+    },
+    "52": {
+      "name": "Fire Bro",
+      "mask": "0x1001",
+      "abilities": [
+        "Wall Splat",
+        "Body Check"
+      ]
+    },
+    "53": {
+      "name": "Boomerang Bro",
+      "mask": "0x3001",
+      "abilities": [
+        "Wall Splat",
+        "Body Check",
+        "Super Curve"
+      ]
+    }
+  }
+}

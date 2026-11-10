@@ -3,8 +3,9 @@
 // variants can tweak individual inputs from the real baseline.
 //
 // Coordinate notes:
-// - The simulation works in a righty-local frame: lefty world X is negated on
-//   the way in (calculateHitGround negates it back when building the path).
+// - The simulation works in a righty-local frame, and so do the stored contact
+//   columns: X is only mirrored for a lefty stance on the way out, when
+//   calculateHitGround builds the path. So contact X goes in as recorded.
 // - The batter's plate position is not stored in the DB, but contact_absolute
 //   (the game's 0-200 contact-spot value) is, so posX is recovered by
 //   inverting the CalculatedBallPos formula from calculateContact().
@@ -187,8 +188,14 @@ export function eventToHitInputs(event: GameEvent): HitBallInputs | null {
 	if (!pitch || !contact) return null;
 
 	const isLefty = event.batter.batting_hand;
-	// World -> righty-local: the simulation negates lefty X back on output.
-	const ballXLocal = isLefty ? -contact.ball_x_contact_pos : contact.ball_x_contact_pos;
+	// ball_x_contact_pos is recorded in the simulation's own righty-local frame —
+	// the game only mirrors X on the way out, in calculateHitGround — so it goes
+	// in untouched. Negating it here for a lefty mirrored the contact point and
+	// pushed recoverBatterX's answer outside the batter's box: measured over 634
+	// recorded lefty contacts the recovered plate X ran to ±1.3 m, where the game
+	// clamps it to [HorizontalRangeNear, HorizontalRangeFar] = [-0.65, 0.55].
+	// Passed straight through it lands on exactly those bounds, matching righties.
+	const ballXLocal = contact.ball_x_contact_pos;
 	const batterStars = event.half_inning === 0 ? event.away_stars : event.home_stars;
 
 	return {

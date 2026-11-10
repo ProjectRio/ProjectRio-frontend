@@ -80,7 +80,7 @@ function MyCommunityKey({ context }: { context: CommunityContext }) {
 					community's game modes — handy for shared setups and LAN events.
 				</p>
 				{key && (
-					<p className="font-mono text-2xl tracking-[0.3em] text-star-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
+					<p className="font-mono text-2xl tracking-[0.3em] text-star-400 tabular-nums">
 						{key}
 					</p>
 				)}
@@ -132,7 +132,7 @@ export default function OverviewTab({ context }: { context: CommunityContext }) 
 						{activeMembers !== undefined && (
 							<div className="flex justify-between gap-4">
 								<dt className="text-fog-500">Members</dt>
-								<dd className="text-fog-100" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<dd className="text-fog-100 tabular-nums">
 									{activeMembers}
 								</dd>
 							</div>
@@ -140,7 +140,7 @@ export default function OverviewTab({ context }: { context: CommunityContext }) 
 						{tags && (
 							<div className="flex justify-between gap-4">
 								<dt className="text-fog-500">Tags</dt>
-								<dd className="text-fog-100" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<dd className="text-fog-100 tabular-nums">
 									{tags.length}
 								</dd>
 							</div>
@@ -149,7 +149,7 @@ export default function OverviewTab({ context }: { context: CommunityContext }) 
 							<div className="flex justify-between gap-4">
 								<dt className="text-fog-500">Sponsor</dt>
 								<dd>
-									<Link href={`/users/${encodeURIComponent(sponsor)}`} className="text-rio-400 hover:text-rio-300">
+									<Link href={`/users/${encodeURIComponent(sponsor)}`} className="text-fog-100 hover:underline">
 										{sponsor}
 									</Link>
 								</dd>

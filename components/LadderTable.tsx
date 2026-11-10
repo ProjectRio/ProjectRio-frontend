@@ -46,7 +46,7 @@ export default function LadderTable({ gameMode, limit }: { gameMode: string; lim
 						const color = getTierColor(player.adjusted_rating);
 						return (
 							<tr key={player.username}>
-								<td className="font-display font-bold text-fog-500">{i + 1}</td>
+								<td className="font-mono font-bold tabular-nums text-fog-500">{i + 1}</td>
 								<td>
 									<span
 										className="inline-block rounded px-2 py-0.5 font-display text-xs font-bold uppercase tracking-wider"
@@ -58,11 +58,11 @@ export default function LadderTable({ gameMode, limit }: { gameMode: string; lim
 								<td>
 									<PlayerLink username={player.username} />
 								</td>
-								<td className="font-display font-bold tabular-nums text-fog-100">{player.adjusted_rating}</td>
-								<td className="tabular-nums">
+								<td className="font-mono font-bold tabular-nums text-fog-100">{player.adjusted_rating}</td>
+								<td className="font-mono tabular-nums">
 									{player.num_wins}–{player.num_losses}
 								</td>
-								<td className="tabular-nums">
+								<td className="font-mono tabular-nums">
 									{((player.num_wins / (player.num_wins + player.num_losses)) * 100).toFixed(1)}%
 								</td>
 							</tr>

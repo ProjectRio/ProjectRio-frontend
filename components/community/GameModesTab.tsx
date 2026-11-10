@@ -63,14 +63,14 @@ export default function GameModesTab({ context }: { context: CommunityContext })
 										<td>
 											{isActive(mode) ? <Badge color="green">Active</Badge> : <Badge color="gray">Ended</Badge>}
 										</td>
-										<td className="text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										<td className="font-mono tabular-nums text-fog-500">
 											{mode.start_date ? new Date(mode.start_date * 1000).toLocaleDateString() : '—'} –{' '}
 											{mode.end_date ? new Date(mode.end_date * 1000).toLocaleDateString() : '—'}
 										</td>
 										<td>
 											<Link
 												href={`/modes/${encodeURIComponent(mode.name)}/ladder`}
-												className="text-rio-400 hover:text-rio-300"
+												className="text-fog-300 hover:text-fog-100"
 											>
 												View
 											</Link>
@@ -79,7 +79,7 @@ export default function GameModesTab({ context }: { context: CommunityContext })
 											<td className="text-right">
 												<Link
 													href={`${communityPath}/modes/${encodeURIComponent(mode.name)}/edit`}
-													className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+													className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
 												>
 													Manage
 												</Link>

@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-refinement="refined">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Project Rio · V3 refinement study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#081817; --field:#0c2424;
+  --chrome:rgb(0 0 0 / .40); --chrome-2:rgb(0 0 0 / .58);
+  --rim:rgb(242 239 224 / .15); --rim-2:rgb(242 239 224 / .09);
+  --ink:#f3f0e2; --ink-2:#a9bbb7; --ink-3:#7a8e89;
+  --rio:#e60012; --gold:#fcd20c; --up:#4cc64c; --down:#e0533a;
+  --chem:#ff94b5; --chem-fill:#ffdeef; --anti:#ad4ad6; --anti-fill:#e7ceff; --anti-ink:#310042;
+  --f-display:"Lilita One","Arial Black",sans-serif;
+  --f-label:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,monospace;
+
+  /* ── the game's own curves ──────────────────────────────────────────── */
+  /* text fade: 16-tick integer exponential, read off the disc, transcribed */
+  --fade: linear(0, .251, .439, .580, .686, .769, .827, .875, .910, .933, .953, .969, .980, .988, .992, .996, 1);
+  --t-step: 233ms;   /* 14 frames @ 60Hz — a cursor row move */
+  --t-press: 167ms;  /* 10 frames — the confirm punch */
+  --t-fade: 267ms;   /* 16 ticks */
+  --ease: cubic-bezier(.33,.0,.2,1);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --ground:#e9e5d2; --field:#dcd7c0;
+    --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+    --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+    --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+    --gold:#9c7a00; --up:#1c7a2a; --down:#b23720; --anti:#8534a8;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --ground:#e9e5d2; --field:#dcd7c0;
+  --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+  --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+  --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+  --gold:#9c7a00; --up:#1c7a2a; --down:#b23720; --anti:#8534a8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-label);font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0}
+p{margin:0 0 1em}p:last-child{margin-bottom:0}
+code{font-family:var(--f-num);font-size:.82em;color:var(--ink-2)}
+button{font:inherit;cursor:pointer}
+.n{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.lbl{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+
+header.top{border-bottom:1px solid var(--rim-2)}
+header.top .wrap{padding-block:clamp(36px,7vw,58px) clamp(26px,5vw,40px)}
+.brandline{display:flex;align-items:center;gap:13px;margin-bottom:22px;flex-wrap:wrap}
+.mark{width:38px;height:38px;image-rendering:pixelated;flex:none;display:block}
+.brandline .t{font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+.brandline .t b{color:var(--ink-2);font-weight:600}
+h1{font-size:clamp(38px,7.6vw,72px);line-height:.94;margin-bottom:18px}
+.dek{font-size:clamp(16.5px,2.2vw,19px);line-height:1.46;max-width:64ch;color:var(--ink-2)}
+.dek b{color:var(--ink);font-weight:600}
+
+section{border-bottom:1px solid var(--rim-2)}
+section > .wrap,section > .v3-only > .wrap{padding-block:clamp(30px,5vw,48px)}
+.chead{display:flex;align-items:baseline;gap:12px;margin-bottom:7px;flex-wrap:wrap}
+.cnum{font-family:var(--f-num);font-size:12px;color:var(--gold)}
+h2{font-size:clamp(24px,3.8vw,34px);line-height:1.06}
+.intro{max-width:66ch;color:var(--ink-2);margin-bottom:22px;font-size:15.5px}
+h3{font-size:18px;margin-bottom:6px}
+.src{font-family:var(--f-num);font-size:11px;color:var(--ink-3);line-height:1.55}
+.chrome{background:var(--chrome);border:1px solid var(--rim);border-radius:6px}
+.pad{padding:18px}
+.grid2{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.note{padding:14px 16px;border-radius:5px;background:var(--chrome);border:1px solid var(--rim);
+  font-size:14.5px;color:var(--ink-2);margin-top:14px}
+.note b{color:var(--ink)}
+.real{display:inline-block;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.09em;
+  padding:3px 7px;border-radius:3px;border:1px solid color-mix(in srgb,var(--up) 45%,transparent);color:var(--up)}
+.ours{display:inline-block;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.09em;
+  padding:3px 7px;border-radius:3px;border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold)}
+
+/* ══ 1 · MENU IN MOTION ═════════════════════════════════════════════════ */
+/* the chrome panel only does its job over something bright — in the game it
+   sits over live gameplay, so the stage is a park, not another dark box */
+.stage{border:1px solid var(--rim);border-radius:6px;padding:22px;position:relative;overflow:hidden;
+  background:
+    linear-gradient(180deg,rgb(0 0 0 / .18),rgb(0 0 0 / .34)),
+    repeating-linear-gradient(104deg,#549c0c 0 26px,#4a8a0a 26px 52px),
+    #549c0c}
+.stage::before{content:"";position:absolute;inset:auto 0 0 0;height:38%;
+  background:linear-gradient(180deg,#cc843c,#a8692f);opacity:.9}
+.menuwrap{position:relative;max-width:330px}
+.menu{list-style:none;margin:0;padding:0;position:relative;z-index:1}
+/* labels float: white text with a dark outline, never a plate */
+.menu li{position:relative;padding:11px 16px;color:#e7efe9;font-weight:600;font-size:17px;
+  letter-spacing:.03em;z-index:1;transition:color var(--t-step) var(--ease);
+  text-shadow:0 0 3px rgb(0 0 0 / .9),0 1px 0 #000,0 -1px 0 #000,1px 0 0 #000,-1px 0 0 #000}
+.menu li[aria-selected="true"]{color:#fff}
+/* the selection bar, rebuilt from its own texture slices.
+   1745:027 is the middle — uniform columns, so it tiles; 1745:028 is the cap.
+   Column 10 of the middle, top to bottom:
+     #bbaaaa a109 · #b5ada5 a255 · #887777 a219 · black a146 ×25 · mirrored
+   The cap's rounding reaches x=5 at the top row, so the radius is ~5px on 31. */
+.hl{position:absolute;top:0;left:0;width:100%;height:43px;border-radius:6px;z-index:0;
+  background:rgb(0 0 0 / .573);
+  border:1px solid #b5ada5;
+  box-shadow:inset 0 0 0 1px rgb(136 119 119 / .86), 0 0 0 1px rgb(187 170 170 / .43);
+  transition:transform var(--t-step) var(--ease)}
+.hl.pulse{animation:hlpulse 1.4s ease-in-out infinite}
+@keyframes hlpulse{0%,100%{border-color:rgb(181 173 165 / .72)}50%{border-color:#d8d2c6}}
+
+/* the slice diagram */
+.slices{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.slice{position:relative;height:46px;background:rgb(0 0 0 / .573);
+  border:1px solid #b5ada5;box-shadow:inset 0 0 0 1px rgb(136 119 119 / .86)}
+.slice.capL{width:30px;border-radius:7px 0 0 7px;border-right:0}
+.slice.midS{width:84px;border-radius:0;border-left:0;border-right:0;
+  background:repeating-linear-gradient(90deg,rgb(0 0 0 / .573) 0 7px,rgb(255 255 255 / .05) 7px 8px)}
+.slice.capR{width:30px;border-radius:0 7px 7px 0;border-left:0}
+.slicelbl{font-family:var(--f-num);font-size:10.5px;color:var(--ink-3);text-align:center;margin-top:5px}
+.sgroup{display:flex;flex-direction:column}
+.hl.press{animation:hlpress var(--t-press) steps(10,end) 1}
+@keyframes hlpress{0%{transform:translateY(var(--y)) scaleX(1)}40%{transform:translateY(var(--y)) scaleX(.955)}100%{transform:translateY(var(--y)) scaleX(1)}}
+.readout{position:relative;z-index:1;margin-top:16px;font-family:var(--f-num);font-size:12px;
+  color:#b6cfc4;min-height:2.4em;line-height:1.6;background:rgb(0 0 0 / .55);
+  border:1px solid rgb(255 255 255 / .16);border-radius:4px;padding:9px 12px}
+.hint{position:relative;z-index:1;font-size:13px;color:#dfeae4;margin-top:10px;
+  text-shadow:0 0 3px rgb(0 0 0 / .9),0 1px 0 #000,1px 0 0 #000,-1px 0 0 #000}
+.faded{animation:fadein var(--t-fade) var(--fade) 1 both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.mbtns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.mbtn{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:#dfeae4;
+  background:rgb(0 0 0 / .4);border:1px solid rgb(255 255 255 / .22);border-radius:4px;padding:7px 11px}
+.mbtn:hover{border-color:rgb(255 255 255 / .45)}
+@media (prefers-reduced-motion:reduce){
+  .hl,.menu li{transition:none}.hl.pulse,.hl.press,.faded{animation:none}
+}
+
+/* ══ 2 · CHARACTER CARD ═════════════════════════════════════════════════ */
+.ccard{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:620px){.ccard{grid-template-columns:1fr}}
+.picker{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+select{font:inherit;font-size:15px;background:var(--chrome-2);color:var(--ink);
+  border:1px solid var(--rim);border-radius:4px;padding:7px 9px;max-width:100%}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);
+  background:var(--chrome-2);border:1px solid var(--rim);border-radius:4px;padding:7px 11px}
+.toggle[aria-pressed="true"]{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,transparent)}
+.bars{display:grid;gap:11px}
+.brow{display:grid;grid-template-columns:76px 1fr 30px;gap:11px;align-items:center}
+.bname{font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:.09em;color:#fff;
+  text-shadow:0 0 2px #000,0 1px 0 #000,1px 0 0 #000,-1px 0 0 #000}
+:root[data-theme="light"] .bname{color:var(--ink);text-shadow:none}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .bname{color:var(--ink);text-shadow:none}}
+.cap{height:15px;border-radius:999px;background:rgb(0 0 0 / .45);
+  border:1px solid rgb(255 255 255 / .1);overflow:hidden}
+.cap i{display:block;height:100%;border-radius:999px;background:#21639c;
+  box-shadow:inset 0 2px 0 rgb(255 255 255 / .34);
+  transition:width var(--t-step) var(--ease),background var(--t-step) var(--ease)}
+.cap i.up{background:#ffbd00}
+.bval{font-family:var(--f-num);font-size:13px;color:var(--ink-3);text-align:right}
+.bval.up{color:var(--gold)}
+.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.pill{font-size:12.5px;font-weight:600;padding:4px 9px;border-radius:3px;
+  border:1px solid var(--rim);color:var(--ink-2)}
+.pill.capt{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
+.rel{margin-top:4px}
+.relrow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;
+  border-bottom:1px solid var(--rim-2);font-size:14.5px}
+.relrow:last-child{border-bottom:0}
+.relrow .v{font-family:var(--f-num);font-size:12.5px}
+.relrow.b .v{color:var(--chem)} .relrow.a .v{color:var(--anti)}
+
+/* ══ 3 · CHEMISTRY TRIANGLE ═════════════════════════════════════════════ */
+.tri-wrap{overflow-x:auto}
+#tri{display:block;width:100%;max-width:620px;height:auto;cursor:crosshair}
+#tri rect{shape-rendering:crispEdges}
+.c-n{fill:rgb(169 187 183 / .13)}
+.c-b{fill:#ff94b5}
+.c-a{fill:#ad4ad6}
+.c-d{fill:rgb(169 187 183 / .04)}
+.trireadout{font-family:var(--f-num);font-size:13px;color:var(--ink-2);min-height:3.2em;
+  padding:10px 12px;background:var(--chrome);border:1px solid var(--rim);border-radius:5px;margin-top:10px}
+.trireadout b{color:var(--ink);font-family:var(--f-label);font-size:15px}
+.key{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:var(--ink-3)}
+.key span{display:inline-flex;align-items:center;gap:7px}
+.key i{width:13px;height:13px;border-radius:2px;display:block}
+
+/* ══ 4 · LIVE STRIP ═════════════════════════════════════════════════════ */
+.live{background:linear-gradient(170deg,#143a2b,#0c2424);border:1px solid var(--rim);
+  border-radius:6px;padding:20px}
+.lrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.rings{display:flex;gap:7px;flex-wrap:wrap}
+.ring{width:38px;height:38px;border-radius:50%;background:rgb(0 0 0 / .85);
+  display:grid;place-items:center;font:600 15px var(--f-num);color:#fff;border:3px solid #3c7fd4}
+.ring.hot{border-color:#e0533a}.ring.now{border-color:#fcd20c}
+.dia{position:relative;width:118px;height:118px;flex:none}
+.bag{position:absolute;width:17px;height:17px;background:#6f8a84;border:1px solid rgb(0 0 0 / .45)}
+.bag.occ{background:var(--gold)}
+.cb{position:absolute;width:27px;height:27px}
+.stars{display:flex;gap:4px;padding:4px;border-radius:5px;border:2px solid #f08a1e;
+  background:rgb(0 0 0 / .5)}
+.stars i{width:14px;height:14px;background:rgb(255 255 255 / .16);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.stars i.on{background:#ff9a1e}
+.pips{display:flex;align-items:center;gap:7px}
+.pip{width:12px;height:12px;border-radius:50%;background:rgb(0 0 0 / .45);border:1px solid rgb(255 255 255 / .2)}
+.pip.b{background:#4cc64c}.pip.s{background:#fcd20c}.pip.o{background:#e0533a}
+.mult{font-family:var(--f-display);font-size:30px;color:#fff;
+  text-shadow:0 0 3px #000,0 2px 0 #000,2px 0 0 #000,-2px 0 0 #000}
+.multlbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#9fc0b4}
+
+/* ══ 5 · LADDER ═════════════════════════════════════════════════════════ */
+.ladder{display:flex;gap:0;border:1px solid var(--rim);border-radius:6px;overflow:hidden}
+.rail{width:16px;flex:none;background:rgb(0 0 0 / .5);position:relative}
+.rail i{position:absolute;left:0;right:0;bottom:0;
+  background:linear-gradient(180deg,#fff721 0 22%,#ffde4a 22% 52%,#ffbd00 52% 86%,#bda500 86% 100%)}
+.ltable{flex:1;min-width:0;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:460px;background:var(--chrome)}
+th{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);
+  text-align:right;padding:9px 12px;border-bottom:1px solid var(--rim);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--rim-2);
+  font-family:var(--f-num);font-size:13px;color:var(--ink-2)}
+td:first-child{font-family:var(--f-label);font-weight:600;font-size:15px;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+.cut td{padding:5px 12px;font-family:var(--f-label);font-weight:600;font-size:10.5px;
+  text-transform:uppercase;letter-spacing:.13em;color:var(--gold);text-align:left;
+  border-top:1px solid var(--gold);border-bottom:1px solid var(--rim)}
+.title{font-family:var(--f-display);font-size:13px;color:var(--gold)}
+
+/* ══ 6 · PARKS ══════════════════════════════════════════════════════════ */
+.phead{border:1px solid var(--rim);border-radius:6px;overflow:hidden}
+.pmat{height:130px;position:relative;border-bottom:1px solid var(--rim)}
+.pbody{padding:16px 18px;background:var(--chrome)}
+.pname{font-family:var(--f-display);font-size:23px;line-height:1.1}
+.pmats{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);margin:3px 0 10px}
+.pvoice{font-size:15px;color:var(--ink-2);font-style:italic;margin-bottom:10px}
+.phaz{font-size:14.5px;color:var(--ink-2)}
+.phaz b{color:var(--ink)}
+.m-ashlar{background:
+  linear-gradient(0deg,#e46c0c 0 11px,transparent 11px),
+  repeating-linear-gradient(90deg,transparent 0 44px,#3d3d50 44px 47px),
+  repeating-linear-gradient(0deg,#5c5c74 0 23px,#3d3d50 23px 26px)}
+.m-ashlar::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,#3d3d50 22px 25px,transparent 25px 66px);
+  -webkit-mask-image:repeating-linear-gradient(0deg,#000 0 23px,transparent 23px 49px);
+  mask-image:repeating-linear-gradient(0deg,#000 0 23px,transparent 23px 49px)}
+.m-star{background:
+  radial-gradient(circle at 18% 26%,#fff 0 1.4px,transparent 1.5px),
+  radial-gradient(circle at 63% 15%,#fff 0 1.7px,transparent 1.8px),
+  radial-gradient(circle at 84% 44%,#fff 0 1.3px,transparent 1.4px),
+  radial-gradient(circle at 38% 62%,#fff 0 1.6px,transparent 1.7px),
+  radial-gradient(circle at 72% 78%,#fff 0 1.3px,transparent 1.4px),
+  radial-gradient(circle at 12% 82%,#fff 0 1.5px,transparent 1.6px),
+  #0c249c}
+.m-star::after{content:"";position:absolute;inset:auto 0 0 0;height:40px;
+  background:
+    radial-gradient(circle at 14px 50%,rgb(255 255 255 / .35) 0 2.4px,transparent 3px),
+    radial-gradient(circle at 93% 50%,rgb(255 255 255 / .35) 0 2.4px,transparent 3px),
+    linear-gradient(180deg,#fcfc24,#e0e01a)}
+
+/* ══ 7 · SCOUT CARDS ════════════════════════════════════════════════════ */
+.scouts{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(236px,1fr))}
+.scout{border:1px solid var(--rim);border-radius:5px;overflow:hidden;background:var(--chrome)}
+.sban{padding:12px 14px;font-family:var(--f-display);font-size:16px;color:#fff;line-height:1.15;
+  background:linear-gradient(180deg,#ff9400 0 16%,#ffb500 16% 32%,#ffce00 32% 50%,
+    #ffb500 50% 66%,#ff9400 66% 80%,#f77b00 80% 90%,#b54200 90% 100%);
+  border-bottom:2px solid #631000;text-shadow:0 2px 0 #8a3000}
+.smeta{padding:9px 14px;font-family:var(--f-num);font-size:11px;color:var(--ink-3)}
+
+footer{padding-block:32px 52px;color:var(--ink-3);font-size:14px}
+footer .wrap > div{max-width:74ch}
+footer b{color:var(--ink-2)}
+</style>
+<link rel="stylesheet" href="refinement.css">
+<link rel="stylesheet" href="stadiums.css">
+<link rel="stylesheet" href="web-stadiums.css">
+<link rel="stylesheet" href="chemistry.css">
+</head>
+<body>
+
+<div class="study-bar"><div class="study-bar-inner">
+  <div class="study-title"><b>PROJECT RIO / V4 REFINEMENT</b><span>V3 language · design specimens only</span></div>
+  <div class="study-switch" role="group" aria-label="Compare styling">
+    <button type="button" data-style="original" aria-pressed="false">V3 styling</button>
+    <button type="button" data-style="refined" aria-pressed="true">Refinement</button>
+  </div>
+  <nav class="study-links" aria-label="Design studies">
+    <a href="index.html" >Language</a><a href="concepts.html" aria-current="page">Components</a>
+    <a href="vocabulary.html">Vocabulary</a><a href="layouts.html">Layouts</a><a href="/design-v3/concepts.html">Original v3 ↗</a>
+  </nav>
+</div></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandline">
+      <img class="mark" src="RioLogo.png" alt="" width="38" height="38">
+      <span class="t"><b>Project Rio</b> · v3 component specimens · design refinement v4</span>
+    </div>
+    <h1>Component<br>refinements</h1>
+    <p class="dek">V3’s typography and green chrome, refined for Project Rio. Explore the component studies, reusable chemistry marks, and stadium materials. Switch to <b>V3 styling</b> to compare the original specimens.</p>
+<nav class="study-jumps" aria-label="Jump to specimen"><a href="#specimen-1">Menu & motion</a><a href="#specimen-2">Character card</a><a href="#specimen-3">Chemistry</a><a href="#specimen-4">Chem & anti-chem</a><a href="#specimen-5">Records table</a><a href="#specimen-6">Materials</a><a href="#specimen-7">Banners</a></nav>
+  </div>
+</header>
+
+<!-- ═══ 1 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-1">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 01</span><h2>The menu, in motion</h2></div>
+    <p class="intro">The most distinctive thing found all session, and the hardest to copy without the disc. A row move takes <b>exactly fourteen frames</b> and <b>input is locked until it lands</b> — the game refuses to let you outrun its own animation. Arrow keys or click. Try holding a key down: it queues rather than scrambling.</p>
+
+    <div class="stage">
+      <div class="menuwrap">
+      <div class="hl pulse" id="hl" style="--y:0px;transform:translateY(0px)"></div>
+      <ul class="menu" id="menu" role="listbox" tabindex="0" aria-label="Demo menu">
+        <li role="option" aria-selected="true">Exhibition</li>
+        <li role="option" aria-selected="false">Challenge Mode</li>
+        <li role="option" aria-selected="false">Minigames</li>
+        <li role="option" aria-selected="false">Toy Field</li>
+        <li role="option" aria-selected="false">Records</li>
+        <li role="option" aria-selected="false">Options</li>
+        <li role="option" aria-selected="false">Quit</li>
+      </ul>
+      </div>
+      <div class="readout" id="mread">ready · input unlocked</div>
+      <div class="mbtns">
+        <button class="mbtn" data-m="up">▲ Up</button>
+        <button class="mbtn" data-m="down">▼ Down</button>
+        <button class="mbtn" data-m="ok">Confirm</button>
+      </div>
+      <p class="hint">The cursor is the game's own selection bar, rebuilt from its texture slices — translucent black at 57% behind a warm three-row rim, rounded about 5px.</p>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="chrome pad">
+        <h3>The cursor is three slices</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:4px">A cap, a repeating middle and a mirrored cap — which is why the pieces look like fragments in a texture dump until you put them together.</p>
+        <div class="slices">
+          <div class="sgroup"><div class="slice capL"></div><div class="slicelbl">1745:028</div></div>
+          <div class="sgroup"><div class="slice midS"></div><div class="slicelbl">1745:027 ×n</div></div>
+          <div class="sgroup"><div class="slice capR"></div><div class="slicelbl">028 mirrored</div></div>
+        </div>
+        <div class="src" style="margin-top:11px">Middle column 10, top to bottom: <code>#bbaaaa</code> a109 · <code>#b5ada5</code> a255 · <code>#887777</code> a219 · black a146 ×25 · mirrored. Cap rounding reaches x=5 by the top row.</div>
+      </div>
+      <div class="chrome pad">
+        <h3>The fade, transcribed</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:10px">Sixteen ticks of an integer exponential ease, straight off the disc and straight into CSS. Click to replay.</p>
+        <div id="fadeDemo" class="faded" style="font-family:var(--f-num);font-size:12px;color:var(--ink-2);background:var(--chrome-2);border:1px solid var(--rim-2);border-radius:4px;padding:10px;line-height:1.6;cursor:pointer">linear(0, .251, .439, .580, .686,<br>&nbsp;.769, .827, .875, .910, .933,<br>&nbsp;.953, .969, .980, .988, .992,<br>&nbsp;.996, 1)</div>
+        <div class="src" style="margin-top:9px">fn_2_653D4 — step = gap/4 + 1. 64, 112, 148 … 254, 255 over 16 ticks.</div>
+      </div>
+    </div>
+    <div class="note"><b>Correction, and it cost me a rule.</b> I had focus as four gold corners, hedged as "ours, not the game's". It is neither — the game draws a <b>translucent rounded bar assembled from separate cap and middle textures</b>, which is what you get above. Worse, I had read those same two textures (<code>1745:027</code> and <code>028</code>) as a "slot and lip" and built a whole principle on them: <i>one mechanical object, reserved for bounded resources</i>. There is no slot. That rule is withdrawn, and the four-corner bracket with it.</div>
+    <div class="note"><b>One caveat that stands.</b> The cursor easing is an approximation. The Bezier constants were recovered (<code>7, 6, 12, -1, 3, -3, 1, -6</code>) but those are Bernstein basis coefficients, not CSS control points, and converting them needs a pass I have not done. The <b>timings</b> are exact; the <b>curve shape</b> is a stand-in.</div>
+  </div>
+</section>
+
+<!-- ═══ 2 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-2">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 02</span><h2>Four bars, not nine</h2><span class="real">Real data</span></div>
+    <p class="intro">At selection the game shows exactly <b>Batting, Pitching, Running and Fielding</b> on a 1–10 scale, and deliberately hides speed, contact, power and trajectory. Superstars adds <b>+2 to every bar, capped at 10</b>. Every number below is read out of the roster file — pick anyone and flip the toggle.</p>
+
+    <div class="picker">
+      <select id="charSel" aria-label="Choose a character"></select>
+      <button class="toggle" id="starTog" aria-pressed="false">★ Superstars</button>
+    </div>
+
+    <div class="ccard">
+      <div class="chrome pad">
+        <div class="character-heading"><img class="v4-only" id="cPortrait" src="/images/Characters/Mario.png" alt=""><div><span class="v4-only">Character specimen / base attributes</span><h3 id="cName" style="margin-bottom:12px">Mario</h3></div></div>
+        <div class="bars" id="bars"></div>
+        <div class="meta" id="cMeta"></div>
+      </div>
+      <div class="chrome pad">
+        <h3 style="margin-bottom:4px">Who they play with</h3>
+        <p class="src" style="margin-bottom:10px">Their row of the real chemistry table. Buddies at 90+, anti under 20.</p>
+        <div class="rel" id="cRel"></div>
+      </div>
+    </div>
+    <div class="note"><b>Source.</b> <code>CharacterStats</code> rows 0xA0 apart in the roster file, bars at +0x37–0x3A, abilities bitmask at +0x20, captain flag at +0x33. Verified: 12 captains, bars span 1–9, and the chemistry block matches every published check.</div>
+  </div>
+</section>
+
+<!-- ═══ 3 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-3">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 03</span><h2>The chemistry triangle</h2><span class="real">Real data</span></div>
+    <p class="intro">The best data visual the game has to offer, and it has never been drawn. The table is <b>perfectly symmetric</b> — zero of 1431 pairs disagree — so half of a square grid would be redundant and it renders as a triangle. Three bands, not a ramp, because <b>90 and 20 are hard lines the game itself draws</b>. Hover or tap any cell.</p>
+
+    <div class="tri-wrap">
+      <svg id="tri" viewBox="0 0 548 548" role="img" aria-label="54 by 54 chemistry matrix as a lower triangle"></svg>
+    </div>
+    <div class="trireadout" id="triRead">Hover a cell to read the pair.</div>
+    <div class="key">
+      <span><i style="background:#ff94b5"></i> Buddy · 90+ · <span class="n">101 pairs</span></span>
+      <span><i style="background:rgb(169 187 183 / .13)"></i> Neutral · 20–89</span>
+      <span><i style="background:#ad4ad6"></i> Anti · under 20 · <span class="n">53 pairs</span></span>
+    </div>
+    <div class="note"><b>Why this works as a centrepiece.</b> With 101 bright pairs and 53 hostile ones against a mean of 59.9, it has genuine structure rather than noise — the clusters are visible without a legend. And because the thresholds are the game's own, it is not a generic heatmap: there are exactly three states, which is the same rule the chemistry badge follows.</div>
+  </div>
+</section>
+
+<!-- ═══ 4 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-4"><div class="v3-only">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 04</span><h2>The live strip</h2></div>
+    <p class="intro">Everything the HUD already draws and the site currently doesn't. Bases carry the <b>bubble-and-note</b> exactly as <code>draw_OnBaseChemLinks</code> places it; the count is pips rather than digits; innings are results rings with state on the rim and the score in a neutral core; and the <b>power multiplier</b> climbs as buddies reach base — a live thing happening that no scoreboard anywhere shows.</p>
+
+    <div class="live">
+      <div class="lrow" style="margin-bottom:18px">
+        <div class="rings">
+          <span class="ring">0</span><span class="ring">2</span><span class="ring">0</span>
+          <span class="ring hot">4</span><span class="ring">1</span><span class="ring now">—</span>
+        </div>
+        <div style="margin-left:auto"><div class="multlbl">Power</div><div class="mult" id="multVal">×1.25</div></div>
+      </div>
+      <div class="lrow">
+        <div class="dia" aria-hidden="true">
+          <div class="bag" style="left:50%;top:85%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag occ" style="left:87%;top:50%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag occ" style="left:50%;top:13%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <div class="bag" style="left:13%;top:50%;transform:translate(-50%,-50%) rotate(45deg)"></div>
+          <svg class="cb" style="left:87%;top:50%;transform:translate(-50%,-152%)" viewBox="0 0 100 100">
+            <path d="M50 10c22 0 38 12 38 28 0 14-12 24-29 27l-13 17 1-17C32 63 12 53 12 38 12 22 28 10 50 10z" fill="#ffdeef" stroke="#ff94b5" stroke-width="5"/>
+            <g fill="#111" transform="rotate(-30 50 42) scale(.6) translate(33 13)"><rect x="55" y="24" width="7" height="44"/><ellipse cx="46" cy="70" rx="14" ry="10"/><path d="M59 24c13 5 21 11 19 24 7-15-3-25-19-31z"/></g>
+          </svg>
+          <svg class="cb" style="left:50%;top:13%;transform:translate(-50%,-152%)" viewBox="0 0 100 100">
+            <path d="M50 10c22 0 38 12 38 28 0 14-12 24-29 27l-13 17 1-17C32 63 12 53 12 38 12 22 28 10 50 10z" fill="#ffdeef" stroke="#ff94b5" stroke-width="5"/>
+            <g fill="#111" transform="rotate(-30 50 42) scale(.6) translate(33 13)"><rect x="55" y="24" width="7" height="44"/><ellipse cx="46" cy="70" rx="14" ry="10"/><path d="M59 24c13 5 21 11 19 24 7-15-3-25-19-31z"/></g>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div class="pips"><span class="lbl" style="width:14px">B</span><i class="pip b"></i><i class="pip b"></i><i class="pip"></i></div>
+          <div class="pips"><span class="lbl" style="width:14px">S</span><i class="pip s"></i><i class="pip"></i></div>
+          <div class="pips"><span class="lbl" style="width:14px">O</span><i class="pip o"></i><i class="pip"></i></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-left:auto">
+          <div><div class="multlbl" style="margin-bottom:5px">Team Stars</div>
+          <span class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>Real:</b> the badge placement (element <code>0x11</code> bubble, <code>0x12</code> note, bits 0/1/2 per base), the 3/2/2 pip counts, the five-ring set differing only in rim hue, the five 13×13 star orbs in their orange frame, and the multiplier ladder ×1.10 / ×1.25 / ×1.50. <b>Ours:</b> the arrangement — the game never puts these in one strip.</div>
+  </div>
+</div><div class="wrap v4-only chem-study">
+  <div class="chead"><span class="cnum">Specimen 04</span><h2>Chemistry, with character.</h2></div>
+  <p class="intro">Two recognizable Mario Baseball signals, redrawn for Rio. Bold silhouettes, the game’s pink and purple, and enough room for each mark to read.</p>
+  <div class="chem-designs"><article class="chem-card chemistry">
+      <div class="chem-card-head"><div><span class="chem-eyebrow">THE NOTE</span><h3>Chemistry</h3></div><a class="chem-download" href="assets/chemistry/chemistry.svg" download>SVG ↓<span class="chem-sr"> — Chemistry</span></a></div>
+      <div class="chem-stage"><img class="chem-hero" src="assets/chemistry/chemistry.svg" width="180" height="180" alt="Chemistry: black musical note on a pink bubble"></div>
+      <p class="chem-description">A full, weighted notehead. A forward lean. The pink bubble sits behind the note, leaving its silhouette free.</p>
+      <div class="chem-sizes" aria-label="Chemistry at 16, 24, 32 and 48 pixels"><figure><img src="assets/chemistry/chemistry-small.svg" width="16" height="16" alt=""><figcaption>16</figcaption></figure><figure><img src="assets/chemistry/chemistry-small.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure><figure><img src="assets/chemistry/chemistry.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure><figure><img src="assets/chemistry/chemistry.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure><span>ACTUAL SIZE / PX</span></div>
+      <div class="chem-use"><div class="chem-pair"><img src="/images/Characters/Mario.png" width="34" height="34" alt=""><img src="assets/chemistry/chemistry.svg" width="32" height="32" alt="Chemistry"><img src="/images/Characters/Luigi.png" width="34" height="34" alt=""></div><span>Mario <span class="chem-pair-separator">/</span> Luigi</span><strong>Chemistry</strong></div>
+    </article><article class="chem-card anti-chemistry">
+      <div class="chem-card-head"><div><span class="chem-eyebrow">THE SPIRAL</span><h3>Anti-chemistry</h3></div><a class="chem-download" href="assets/chemistry/anti-chemistry.svg" download>SVG ↓<span class="chem-sr"> — Anti-chemistry</span></a></div>
+      <div class="chem-stage"><img class="chem-hero" src="assets/chemistry/anti-chemistry.svg" width="180" height="180" alt="Anti-chemistry: purple tapered spiral on a lavender burst"></div>
+      <p class="chem-description">Wide loops tighten into a downward twist. The lavender burst gives the negative state its own unmistakable outline.</p>
+      <div class="chem-sizes" aria-label="Anti-chemistry at 16, 24, 32 and 48 pixels"><figure><img src="assets/chemistry/anti-chemistry-small.svg" width="16" height="16" alt=""><figcaption>16</figcaption></figure><figure><img src="assets/chemistry/anti-chemistry-small.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure><figure><img src="assets/chemistry/anti-chemistry.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure><figure><img src="assets/chemistry/anti-chemistry.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure><span>ACTUAL SIZE / PX</span></div>
+      <div class="chem-use"><div class="chem-pair"><img src="/images/Characters/Mario.png" width="34" height="34" alt=""><img src="assets/chemistry/anti-chemistry.svg" width="32" height="32" alt="Anti-chemistry"><img src="/images/Characters/Bowser.png" width="34" height="34" alt=""></div><span>Mario <span class="chem-pair-separator">/</span> Bowser</span><strong>Anti-chemistry</strong></div>
+    </article></div>
+  <div class="chem-utility">
+    <div class="chem-utility-copy"><span class="chem-eyebrow">THE MARKS ON THEIR OWN</span><h3>Same character. Less framing.</h3><p>Use the complete badge for relationships. Use the isolated mark beside an explicit label when space is tight.</p><div class="chem-downloads"><a href="assets/chemistry/chemistry-mark.svg" download>Note SVG ↓</a><a href="assets/chemistry/anti-chemistry-mark.svg" download>Spiral SVG ↓</a></div></div>
+    <div class="chem-ground dark" aria-label="Marks on dark green"><figure><img src="assets/chemistry/chemistry-mark.svg" width="48" height="48" alt="Note"><figcaption>Note</figcaption></figure><figure><img src="assets/chemistry/anti-chemistry-mark.svg" width="48" height="48" alt="Spiral"><figcaption>Spiral</figcaption></figure></div><div class="chem-ground light" aria-label="Marks on ivory"><figure><img src="assets/chemistry/chemistry-mark.svg" width="48" height="48" alt="Note"><figcaption>Note</figcaption></figure><figure><img src="assets/chemistry/anti-chemistry-mark.svg" width="48" height="48" alt="Spiral"><figcaption>Spiral</figcaption></figure></div>
+  </div>
+  <div class="chem-spec-footer"><p><b>Ready to use:</b> transparent SVGs, with simplified 16–24px versions. Color, silhouette and labels all distinguish the two states.</p><div class="chem-downloads"><a href="assets/chemistry/chemistry-small.svg" download>Small chem ↓</a><a href="assets/chemistry/anti-chemistry-small.svg" download>Small anti-chem ↓</a></div></div>
+  <p class="src">Original vector redraws informed by the recovered chemistry emotes. The source game artwork remains in Language / Chemistry for reference.</p>
+</div></section>
+
+<!-- ═══ 5 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-5">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 05</span><h2>Past Superstars</h2><span class="ours">Example rows</span></div>
+    <p class="intro">The ladder with the game's own furniture: a banded <b>gold rail</b> filled to your position, a <b>labelled cut line</b> rather than an implied highlight, the records book's title in place of "Leaderboard", and no grade column anywhere.</p>
+
+    <div class="ladder">
+      <div class="rail"><i style="height:72%"></i></div>
+      <div class="ltable">
+        <table>
+          <thead><tr><th>Player</th><th>Title</th><th>W–L</th><th>Batting Avg.</th><th>Big Plays</th><th>ERA</th><th>Rating</th></tr></thead>
+          <tbody>
+            <tr><td>jonbonjon</td><td class="title">Star</td><td>42–11</td><td>.347</td><td>38</td><td>2.18</td><td>1912</td></tr>
+            <tr><td>PeacockSlayer</td><td class="title">Star</td><td>39–14</td><td>.331</td><td>41</td><td>2.44</td><td>1877</td></tr>
+            <tr><td>LittleCoaks</td><td class="title">Ace</td><td>37–16</td><td>.318</td><td>29</td><td>2.61</td><td>1854</td></tr>
+            <tr class="cut"><td colspan="7">Cut · top three advance to Netplay Superstars 14</td></tr>
+            <tr><td>maybejon</td><td class="title">Ace</td><td>33–20</td><td>.302</td><td>33</td><td>2.88</td><td>1796</td></tr>
+            <tr><td>DingerCity</td><td class="title">Slugger</td><td>29–24</td><td>.291</td><td>27</td><td>3.02</td><td>1741</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="note"><b>Figures are illustrative.</b> The rail is real (<code>1745:033</code>, banded <code>#fff721 → #ffde4a → #ffbd00</code> capped <code>#bda500</code>) and "Past Superstars" is the records book's own section name. The <b>titles</b> in that column are placeholders: the game does ship a per-character growth-title ladder ending in "Star", but my reading of its rungs comes from the string table's layout rather than from clearing the missions, so these are not quotable yet.</div>
+  </div>
+</section>
+
+<!-- ═══ 6 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-6"><div class="v3-only">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 06</span><h2>A park is a material and a hazard</h2></div>
+    <p class="intro">Two parks that share no colour, no surface and no mood — and neither needs a single pixel of extracted art. Both fills are procedural CSS over generic materials, which is how a theme carries real texture without redistributing anything.</p>
+
+    <div class="grid2">
+      <div class="phead">
+        <div class="pmat m-ashlar"></div>
+        <div class="pbody">
+          <div class="pname">Bowser Castle</div>
+          <div class="pmats">Cut stone · castle brick · lava</div>
+          <p class="pvoice">"A stone fortress over a lava moat, with spiked arches and a door that looks like it wants to eat the ball."</p>
+          <p class="phaz"><b>Thwomps</b> spurn home-run balls. Fiery <b>Bubbles</b> burn fielders.</p>
+        </div>
+      </div>
+      <div class="phead">
+        <div class="pmat m-star"></div>
+        <div class="pbody">
+          <div class="pname">Toy Field</div>
+          <div class="pmats">Painted plastic · riveted panel · no natural texture anywhere</div>
+          <p class="pvoice">"A toy-box ballpark under a starfield, the blue floor lit up like a game board with the bonus pads glowing."</p>
+          <p class="phaz">The <b>Star Panel</b>. Hit it and the Team Star is yours.</p>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>Real:</b> the hazards, verbatim from loading tips T79 #151–162, and the palettes, sampled from the disc. <b>Ours:</b> the broadcaster lines in italics, and the material recipes — the game's surfaces are textures, these are CSS approximations of the same materials.</div>
+  </div>
+</div><div class="wrap v4-only web-stadium-study">
+  <div class="kick">Stadium themes / page design</div>
+  <h2>The park, in the page.</h2>
+  <p class="intro">A stadium statistics page with each park’s own surface pairing: the infield against the wider field, with newly drawn hazards at the edge. Switch parks to compare the materials around the same sample statistics.</p>
+  <div class="web-park-choices" id="stadium-web-themes" role="group" aria-label="Choose a web theme">
+    <button data-web-park="mario" aria-pressed="false"><img src="/images/Characters/Mario.png" alt="">Mario Stadium</button>
+    <button data-web-park="bowser" aria-pressed="true"><img src="/images/Characters/Bowser.png" alt="">Bowser Castle</button>
+    <button data-web-park="wario" aria-pressed="false"><img src="/images/Characters/Wario.png" alt="">Wario Palace</button>
+    <button data-web-park="yoshi" aria-pressed="false"><img src="/images/Characters/Yoshi.png" alt="">Yoshi Park</button>
+    <button data-web-park="peach" aria-pressed="false"><img src="/images/Characters/Peach.png" alt="">Peach Garden</button>
+    <button data-web-park="dk" aria-pressed="false"><img src="/images/Characters/DK.png" alt="">DK Jungle</button>
+    <button data-web-park="toy" aria-pressed="false"><img src="/images/baseball.png" alt="">Toy Field</button>
+  </div>
+
+  <div class="web-theme" data-web-theme="bowser" data-motion="off">
+    <header class="web-stats-header">
+      <div class="web-header-texture" aria-hidden="true"></div>
+      <div class="web-specimen-brand"><img src="RioLogo.png" alt="" width="26" height="26"><b>PROJECT RIO</b><span class="web-sample-label">SAMPLE DATA</span></div>
+      <div class="web-theme-heading"><span>STADIUM STATISTICS</span><h3 data-web-name>Bowser Castle</h3><p>Exhibition <i>·</i> All dates <i>·</i> <span>1,248 games</span></p></div>
+      <div class="web-header-inhabitants" aria-hidden="true"><span class="web-hazard-connection"></span><img class="web-hazard-primary" data-web-hazard src="assets/hazards-v2/thwomp.svg" alt=""><img class="web-hazard-secondary" data-web-secondary src="assets/hazards-v2/bubble.svg" alt=""></div>
+      <div class="web-header-foot"><span data-web-signature>Thwomps & fiery Bubbles</span></div>
+      <div class="web-material-edge" aria-hidden="true"></div>
+    </header>
+    <div class="web-stats-body">
+      <dl class="web-stat-line"><div><dt>GAMES PLAYED</dt><dd>1,248</dd><span>Recorded games</span></div><div><dt>RUNS / GAME</dt><dd>8.4</dd><span>Both teams combined</span></div><div><dt>BATTING AVG.</dt><dd>.312</dd><span>All characters</span></div><div><dt>HOME RUNS / GAME</dt><dd>1.6</dd><span>Both teams combined</span></div></dl>
+      <div class="web-table-section">
+        <div class="web-table-toolbar"><div><span class="web-panel-label">CHARACTER TOTALS</span><h4 data-stat-title>At the plate</h4></div><div class="web-stat-tabs" role="group" aria-label="Statistics category"><button data-stat-mode="batting" aria-pressed="true">Batting</button><button data-stat-mode="pitching" aria-pressed="false">Pitching</button></div></div>
+        <p class="web-table-hint">Swipe the table for more columns <span aria-hidden="true">→</span></p>
+        <div class="web-table-wrap" tabindex="0" role="region" aria-label="Illustrative character statistics"><table class="web-stats-table"><caption class="web-sr-only">Illustrative batting totals by character</caption><thead></thead><tbody></tbody></table></div>
+        <div class="web-table-foot"><span>5 sample characters</span><span>Illustrative totals</span></div>
+      </div>
+      <div class="web-bottom-detail" aria-hidden="true"><img data-web-footer-mark src="assets/hazards-v2/bubble.svg" alt=""><span></span></div>
+      <div class="web-specimen-footer"><span>Design specimen · statistics are illustrative</span><button class="web-motion" aria-pressed="false">Ambient motion: off</button></div>
+    </div>
+  </div>
+  <div class="web-roles"><div><div class="web-material-swatch web-swatch-infield" aria-hidden="true"></div><span>Infield</span><h4 data-web-surround></h4><p data-web-surround-note></p></div><div><div class="web-material-swatch web-swatch-field" aria-hidden="true"></div><span>Wider field</span><h4 data-web-panel></h4><p data-web-panel-note></p></div><div><div class="web-material-swatch web-swatch-hazard"><img data-web-hazard-swatch src="assets/hazards-v2/thwomp.svg" alt=""></div><span>Hazard drawing</span><h4 data-web-accent></h4><p data-web-accent-note></p></div></div>
+  <div class="web-theme-palette" aria-label="Web theme palette"></div>
+  <p class="web-design-note">Original procedural surfaces informed by the recovered infield and ground textures; newly drawn hazard illustrations. Typography, compact figures, and the neutral selection frame carry forward the v3 language. <a href="/design-v4/stadium-stats-first-pass.html?style=refined#stadium-web-themes">Previous stats treatment ↗</a></p>
+</div>
+</section>
+
+<!-- ═══ 7 ═══════════════════════════════════════════════════════════════ -->
+<section id="specimen-7">
+  <div class="wrap">
+    <div class="chead"><span class="cnum">Specimen 07</span><h2>Challenges in the game's voice</h2><span class="real">Verbatim copy</span></div>
+    <p class="intro">All twelve scout banners, recovered this session. A complete challenge vocabulary already written — imperative, specific, never congratulatory. This is what Rio's own daily or seasonal challenges should sound like, and the banner treatment is the loud register doing its one job.</p>
+    <div class="scouts" id="scouts"></div>
+    <div class="note"><b>Verbatim</b> from entry 2513, 231–450 × 44 C4, frame-mapped through <code>scoutMissionBannerFrames[]</code> and layout element <code>0x65</code>. Note that <code>SMACK A HIT!</code>, quoted in an earlier pass, turned out to be the explainer's example rather than a texture.</div>
+  </div>
+</section>
+
+<aside class="study-notes"><div class="wrap"><h2>Refinement, not a new direction.</h2><ul>
+<li><b>Same type family.</b> Lilita stays expressive; condensed labels and monospace values do the quieter work. Tighter heading rhythm, more readable secondary text.</li>
+<li><b>More legible chrome.</b> A slightly warmer neutral rim and clearer green staging help the translucent surfaces read. No colored card rails or new decorative border system.</li>
+<li><b>Use the original shapes.</b> The chemistry composites and team emblems provide the distinctive outlines. They replace approximations, not the underlying design language.</li>
+<li><b>Keep the game’s proportions.</b> Compact continuous gauges, small portraits, a calm selection bar, and disciplined spacing. No full-page character collage or new product features.</li>
+</ul><p class="src">V4 is a design proposal. Original research prose and specimen interactions are retained from v3; they are not newly verified findings. Chemistry composites: v3/evidence. Emblems and portraits: existing frontend assets. Motion remains a web approximation.</p></div></aside>
+<footer>
+  <div class="wrap">
+    <div>
+      <p><b>What is real and what is not.</b> Concepts 2 and 3 run on the actual roster file — 54 <code>CharacterStats</code> rows 0xA0 apart, chemistry at +0x3B, validated against every published signature (diagonal all 50, zero asymmetric pairs, 101 buddies, 53 anti, mean 59.9). Concept 7 is verbatim game copy. Concept 1's timings are exact and its easing curve is a stand-in. Concept 5's figures and growth titles are placeholders. The original Concept 4 arranges HUD elements into a proposed strip. Refined Specimen 04 now presents new chemistry vector assets informed by the recovered emote artwork.</p>
+      <p><b>Still not shipped.</b> Nothing here is in the repository — these are concepts to judge, not code to merge. The roster data is embedded in this page as JSON; wiring it to a real endpoint is a separate job.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="roster.js"></script>
+<script>
+/* ══ 1 · menu ═══════════════════════════════════════════════════════════ */
+(function(){
+  const menu=document.getElementById('menu'), hl=document.getElementById('hl'),
+        read=document.getElementById('mread');
+  const items=[...menu.querySelectorAll('li')];
+  const STEP=233, PRESS=167;
+  let i=0, locked=false, queued=null;
+
+  // the web font swaps in after first paint and reflows every row, so the
+  // cursor has to be re-placed rather than positioned once at load
+  function place(){
+    hl.style.height=(items[i].offsetHeight||43)+'px';
+    const y=items[i].offsetTop-menu.offsetTop;
+    hl.style.setProperty('--y',y+'px');
+    hl.style.transform='translateY('+y+'px)';
+  }
+  function replace_(){
+    const prev=hl.style.transition; hl.style.transition='none';
+    place(); void hl.offsetWidth; hl.style.transition=prev;
+  }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(replace_);
+  window.addEventListener('resize', replace_);
+  function move(d,init){
+    if(locked && !init){ queued=d; read.textContent='input locked · move queued'; return; }
+    const prev=i;
+    i=(i+d+items.length)%items.length;
+    const wrapped = Math.abs(i-prev)>1;
+    items.forEach((li,k)=> li.setAttribute('aria-selected', k===i));
+    place();
+    if(init) return;
+    locked=true;
+    const frames = wrapped
+      ? (d>0 ? 'frames 0 → 14' : 'frames 54 → 45 (backward)')
+      : (d>0 ? 'frames 15 → 29' : 'frames 30 → 44');
+    read.innerHTML = '<b style="color:#cfe0d8">'+(wrapped?'wrap':'step')+'</b> · '
+      + frames + ' · 14 frames / 233ms · <span style="color:#e0b84a">INPUT LOCKED</span>';
+    setTimeout(()=>{
+      locked=false;
+      read.innerHTML='ready · input unlocked';
+      if(queued!==null){ const q=queued; queued=null; move(q); }
+    }, STEP);
+  }
+  function confirm(){
+    if(locked) return;
+    locked=true;
+    hl.classList.remove('pulse'); hl.classList.add('press');
+    read.innerHTML='<b style="color:#cfe0d8">confirm</b> · frames 55 → 65 · 10 frames / 167ms · <span style="color:#e0b84a">INPUT LOCKED</span>';
+    setTimeout(()=>{
+      hl.classList.remove('press'); hl.classList.add('pulse');
+      locked=false; read.textContent='ready · input unlocked';
+    }, PRESS);
+  }
+  menu.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){e.preventDefault();move(1)}
+    else if(e.key==='ArrowUp'){e.preventDefault();move(-1)}
+    else if(e.key==='Enter'||e.key===' '){e.preventDefault();confirm()}
+  });
+  items.forEach((li,k)=> li.addEventListener('click',()=>{
+    if(locked||k===i) return confirm();
+    move(((k-i)%items.length+items.length)%items.length > items.length/2 ? -1 : 1);
+  }));
+  document.querySelectorAll('.mbtn').forEach(b=> b.addEventListener('click',()=>{
+    const m=b.dataset.m; m==='ok'?confirm():move(m==='down'?1:-1);
+  }));
+  const fd=document.getElementById('fadeDemo');
+  fd.addEventListener('click',()=>{ fd.classList.remove('faded'); void fd.offsetWidth; fd.classList.add('faded'); });
+  replace_();
+})();
+
+/* ══ 2 · character card ═════════════════════════════════════════════════ */
+(function(){
+  const sel=document.getElementById('charSel'), tog=document.getElementById('starTog');
+  const BARNAMES=['Batting','Pitching','Running','Fielding'];
+  R.chars.forEach((c,k)=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=c.n+(c.cap?' · captain':'');
+    sel.appendChild(o);
+  });
+  let star=false;
+  function draw(){
+    const k=+sel.value, c=R.chars[k];
+    document.getElementById('cName').textContent=c.n;
+    document.getElementById('cPortrait').src='/images/Characters/'+["Mario", "Luigi", "DK", "Diddy", "Peach", "Daisy", "Yoshi", "Baby Mario", "Baby Luigi", "Bowser", "Wario", "Waluigi", "Koopa(R)", "Toad(R)", "Boo", "Toadette", "Shy Guy(R)", "Birdo", "Monty", "Bowser Jr", "Paratroopa(R)", "Pianta(B)", "Pianta(R)", "Pianta(Y)", "Noki(B)", "Noki(R)", "Noki(G)", "Bro(H)", "Toadsworth", "Toad(B)", "Toad(Y)", "Toad(G)", "Toad(P)", "Magikoopa(B)", "Magikoopa(R)", "Magikoopa(G)", "Magikoopa(Y)", "King Boo", "Petey", "Dixie", "Goomba", "Paragoomba", "Koopa(G)", "Paratroopa(G)", "Shy Guy(B)", "Shy Guy(Y)", "Shy Guy(G)", "Shy Guy(Bk)", "Dry Bones(Gy)", "Dry Bones(G)", "Dry Bones(R)", "Dry Bones(B)", "Bro(F)", "Bro(B)"][k]+'.png';
+    document.getElementById('bars').innerHTML=c.bars.map((v,bi)=>{
+      const nv=star?Math.min(10,v+2):v;
+      return '<div class="brow"><span class="bname">'+BARNAMES[bi]+'</span>'
+        +'<span class="cap"><i class="'+(star?'up':'')+'" style="width:'+(nv*10)+'%"></i></span>'
+        +'<span class="bval '+(star?'up':'')+'">'+nv+'</span></div>';
+    }).join('');
+    const meta=[];
+    if(c.cap) meta.push('<span class="pill capt">Captain</span>');
+    meta.push('<span class="pill">Weight '+c.wt+'</span>');
+    meta.push('<span class="pill">'+(c.traj<85?'Pull':c.traj>170?'Push':'Centre')+' hitter</span>');
+    c.ab.forEach(a=> meta.push('<span class="pill">'+a+'</span>'));
+    document.getElementById('cMeta').innerHTML=meta.join('');
+    const row=R.chem[k];
+    const b=[],a=[];
+    row.forEach((v,j)=>{ if(j===k) return; if(v>=90) b.push([j,v]); else if(v<20) a.push([j,v]); });
+    b.sort((x,y)=>y[1]-x[1]); a.sort((x,y)=>x[1]-y[1]);
+    const line=(p,cls)=>'<div class="relrow '+cls+'"><span>'+R.names[p[0]]+'</span><span class="v">'+p[1]+'</span></div>';
+    document.getElementById('cRel').innerHTML=
+      '<div class="lbl" style="margin-bottom:4px">Buddies · '+b.length+'</div>'
+      + (b.length?b.slice(0,6).map(p=>line(p,'b')).join(''):'<div class="relrow"><span style="color:var(--ink-3)">None at 90 or above</span></div>')
+      + '<div class="lbl" style="margin:12px 0 4px">Anti · '+a.length+'</div>'
+      + (a.length?a.slice(0,6).map(p=>line(p,'a')).join(''):'<div class="relrow"><span style="color:var(--ink-3)">None under 20</span></div>');
+  }
+  sel.addEventListener('change',draw);
+  tog.addEventListener('click',()=>{ star=!star; tog.setAttribute('aria-pressed',star); draw(); });
+  sel.value=0; draw();
+})();
+
+/* ══ 3 · chemistry triangle ═════════════════════════════════════════════ */
+(function(){
+  const svg=document.getElementById('tri'), N=54, C=10, PAD=4;
+  let s='';
+  for(let i=0;i<N;i++){
+    for(let j=0;j<=i;j++){
+      const v=R.chem[i][j];
+      const cls = i===j ? 'c-d' : v>=90 ? 'c-b' : v<20 ? 'c-a' : 'c-n';
+      s+='<rect x="'+(PAD+j*C)+'" y="'+(PAD+i*C)+'" width="'+(C-1)+'" height="'+(C-1)+'" class="'+cls+'"/>';
+    }
+  }
+  svg.innerHTML=s;
+  const out=document.getElementById('triRead');
+  function at(e){
+    const r=svg.getBoundingClientRect();
+    const sx=548/r.width;
+    const px=(e.clientX-r.left)*sx-PAD, py=(e.clientY-r.top)*sx-PAD;
+    const j=Math.floor(px/C), i=Math.floor(py/C);
+    if(i<0||i>=N||j<0||j>i){ out.textContent='Hover a cell to read the pair.'; return; }
+    const v=R.chem[i][j];
+    const band = i===j ? 'self' : v>=90 ? 'BUDDY' : v<20 ? 'ANTI' : 'neutral';
+    const col  = v>=90 ? 'var(--chem)' : v<20 ? 'var(--anti)' : 'var(--ink-2)';
+    out.innerHTML='<b>'+R.names[i]+'</b> &nbsp;×&nbsp; <b>'+R.names[j]+'</b><br>'
+      +'<span style="color:'+col+'">'+v+' · '+band+'</span>'
+      +(i===j?'':'<span style="color:var(--ink-3)"> &nbsp;— and it is exactly the same the other way round</span>');
+  }
+  svg.addEventListener('mousemove',at);
+  svg.addEventListener('click',at);
+  svg.addEventListener('mouseleave',()=> out.textContent='Hover a cell to read the pair.');
+})();
+
+/* ══ 4 · multiplier ticker ══════════════════════════════════════════════ */
+(function(){
+  const el=document.getElementById('multVal'); const vals=['×1.10','×1.25','×1.50'];
+  let k=1;
+  setInterval(()=>{ k=(k+1)%3; el.textContent=vals[k]; }, 2600);
+})();
+
+/* ══ 7 · scout banners ══════════════════════════════════════════════════ */
+(function(){
+  const S=[["Get a hit!","2513:245"],["Get the player out!","2513:243"],["Score a run!","2513:246"],
+    ["Strike 'em out!","2513:244"],["Get a double play!","2513:323"],["Mount a comeback!","2513:320"],
+    ["Don't let them score even one run!","2513:321"],["Finish them off in 3 batters!","2513:322"],
+    ["Hit a sacrifice fly!","2513:324"],["Drop a successful squeeze bunt!","2513:325"],
+    ["Steal a base!","2513:326"],["Win the game!","2513:358"]];
+  document.getElementById('scouts').innerHTML=S.map(([t,src])=>
+    '<div class="scout"><div class="sban">'+t.replace(/'/g,"&#39;")+'</div><div class="smeta">'+src+'</div></div>').join('');
+})();
+</script>
+<script src="refinement.js"></script>
+<script src="stadiums.js"></script>
+<script src="animated-stadiums.js"></script>
+<script src="web-stadiums.js"></script>
+</body>
+</html>

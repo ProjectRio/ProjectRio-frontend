@@ -135,7 +135,7 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 									<div key={mode.name} className="flex items-center gap-4 px-4 py-3">
 										<div className="min-w-0 flex-1">
 											<p className="truncate font-semibold text-fog-100">{mode.name}</p>
-											<p className="text-xs text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+											<p className="text-xs text-fog-500 tabular-nums">
 												{mode.wins}–{mode.losses} · {pct(mode.wins, mode.losses)} win rate
 											</p>
 										</div>
@@ -144,12 +144,11 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 										</div>
 										<div className="w-16 text-right">
 											<p
-												className="font-display text-lg font-bold text-fog-100"
-												style={{ fontVariantNumeric: 'tabular-nums' }}
+												className="font-mono text-lg font-bold text-fog-100 tabular-nums"
 											>
 												{mode.currentElo}
 											</p>
-											<p className="text-[10px] uppercase tracking-widest text-fog-500">
+											<p className="font-display text-[10px] uppercase tracking-widest text-fog-500">
 												peak {mode.peakElo}
 											</p>
 										</div>
@@ -172,7 +171,7 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 									<div className="min-w-0 flex-1">
 										<div className="flex items-baseline justify-between gap-2">
 											<p className="truncate text-sm font-semibold text-fog-100">{captain.name}</p>
-											<p className="text-xs text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+											<p className="text-xs text-fog-500 tabular-nums">
 												{captain.picks} games · {pct(captain.wins, captain.losses)} WR
 											</p>
 										</div>
@@ -194,7 +193,7 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 								<div className="min-w-0 flex-1">
 									<div className="flex items-baseline justify-between gap-2">
 										<p className="truncate text-xs font-semibold text-fog-100">{char.name}</p>
-										<p className="text-[11px] text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										<p className="text-[11px] text-fog-500 tabular-nums">
 											{Math.round((char.count / games.length) * 100)}%
 										</p>
 									</div>
@@ -213,14 +212,14 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 							{derived.activity.map((month, i) => (
 								<div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${month.count} games`}>
 									<div
-										className={`w-full rounded-t ${month.count > 0 ? 'bg-rio-500/70' : 'bg-night-700'}`}
+										className={`w-full rounded-t ${month.count > 0 ? 'bg-star-400/70' : 'bg-night-700'}`}
 										style={{ height: `${Math.max(4, (month.count / maxActivity) * 100)}%` }}
 									/>
-									<span className="text-[9px] uppercase text-fog-500">{month.label}</span>
+									<span className="font-display text-[9px] uppercase text-fog-500">{month.label}</span>
 								</div>
 							))}
 						</div>
-						<p className="mt-3 text-xs text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<p className="mt-3 text-xs text-fog-500 tabular-nums">
 							{derived.activity.reduce((sum, month) => sum + month.count, 0)} games in the last 12 months
 						</p>
 					</div>
@@ -247,13 +246,13 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 									<td>
 										<Link
 											href={`/users/${encodeURIComponent(rival.opponent)}`}
-											className="font-semibold text-fog-100 hover:text-rio-300"
+											className="font-semibold text-fog-100 hover:underline"
 										>
 											{rival.opponent}
 										</Link>
 									</td>
-									<td style={{ fontVariantNumeric: 'tabular-nums' }}>{rival.games}</td>
-									<td style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<td className="font-mono tabular-nums">{rival.games}</td>
+									<td className="font-mono tabular-nums">
 										{rival.wins}–{rival.losses}
 									</td>
 									<td className="w-48">
@@ -261,12 +260,12 @@ export default function UserPage({ params }: { params: Promise<{ user: string }>
 											<div className="w-24">
 												<UsageBar pct={rival.games === 0 ? 0 : rival.wins / rival.games} />
 											</div>
-											<span className="text-xs text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+											<span className="text-xs text-fog-500 tabular-nums">
 												{pct(rival.wins, rival.losses)}
 											</span>
 										</div>
 									</td>
-									<td className="text-fog-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<td className="text-fog-500 tabular-nums">
 										{rival.lastPlayed ? new Date(rival.lastPlayed * 1000).toLocaleDateString() : '—'}
 									</td>
 								</tr>

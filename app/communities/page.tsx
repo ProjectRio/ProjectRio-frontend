@@ -11,7 +11,7 @@ function CommunityCard({ community, isMember }: { community: Community; isMember
 	return (
 		<Link href={`/communities/${encodeURIComponent(community.name)}`} className="panel panel-glow block p-5">
 			<div className="flex items-start justify-between gap-3">
-				<h2 className="font-display text-lg font-bold uppercase tracking-wide">{community.name}</h2>
+				<h2 className="text-lg">{community.name}</h2>
 				<div className="flex shrink-0 gap-1.5">
 					{community.type === 'Official' && <Badge color="gold">Official</Badge>}
 					{community.private && <Badge color="gray">Private</Badge>}
@@ -104,7 +104,7 @@ function CommunitiesDirectory() {
 					<label className="flex items-center gap-2 text-sm text-fog-300">
 						<input
 							type="checkbox"
-							className="accent-rio-500"
+							className="accent-star-400"
 							checked={mineOnly}
 							onChange={(event) => setMineOnly(event.target.checked)}
 						/>

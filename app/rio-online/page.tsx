@@ -54,13 +54,9 @@ export default async function RioOnlinePage() {
 	return (
 		<div className="space-y-10">
 			<section className="panel relative overflow-hidden p-10 text-center">
-				<div
-					className="pointer-events-none absolute inset-0"
-					style={{ backgroundImage: 'radial-gradient(ellipse 60% 80% at 50% -10%, rgb(230 0 18 / 0.2), transparent)' }}
-				/>
 				<div className="relative">
 					<Image src="/images/RioLogo.png" alt="" width={72} height={72} className="mx-auto [image-rendering:pixelated]" />
-					<h1 className="mt-4 text-4xl uppercase">Play Online with Project Rio</h1>
+					<h1 className="mt-4 text-4xl">Play Online with Project Rio</h1>
 					<p className="mx-auto mt-3 max-w-xl text-fog-300">
 						Project Rio is a custom Dolphin build tuned for competitive Mario Superstar Baseball — netplay
 						optimizations, ranked play, and automatic stat tracking.
@@ -90,7 +86,7 @@ export default async function RioOnlinePage() {
 					<ul className="space-y-2 px-5 py-4 text-sm text-fog-300">
 						{FEATURES.map((feature) => (
 							<li key={feature} className="flex items-center gap-2">
-								<span className="text-rio-400">▸</span> {feature}
+								<span className="text-star-400">▸</span> {feature}
 							</li>
 						))}
 					</ul>
@@ -104,7 +100,7 @@ export default async function RioOnlinePage() {
 									href={resource.href}
 									target="_blank"
 									rel="noreferrer"
-									className="text-fog-300 hover:text-rio-300"
+									className="text-fog-300 hover:text-fog-100"
 								>
 									{resource.label} ↗
 								</a>

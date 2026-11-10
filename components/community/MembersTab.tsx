@@ -99,7 +99,7 @@ function MemberActions({
 		return (
 			<button
 				type="button"
-				className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+				className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
 				disabled={busy}
 				onClick={() =>
 					inviteMembers(context.community.name, [member.username!])
@@ -117,7 +117,7 @@ function MemberActions({
 		return (
 			<button
 				type="button"
-				className="text-xs font-semibold uppercase tracking-wider text-emerald-300 hover:text-emerald-400"
+				className="font-display text-xs font-semibold uppercase tracking-wider text-emerald-300 hover:text-emerald-400"
 				disabled={busy}
 				onClick={() =>
 					inviteMembers(context.community.name, [member.username!])
@@ -135,7 +135,7 @@ function MemberActions({
 			{!isSelf && (
 				<button
 					type="button"
-					className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+					className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
 					disabled={busy}
 					onClick={() => act({ admin: !member.admin })}
 				>
@@ -144,7 +144,7 @@ function MemberActions({
 			)}
 			<button
 				type="button"
-				className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+				className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
 				disabled={busy}
 				onClick={() => act({ key: true })}
 			>
@@ -154,7 +154,7 @@ function MemberActions({
 				<>
 					<button
 						type="button"
-						className="text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-rio-300"
+						className="font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-rio-300"
 						disabled={busy}
 						onClick={() => act({ remove: true }, `Remove ${member.username} from ${context.community.name}?`)}
 					>
@@ -162,7 +162,7 @@ function MemberActions({
 					</button>
 					<button
 						type="button"
-						className="text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
+						className="font-display text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
 						disabled={busy}
 						onClick={() => act({ ban: true }, `Ban ${member.username} from ${context.community.name}?`)}
 					>

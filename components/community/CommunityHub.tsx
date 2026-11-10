@@ -42,7 +42,7 @@ function CommunityHubInner({ name }: { name: string }) {
 				<div className="flex gap-1.5">
 					{context.community.type === 'Official' && <Badge color="gold">Official</Badge>}
 					{context.community.private && <Badge color="gray">Private</Badge>}
-					{context.isAdmin && <Badge color="red">Admin</Badge>}
+					{context.isAdmin && <Badge color="gray">Admin</Badge>}
 				</div>
 			</PageHeader>
 			<Tabs tabs={tabs} active={activeTab} onChange={setTab} />

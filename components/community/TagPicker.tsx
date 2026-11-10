@@ -25,7 +25,7 @@ function TagCheckboxGrid({
 				<label key={tag.id} className="flex items-baseline gap-2 text-sm text-fog-300" title={tag.desc}>
 					<input
 						type="checkbox"
-						className="accent-rio-500"
+						className="accent-star-400"
 						checked={selected.has(tag.id)}
 						onChange={() => onToggle(tag.id)}
 					/>

@@ -1,0 +1,147 @@
+.web-stadium-study{--web-ground:#282c2c;--web-panel:#171c1eee;--web-rim:#a7aaa363;--web-accent:#dfab6f;--web-text:#f2eddf;--web-muted:#bdc0b6;--web-wash:#5e5744;--web-pattern:#adb1a3}
+.web-park-choices{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 20px}.web-park-choices button{display:flex;align-items:center;gap:8px;min-height:46px;padding:9px 12px;background:#0003;border:1px solid var(--rim);border-radius:5px;color:var(--ink-2);font:500 15px var(--f-label);cursor:pointer}.web-park-choices img{width:24px;height:27px;object-fit:contain}.web-park-choices button[aria-pressed=true]{border-color:#b5ada5;background:#b5ada51c;color:var(--ink);box-shadow:inset 0 0 0 1px #88777766}.web-park-choices button:hover{color:var(--ink);background:#ffffff0a}
+.web-stadium-study button:focus-visible{outline:2px solid #f4eddb;outline-offset:4px}
+.web-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:26px 0 22px;border-bottom:1px solid var(--rim-2)}.web-roles>div>span{font:600 10px var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}.web-roles h4{font:600 20px/1.2 var(--f-label);color:var(--ink);margin:8px 0}.web-roles p{font:400 15px/1.55 var(--f-label);color:var(--ink-2);margin:0}
+.web-theme-palette{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin:22px 0}.web-theme-palette>div{display:grid;grid-template-columns:20px 1fr;gap:3px 8px}.web-theme-palette i{grid-row:1/3;border-radius:3px;border:1px solid #ffffff26}.web-theme-palette span{font:400 13px var(--f-label);color:var(--ink-2)}.web-theme-palette code{font:400 10px var(--f-num);color:var(--ink-3)}
+.web-design-note{font:400 13px/1.7 var(--f-label)!important;color:var(--ink-3);margin:0!important;border-top:1px solid var(--rim-2);padding-top:14px}.web-design-note a{white-space:nowrap;text-decoration:underline;text-underline-offset:3px;margin-left:12px;color:var(--ink-2)}
+
+/* Stadium identity carried by page furniture, not a field illustration. */
+.web-theme{position:relative;isolation:isolate;color:var(--web-text);background:var(--web-panel);border:1px solid var(--web-rim);border-radius:7px;overflow:hidden;min-width:0;box-shadow:0 12px 30px #0002}
+.web-stats-header{position:relative;padding:25px 34px 0;background:var(--web-ground);overflow:hidden}
+.web-header-texture{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;background-size:240px 100px;opacity:.8}
+.web-specimen-brand{position:relative;display:flex;align-items:center;gap:9px;font:600 14px var(--f-label);letter-spacing:.1em;color:var(--web-text)}
+.web-specimen-brand img{object-fit:contain;image-rendering:pixelated}.web-specimen-brand>span{margin-left:auto;font:400 9px var(--f-num);letter-spacing:.08em;color:var(--web-muted)}
+.web-theme-heading{position:relative;margin:31px 0 28px;padding-right:185px}
+.web-theme-heading>span{font:600 10px var(--f-label);letter-spacing:.14em;color:var(--web-accent)}
+html[data-refinement=refined] .web-theme-heading h3{font:400 clamp(34px,4.4vw,54px)/1.05 var(--f-display);color:var(--web-text);letter-spacing:-.015em;margin:9px 0 13px}
+.web-theme-heading p{font:400 15px var(--f-label);color:var(--web-muted);margin:0;display:flex;align-items:center;gap:10px}.web-theme-heading p i{font-style:normal;opacity:.6}
+.web-header-foot{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 0 16px;font:500 11px var(--f-label);letter-spacing:.035em;color:var(--web-muted);border-top:1px solid color-mix(in srgb,var(--web-rim) 65%,transparent)}
+.web-sample-label{font:400 8px var(--f-num);letter-spacing:.05em;opacity:.8;white-space:nowrap}
+.web-material-edge{height:7px;margin:0 -34px;position:relative;border-top:1px solid #ffffff1a;border-bottom:1px solid #0006;background:var(--web-rim)}
+.web-header-inhabitants{position:absolute;right:37px;bottom:63px;width:155px;height:104px;pointer-events:none}
+.web-hazard-primary{position:absolute;width:77px;height:77px;right:48px;bottom:0;filter:drop-shadow(0 4px 1px #0002)}
+.web-hazard-secondary{position:absolute;width:43px;height:43px;right:0;bottom:-1px;filter:drop-shadow(0 3px 1px #0002)}
+.web-hazard-connection{position:absolute;inset:0;display:none}
+.web-stats-body{position:relative;padding:0 34px 19px;background:linear-gradient(#ffffff02,#ffffff00)}
+.web-stat-line{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0;padding:26px 0;border-bottom:1px solid var(--web-rim)}
+.web-stat-line>div{padding:0 20px;border-right:1px solid color-mix(in srgb,var(--web-rim) 60%,transparent)}.web-stat-line>div:first-child{padding-left:0}.web-stat-line>div:last-child{border:0;padding-right:0}
+.web-stat-line dt{font:600 10px var(--f-label);letter-spacing:.07em;color:var(--web-muted);margin-bottom:8px}
+.web-stat-line dd{font:400 31px/1.1 var(--f-num);letter-spacing:-.045em;color:var(--web-text);font-variant-numeric:tabular-nums;margin:0 0 8px}
+.web-stat-line>div>span{font:400 12px var(--f-label);color:var(--web-muted);opacity:.85}
+.web-table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:27px 0 18px}
+.web-panel-label{font:500 9px var(--f-label);letter-spacing:.1em;color:var(--web-muted)}
+.web-table-toolbar h4{font:400 27px var(--f-display);color:var(--web-text);margin:5px 0 0;letter-spacing:0}
+.web-stat-tabs{display:flex;gap:4px;padding:4px;border-radius:5px;background:#0002;border:1px solid color-mix(in srgb,var(--web-rim) 50%,transparent)}
+.web-stat-tabs button{font:600 15px var(--f-label);padding:8px 18px;min-height:36px;color:var(--web-muted);border:1px solid transparent;background:transparent;border-radius:4px;cursor:pointer}
+.web-stat-tabs button[aria-pressed=true]{color:var(--web-text);background:#0003;border-color:#b5ada5;box-shadow:inset 0 0 0 1px #887777a1,0 0 0 1px #bbaaaa33}
+.web-stat-tabs button:hover{background:#ffffff06;color:var(--web-text)}
+.web-table-wrap{border:1px solid var(--web-rim);border-radius:5px;overflow-x:auto;background:#07120f33;scrollbar-width:thin;scrollbar-color:var(--web-rim) transparent}
+html[data-refinement=refined] .web-stats-table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0;color:var(--web-text)}
+html[data-refinement=refined] .web-stats-table th,html[data-refinement=refined] .web-stats-table td{border:0;border-bottom:1px solid color-mix(in srgb,var(--web-rim) 48%,transparent);padding:13px 18px;text-align:right;white-space:nowrap;background:transparent}
+html[data-refinement=refined] .web-stats-table thead{background:#ffffff05}html[data-refinement=refined] .web-stats-table thead th{font:500 10px var(--f-label);letter-spacing:.06em;color:var(--web-muted);padding-top:11px;padding-bottom:11px}
+html[data-refinement=refined] .web-stats-table th:first-child{width:30%;text-align:left}
+html[data-refinement=refined] .web-stats-table tbody th{font:600 17px var(--f-label);color:var(--web-text)}
+html[data-refinement=refined] .web-stats-table tbody th img{width:26px;height:28px;object-fit:contain;vertical-align:middle;margin-right:12px}
+html[data-refinement=refined] .web-stats-table td{font:400 13px var(--f-num);font-variant-numeric:tabular-nums;color:var(--web-muted)}
+html[data-refinement=refined] .web-stats-table td:nth-child(3){color:var(--web-text)}
+html[data-refinement=refined] .web-stats-table tbody tr:nth-child(even){background:#ffffff02}html[data-refinement=refined] .web-stats-table tbody tr:hover{background:#ffffff06}
+html[data-refinement=refined] .web-stats-table tbody tr:last-child>*{border-bottom:0}
+.web-table-foot{display:flex;justify-content:space-between;gap:15px;font:400 11px var(--f-label);color:var(--web-muted);padding:12px 2px 0;opacity:.75}
+.web-bottom-detail{position:relative;height:24px;margin:10px -34px 0;pointer-events:none}
+.web-bottom-detail span{position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--web-rim);opacity:.4}
+.web-bottom-detail img{position:absolute;height:26px;width:26px;right:34px;bottom:-2px;display:none}
+.web-specimen-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:14px;font:400 11px var(--f-label);color:var(--web-muted)}
+.web-motion{border:1px solid var(--web-rim);background:#0002;border-radius:4px;font:500 12px var(--f-label);color:var(--web-muted);padding:7px 10px;min-height:32px;white-space:nowrap;cursor:pointer}.web-motion:disabled{opacity:.55;cursor:default}
+.web-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+[data-motion=on] .web-hazard-primary{animation:web-idle 7s ease-in-out infinite}
+[data-motion=on][data-web-theme=bowser] .web-hazard-primary{animation:web-thump 11s ease-in-out infinite}
+[data-motion=on][data-web-theme=wario] .web-hazard-primary{animation:web-chomp 9s ease-in-out infinite}
+[data-motion=on][data-web-theme=toy] .web-hazard-primary{animation:web-star 8s ease-in-out infinite}
+[data-motion=on] .web-hazard-secondary{animation:web-idle 9s ease-in-out infinite reverse}
+[data-motion=on][data-web-theme=mario] .web-hazard-primary{animation:none}
+@keyframes web-idle{0%,100%{translate:0 0}50%{translate:0 -4px}}
+@keyframes web-thump{0%,70%,100%{translate:0 0}75%,78%{translate:0 6px}87%{translate:0 0}}
+@keyframes web-chomp{0%,65%,100%{translate:0 0}72%{translate:7px 0}82%{translate:0 0}}
+@keyframes web-star{0%,100%{opacity:.8}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.web-theme *{animation:none!important}}
+@media(max-width:760px){.web-stats-header{padding:23px 24px 0}.web-stats-body{padding:0 24px 18px}.web-material-edge{margin:0 -24px}.web-stat-line>div{padding:0 12px}.web-stat-line dd{font-size:26px}html[data-refinement=refined] .web-stats-table th,html[data-refinement=refined] .web-stats-table td{padding:12px}.web-bottom-detail{margin-left:-24px;margin-right:-24px}.web-header-inhabitants{right:25px}.web-stat-tabs button{padding:8px 13px}}
+@media(max-width:620px){.web-park-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.web-park-choices button{font-size:15px;padding:9px 10px}.web-stats-header{padding:20px 18px 0}.web-stats-body{padding:0 18px 16px}.web-specimen-brand{font-size:12px}.web-specimen-brand>span{font-size:7px}.web-specimen-brand img{height:23px;width:23px}.web-theme-heading{margin:28px 0 21px;padding-right:0}html[data-refinement=refined] .web-theme-heading h3{font-size:36px;max-width:75%}.web-theme-heading>span{font-size:9px}.web-theme-heading p{font-size:13px;gap:7px;margin-top:13px}.web-header-inhabitants{right:15px;bottom:92px;width:80px;height:66px;opacity:.9}.web-hazard-primary{width:49px!important;height:49px!important;right:22px!important;bottom:0!important}.web-hazard-secondary{width:30px!important;height:30px!important;right:-4px!important;bottom:-8px!important}[data-web-theme=toy] .web-header-inhabitants{width:60px;height:60px;right:20px;bottom:90px}[data-web-theme=toy] .web-hazard-primary{width:42px!important;height:42px!important;right:8px!important;bottom:8px!important}[data-web-theme=wario] .web-hazard-connection{left:-15px;right:45px;bottom:8px}.web-header-foot{font-size:10px;padding-bottom:14px;gap:10px}.web-sample-label{font-size:7px}.web-material-edge{margin:0 -18px}.web-stat-line{grid-template-columns:1fr 1fr;padding:20px 0;gap:20px 0}.web-stat-line>div{padding:0 0 0 18px}.web-stat-line>div:nth-child(odd){padding-left:0;border-right:1px solid var(--web-rim)}.web-stat-line>div:nth-child(even){border:0}.web-stat-line dd{font-size:27px}.web-stat-line dt{font-size:9px}.web-stat-line>div>span{font-size:11px}.web-table-toolbar{margin:23px 0 16px;gap:8px}.web-table-toolbar h4{font-size:23px}.web-stat-tabs{padding:3px;gap:2px}.web-stat-tabs button{font-size:13px;padding:7px 10px;min-height:35px}html[data-refinement=refined] .web-stats-table{min-width:480px}html[data-refinement=refined] .web-stats-table th:first-child{width:31%}html[data-refinement=refined] .web-stats-table tbody th{font-size:16px}html[data-refinement=refined] .web-stats-table tbody th img{width:23px;height:25px;margin-right:9px}html[data-refinement=refined] .web-stats-table td{font-size:12px}html[data-refinement=refined] .web-stats-table th,html[data-refinement=refined] .web-stats-table td{padding:12px 10px}.web-table-foot{font-size:10px}.web-bottom-detail{margin-left:-18px;margin-right:-18px}.web-bottom-detail img{right:18px}.web-specimen-footer{font-size:10px;align-items:center}.web-specimen-footer>span{max-width:155px;line-height:1.5}.web-motion{font-size:11px;padding:7px 8px}.web-roles{grid-template-columns:1fr;gap:20px}.web-roles h4{font-size:19px}.web-theme-palette{grid-template-columns:repeat(3,1fr);gap:16px 10px}.web-theme-palette>div{grid-template-columns:15px 1fr;gap:3px 6px}.web-theme-palette code{font-size:9px}.web-design-note a{display:inline-block;margin:8px 14px 0 0}}
+
+html[data-refinement=refined] .web-stats-table tbody th{text-transform:none;letter-spacing:0}
+
+.web-table-hint{display:none}
+html[data-refinement=refined] .web-stats-table[data-mode=pitching] td:nth-child(3){color:var(--web-muted)}
+html[data-refinement=refined] .web-stats-table[data-mode=pitching] td:nth-child(4){color:var(--web-text)}
+@media(max-width:620px){.web-table-hint{display:flex;justify-content:space-between;font:400 11px var(--f-label);color:var(--web-muted);margin:0 0 9px}.web-table-hint span{font-size:15px}html[data-refinement=refined] .web-stats-table th:first-child{position:sticky;left:0;z-index:1;background:color-mix(in srgb,var(--web-ground) 38%,#101a18);box-shadow:1px 0 var(--web-rim)}}
+
+/* Keep the hazards attached to the material boundary. */
+.web-header-inhabitants{bottom:10px}
+[data-web-theme=bowser] .web-hazard-secondary{bottom:0}
+[data-web-theme=dk] .web-hazard-secondary{bottom:-2px}
+[data-web-theme=toy] .web-header-inhabitants{bottom:23px}
+@media(max-width:620px){.web-header-inhabitants{bottom:10px}.web-hazard-secondary{bottom:-1px!important}[data-web-theme=toy] .web-header-inhabitants{bottom:20px}.web-header-foot{padding-right:80px}}
+
+/* Two actual material families per park: field above, infield below. */
+.web-stats-header{background:var(--web-ground);padding-bottom:0}
+.web-header-texture{opacity:1;background-image:linear-gradient(100deg,#071b16cc,#071b1680 52%,#071b1622),var(--web-field-image);background-size:auto,256px 256px;image-rendering:auto}
+.web-header-foot{margin:0 -34px;padding:18px 210px 18px 34px;min-height:62px;border-top:1px solid #f1e7c580;color:#30261a;text-shadow:0 1px #ffffff1a;background-image:var(--web-infield-image);background-size:256px 256px;font-size:12px;font-weight:600;letter-spacing:.025em;box-shadow:inset 0 3px 9px #38281818}
+.web-theme-heading{margin-bottom:25px}
+.web-material-edge{margin:0 -34px;height:5px;background:#d0c4a3;border:0;box-shadow:inset 0 1px #ffffff4d,inset 0 -1px #0005}
+.web-header-inhabitants{right:31px;bottom:9px;height:120px;width:190px;z-index:2;opacity:1}
+.web-hazard-primary{width:96px;height:96px;right:62px;bottom:0;filter:drop-shadow(0 4px 2px #0b161738)}
+.web-hazard-secondary{width:58px;height:58px;right:2px;bottom:0;filter:drop-shadow(0 3px 2px #0b16172b)}
+.web-hazard-connection{display:none}
+.web-material-swatch{height:89px;border:1px solid #ced3b933;border-radius:4px;margin:0 0 17px;background-size:200px 200px;box-shadow:inset 0 1px #ffffff14}
+.web-swatch-infield{background-image:var(--web-infield-image)}.web-swatch-field{background-image:var(--web-field-image)}
+.web-swatch-hazard{background:linear-gradient(120deg,#19322a,#12251f);display:flex;align-items:center;justify-content:center}
+.web-swatch-hazard img{height:75px;width:75px;object-fit:contain;filter:drop-shadow(0 3px 1px #0003)}
+.web-roles{gap:22px;padding-top:26px}
+/* Mario: the orange-clay/olive-grass contrast is the identity. */
+[data-web-theme=mario] .web-header-texture{background-image:linear-gradient(100deg,#122616bd,#1423115e 64%,#14231122),repeating-linear-gradient(128deg,#d6e2a00e 0 50px,#15260b0a 50px 100px),var(--web-field-image);background-size:auto,auto,256px 256px}
+[data-web-theme=mario] .web-material-edge{background:#526c9a;height:6px;border-top:2px solid #ede3c7}
+[data-web-theme=mario] .web-hazard-primary{width:69px;height:69px;right:25px;transform:rotate(-16deg)}
+[data-web-theme=mario] .web-hazard-secondary{display:none}
+/* Bowser alone receives broad worn stone. Orange is local to the lava edge. */
+[data-web-theme=bowser] .web-header-texture{background-image:linear-gradient(100deg,#111a24c4,#1720298c 60%,#161b2440),var(--web-field-image);background-size:auto,320px 320px}
+[data-web-theme=bowser] .web-header-foot{background-image:linear-gradient(#20272533,#20272533),var(--web-infield-image);background-size:auto,440px 440px;color:#eeecd8;text-shadow:0 1px #12202b}
+[data-web-theme=bowser] .web-material-edge{height:7px;background:linear-gradient(92deg,#b15828,#f4b842 30%,#e77f28 60%,#f9c652 84%,#a24a27);border-top:1px solid #ffd68a77;border-bottom:2px solid #4c3025}
+[data-web-theme=bowser] .web-hazard-primary{width:96px;height:96px;bottom:2px;right:61px}
+[data-web-theme=bowser] .web-hazard-secondary{width:48px;height:48px;bottom:0}
+[data-web-theme=bowser] .web-bottom-detail img{display:block;width:27px;height:27px;opacity:.75}
+/* Wario: sand across the page crown. Purple is a restrained mound/fabric accent. */
+[data-web-theme=wario] .web-header-texture{background-image:linear-gradient(100deg,#48351322,#fff2ba0a),var(--web-field-image)}
+[data-web-theme=wario] .web-specimen-brand,[data-web-theme=wario] .web-theme-heading h3{color:#312518!important}
+[data-web-theme=wario] .web-specimen-brand>span,[data-web-theme=wario] .web-theme-heading p,[data-web-theme=wario] .web-theme-heading>span{color:#493822}
+[data-web-theme=wario] .web-header-foot{background-image:var(--web-infield-image);border-color:#f4dc9d}
+[data-web-theme=wario] .web-material-edge{height:8px;background:linear-gradient(#735674 0 4px,#d4b16e 4px 5px,#493c58 5px)}
+[data-web-theme=wario] .web-hazard-primary{width:102px;height:102px;right:0}
+[data-web-theme=wario] .web-hazard-secondary{display:block;width:62px;height:62px;right:123px;bottom:6px;opacity:.75}
+[data-web-theme=wario] .web-hazard-connection{display:block;top:auto;bottom:12px;left:47px;right:71px;height:11px;background:radial-gradient(ellipse at center,transparent 32%,#a8aeb2 36% 48%,#4d5559 52% 61%,transparent 65%) 0 0/19px 10px repeat-x;transform:rotate(-10deg)}
+/* Yoshi: soft tan against lively grass, not orange clay or brick. */
+[data-web-theme=yoshi] .web-header-texture{background-image:linear-gradient(100deg,#14331dc7,#14331d66 60%,#274d251f),var(--web-field-image)}
+[data-web-theme=yoshi] .web-material-edge{height:7px;background:linear-gradient(#b9a9cf 0 2px,#88734a 2px 7px)}
+[data-web-theme=yoshi] .web-hazard-primary{width:101px;height:101px;right:59px;transform:rotate(-5deg);bottom:-2px}
+[data-web-theme=yoshi] .web-hazard-secondary{width:71px;height:71px;transform:rotate(7deg);bottom:-1px}
+/* Peach: rose terracotta and closely textured lawn, with only a fine cream trim. */
+[data-web-theme=peach] .web-header-texture{background-image:linear-gradient(100deg,#16321dcc,#16321d77 60%,#23431833),var(--web-field-image)}
+[data-web-theme=peach] .web-header-foot{color:#341d18;border-top-color:#edc5a0}
+[data-web-theme=peach] .web-material-edge{height:7px;background:linear-gradient(#e6d6b3 0 3px,#a79876 3px 5px,#d4c7a6 5px)}
+[data-web-theme=peach] .web-hazard-primary{width:84px;height:84px;transform:rotate(-7deg);right:74px;bottom:13px}
+[data-web-theme=peach] .web-hazard-secondary{width:65px;height:65px;transform:rotate(7deg);right:2px;bottom:2px}
+/* DK: dark earth clods and coarse ground cover; timber is limited to edging. */
+[data-web-theme=dk] .web-header-texture{background-image:linear-gradient(100deg,#081e14bf,#081e1477 60%,#07170d33),var(--web-field-image)}
+[data-web-theme=dk] .web-header-foot{color:#e8d8b5;border-top:2px solid #7f6641;box-shadow:inset 0 4px 5px #0002;text-shadow:0 1px #251b12}
+[data-web-theme=dk] .web-material-edge{height:7px;background:repeating-linear-gradient(174deg,#57928f 0 8px,#94c0af 9px 10px,#57928f 11px 22px);border-bottom:1px solid #23524d}
+[data-web-theme=dk] .web-hazard-primary{width:86px;height:86px;right:91px;transform:rotate(-17deg);bottom:3px}
+[data-web-theme=dk] .web-hazard-secondary{width:92px;height:92px;right:-3px;bottom:-4px}
+[data-web-theme=dk] .web-bottom-detail img{display:block;width:40px;height:40px;bottom:-9px;opacity:.8}
+/* Toy: clean cobalt enamel and inset navy panels; no natural grain or soil. */
+[data-web-theme=toy] .web-header-texture{background-image:linear-gradient(110deg,#0b1c4a80,#11245020),var(--web-field-image);background-size:auto,256px 256px}
+[data-web-theme=toy] .web-header-foot{background-image:var(--web-infield-image);background-size:128px 128px;color:#d5e2ec;border-top:2px solid #7292bf70;text-shadow:none}
+[data-web-theme=toy] .web-header-inhabitants{height:97px;width:97px;right:45px;bottom:17px;border:2px solid #8da7d177;border-radius:5px;background:#112b5ca8;box-shadow:inset 0 0 0 4px #0c1c4699,0 2px 0 #09163577}
+[data-web-theme=toy] .web-hazard-primary{width:75px;height:75px;right:9px;bottom:9px;filter:drop-shadow(0 2px 0 #241b1a66)}
+[data-web-theme=toy] .web-hazard-secondary{display:none}
+[data-web-theme=toy] .web-material-edge{height:6px;background:linear-gradient(#eaca51 0 2px,#a98526 2px 4px,#16336c 4px)}
+[data-web-theme=toy] .web-table-wrap{box-shadow:inset 0 0 0 3px #8aa6d409;background:#0c19312e}
+@media(max-width:760px){.web-header-foot{margin:0 -24px;padding-left:24px}.web-material-edge{margin:0 -24px}}
+@media(max-width:620px){.web-header-foot{margin:0 -18px;padding:17px 126px 17px 18px;min-height:62px;font-size:10px;line-height:1.5}.web-material-edge{margin:0 -18px}.web-header-inhabitants{width:120px;height:85px;right:12px;bottom:9px}.web-hazard-primary{width:69px!important;height:69px!important;right:42px!important;bottom:0!important}.web-hazard-secondary{width:46px!important;height:46px!important;right:-1px!important;bottom:0!important}[data-web-theme=dk] .web-hazard-primary{right:55px!important;width:61px!important;height:61px!important}[data-web-theme=dk] .web-hazard-secondary{width:65px!important;height:65px!important;bottom:-4px!important}[data-web-theme=wario] .web-hazard-primary{right:0!important;width:76px!important;height:76px!important}[data-web-theme=wario] .web-hazard-secondary{right:77px!important;bottom:5px!important;width:43px!important;height:43px!important}[data-web-theme=wario] .web-hazard-connection{left:27px;right:54px;bottom:10px}[data-web-theme=toy] .web-header-inhabitants{height:70px;width:70px;right:20px;bottom:15px}[data-web-theme=toy] .web-hazard-primary{height:56px!important;width:56px!important;right:5px!important;bottom:5px!important}[data-web-theme=mario] .web-hazard-primary{right:14px!important;width:55px!important;height:55px!important}.web-material-swatch{height:100px;margin-bottom:12px}.web-roles{gap:25px}}

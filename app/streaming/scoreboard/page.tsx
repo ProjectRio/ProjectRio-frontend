@@ -69,7 +69,7 @@ export default function StreamScoreboardPage() {
 
 	return (
 		<div
-			className="grid gap-8 rounded-xl p-6 lg:grid-cols-[24rem_1fr]"
+			className="grid gap-8 rounded-lg p-6 lg:grid-cols-[24rem_1fr]"
 			style={greenscreen ? { backgroundColor: GREENSCREEN } : undefined}
 		>
 			<div className="space-y-8">
@@ -101,7 +101,7 @@ export default function StreamScoreboardPage() {
 						<label className="flex items-center gap-2">
 							<input
 								type="checkbox"
-								className="accent-rio-500"
+								className="accent-star-400"
 								checked={includeLogos}
 								onChange={(event) => setIncludeLogos(event.target.checked)}
 							/>
@@ -143,7 +143,7 @@ export default function StreamScoreboardPage() {
 						<label className="flex items-center gap-2">
 							<input
 								type="checkbox"
-								className="accent-rio-500"
+								className="accent-star-400"
 								checked={greenscreen}
 								onChange={(event) => setGreenscreen(event.target.checked)}
 							/>

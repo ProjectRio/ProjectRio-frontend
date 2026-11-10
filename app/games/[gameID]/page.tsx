@@ -2,8 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-// Completed-game page — MLB Gameday × esports match hub. Stadium-themed hero
-// scoreboard, tabbed sections (Overview / Play-by-Play / Field / Box Score),
+// Completed-game page. The ballpark scoreboard up top (the page takes on the
+// stadium the game was played in), tabbed sections (Overview / Play-by-Play / Field / Box Score),
 // an AB-by-AB timeline fed by /games/events/, and the 3D Rio Visualizer for
 // replaying and what-if-ing every ball in play.
 
@@ -25,13 +25,14 @@ import { atBatResultName } from '@/lib/mssb/constants';
 import { msToTime } from '@/lib/time';
 import type { GameEvent } from '@/lib/mssb/BattingSimulation/eventToSim';
 import { groupAtBats, hasBallFlight, linescoreFromEvents } from '@/lib/gameEvents';
-import { Spinner, ErrorState, Badge, PlayerLink, Panel, PanelHeader } from '@/components/ui';
-import LineScore, { MetaItem } from '@/components/LineScore';
+import { Spinner, ErrorState, PlayerLink, Panel, PanelHeader } from '@/components/ui';
+import Scoreboard from '@/components/game/Scoreboard';
+import { useGamePark } from '@/lib/useGamePark';
 import { buildRoster, sum, TeamPanel, type RosterEntry } from '@/components/game/BoxScore';
 import RunFlow from '@/components/game/RunFlow';
-import PlayByPlay from '@/components/game/PlayByPlay';
+import { AtBatRow } from '@/components/game/PlayByPlay';
+import Scorecard, { buildPlates, type ScorecardTotals } from '@/components/game/Scorecard';
 import SprayChart from '@/components/game/SprayChart';
-import { getTheme3D } from '@/components/visualizer/stadiumThemes';
 
 const HitVisualizer = dynamic(() => import('@/components/visualizer/HitVisualizer'), {
 	ssr: false,
@@ -42,16 +43,58 @@ const HitVisualizer = dynamic(() => import('@/components/visualizer/HitVisualize
 	)
 });
 
-const AWAY_COLOR = '#4f9dff';
-const HOME_COLOR = '#f43f5e';
+const AWAY_COLOR = 'var(--color-series-1)';
+const HOME_COLOR = 'var(--color-series-2)';
 
-// Star hits are intentionally excluded here (shown separately below the chart)
-// so they don't dwarf the ordinary contact-quality bars.
-const CONTACT_CATS: { key: string; label: string }[] = [
-	{ key: 'sour_hits', label: 'Sour' },
-	{ key: 'nice_hits', label: 'Nice' },
-	{ key: 'perfect_hits', label: 'Perfect' }
+// Contact quality, worst to best. Star hits are counted apart: they are a
+// spent resource, not a quality of contact.
+const CONTACT_CATS: { key: string; label: string; fill: string; edge: string; ink: string }[] = [
+	{ key: 'sour_hits', label: 'Sour', fill: '#7d8a80', edge: '#3f4842', ink: '#0d1410' },
+	{ key: 'nice_hits', label: 'Nice', fill: '#5284bd', edge: '#08298c', ink: '#ffffff' },
+	{ key: 'perfect_hits', label: 'Perfect', fill: '#ffbd00', edge: '#8a5a00', ink: '#14140c' }
 ];
+
+/** One side's contact as a single capsule, split by quality. */
+function ContactRow({ user, color, roster }: { user: string; color: string; roster: RosterEntry[] }) {
+	const parts = CONTACT_CATS.map((cat) => ({ ...cat, value: sum(roster, 'batting', cat.key) }));
+	const total = parts.reduce((n, part) => n + part.value, 0);
+	const stars = sum(roster, 'batting', 'star_hits');
+
+	return (
+		<div>
+			<div className="mb-1.5 flex items-baseline justify-between gap-3">
+				<span className="flex min-w-0 items-center gap-2 font-display text-base font-semibold text-fog-100">
+					<span className="h-3.5 w-1 flex-none rounded-full" style={{ backgroundColor: color }} />
+					<span className="truncate">{user}</span>
+				</span>
+				<span className="flex-none font-mono text-xs tabular-nums text-fog-500">
+					{total} contacts{stars > 0 && <span className="text-star-400"> · {stars} star</span>}
+				</span>
+			</div>
+			<div className="flex h-8 overflow-hidden rounded-full border border-[var(--rim-strong)] bg-black/50">
+				{parts.map(
+					(part) =>
+						part.value > 0 && (
+							<div
+								key={part.key}
+								title={`${part.label}: ${part.value}`}
+								className="flex min-w-7 items-center justify-center border-r font-mono text-sm font-semibold tabular-nums last:border-r-0 [box-shadow:inset_0_2px_0_rgb(255_255_255/0.3)]"
+								style={{
+									flexGrow: part.value,
+									flexBasis: 0,
+									backgroundColor: part.fill,
+									borderColor: part.edge,
+									color: part.ink
+								}}
+							>
+								{part.value}
+							</div>
+						)
+				)}
+			</div>
+		</div>
+	);
+}
 
 function ContactQuality({
 	awayRoster,
@@ -64,57 +107,24 @@ function ContactQuality({
 	awayUser: string;
 	homeUser: string;
 }) {
-	const data = CONTACT_CATS.map(({ key, label }) => ({
-		label,
-		away: sum(awayRoster, 'batting', key),
-		home: sum(homeRoster, 'batting', key)
-	}));
-	const max = Math.max(1, ...data.flatMap((d) => [d.away, d.home]));
-	const PLOT = 150;
-	const awayStars = sum(awayRoster, 'batting', 'star_hits');
-	const homeStars = sum(homeRoster, 'batting', 'star_hits');
-
-	const Bar = ({ value, color }: { value: number; color: string }) => (
-		<div className="flex flex-col items-center">
-			<span className="mb-1 text-xs font-semibold tabular-nums text-fog-300">{value}</span>
-			<div
-				className="w-7 rounded-t"
-				style={{ height: `${(value / max) * PLOT}px`, backgroundColor: color }}
-			/>
-		</div>
-	);
-
 	return (
 		<Panel>
-			<PanelHeader title="Contact Quality" />
-			<div className="px-4 py-5">
-				<div className="flex items-end justify-around">
-					{data.map((d) => (
-						<div key={d.label} className="flex flex-1 flex-col items-center gap-2">
-							<div className="flex items-end gap-3">
-								<Bar value={d.away} color={AWAY_COLOR} />
-								<Bar value={d.home} color={HOME_COLOR} />
-							</div>
-							<span className="text-xs font-semibold uppercase tracking-wide text-fog-500">
-								{d.label}
+			<PanelHeader
+				title="Contact quality"
+				action={
+					<span className="flex items-center gap-3 font-display text-xs font-semibold uppercase tracking-[0.1em] text-fog-300">
+						{CONTACT_CATS.map((cat) => (
+							<span key={cat.key} className="flex items-center gap-1.5">
+								<span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.fill }} />
+								{cat.label}
 							</span>
-						</div>
-					))}
-				</div>
-				<div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-night-700 pt-4 text-sm">
-					<span className="flex items-center gap-2 text-fog-300">
-						<span className="h-3 w-3 rounded-sm" style={{ backgroundColor: AWAY_COLOR }} />
-						{awayUser}
+						))}
 					</span>
-					<span className="flex items-center gap-2 text-fog-300">
-						<span className="h-3 w-3 rounded-sm" style={{ backgroundColor: HOME_COLOR }} />
-						{homeUser}
-					</span>
-					<span className="text-fog-300">
-						<span className="text-star-400">✪</span> Star hits — {awayUser} {awayStars} · {homeUser}{' '}
-						{homeStars}
-					</span>
-				</div>
+				}
+			/>
+			<div className="space-y-4 px-4 py-4">
+				<ContactRow user={awayUser} color={AWAY_COLOR} roster={awayRoster} />
+				<ContactRow user={homeUser} color={HOME_COLOR} roster={homeRoster} />
 			</div>
 		</Panel>
 	);
@@ -134,7 +144,7 @@ function ScoringPlayRow({ play }: { play: ScoringPlay }) {
 				{result && <span className="text-fog-500">— {result}</span>}
 				{play.result_rbi > 0 && <span className="shrink-0 text-fog-300">{play.result_rbi} RBI</span>}
 			</div>
-			<span className="shrink-0 font-display font-bold tabular-nums text-fog-100">
+			<span className="shrink-0 font-mono font-bold tabular-nums text-fog-100">
 				<span className={awayBatting ? '' : 'text-fog-500'}>{awayAfter}</span>
 				<span className="text-fog-500">–</span>
 				<span className={awayBatting ? 'text-fog-500' : ''}>{homeAfter}</span>
@@ -163,7 +173,7 @@ function ScoringSummary({ info }: { info: GameSummary }) {
 			<div className="min-h-0 flex-1 divide-y divide-night-800 overflow-y-auto">
 				{groups.map((group, gi) => (
 					<div key={gi}>
-						<div className="bg-night-850 px-4 py-1.5 font-display text-xs font-semibold uppercase tracking-wider">
+						<div className="bg-black/30 px-4 py-1.5 font-display text-xs font-semibold uppercase tracking-wider">
 							<span style={{ color: group.half === 0 ? AWAY_COLOR : HOME_COLOR }}>
 								{group.half === 0 ? 'Top' : 'Bottom'} {ordinal(group.inning)}
 							</span>
@@ -179,112 +189,36 @@ function ScoringSummary({ info }: { info: GameSummary }) {
 	);
 }
 
-function GameLineScore({
-	info,
-	linescore
-}: {
-	info: GameSummary;
-	linescore: [(number | 'X')[], (number | 'X')[]] | undefined;
-}) {
-	if (!linescore) return null;
-	const [away, home] = linescore;
-	const innings = Math.max(away.length, home.length);
-	if (innings === 0) return null;
-	const homeWon = info.home_score > info.away_score;
-
-	const firstPitch = info.date_time_start
-		? new Date(info.date_time_start * 1000).toLocaleString()
-		: '—';
-	const gameTime =
-		info.date_time_start && info.date_time_end
-			? msToTime((info.date_time_end - info.date_time_start) * 1000)
-			: '—';
-
-	return (
-		<LineScore
-			innings={innings}
-			teams={[
-				{ label: info.away_user, runs: away, total: info.away_score, highlight: !homeWon },
-				{ label: info.home_user, runs: home, total: info.home_score, highlight: homeWon }
-			]}
-			meta={
-				<>
-					<MetaItem label="First Pitch" value={firstPitch} />
-					<MetaItem label="Game Time" value={gameTime} />
-					<MetaItem label="Stadium" value={stadiums[info.stadium] ?? 'Unknown'} />
-				</>
-			}
-		/>
-	);
-}
-
 function EloLine({ elo, delta }: { elo: number | undefined; delta: number | null }) {
 	if (elo === undefined) return null;
 	return (
-		<p className="text-xs text-fog-500">
-			ELO {Math.round(elo)}
+		<>
+			{' · '}
+			<span className="font-mono tabular-nums">{Math.round(elo)}</span>
 			{delta !== null && (
-				<span className={delta >= 0 ? 'text-emerald-400' : 'text-rio-400'}>
+				<span className={`font-mono tabular-nums ${delta >= 0 ? 'text-emerald-400' : 'text-rio-400'}`}>
 					{' '}
 					{delta >= 0 ? '+' : ''}
 					{Math.round(delta)}
 				</span>
 			)}
-		</p>
+		</>
 	);
 }
 
-function HeroSide({
-	user,
-	captain,
-	elo,
-	eloDelta,
-	logo,
-	won,
-	align
-}: {
-	user: string;
-	captain: string;
-	elo: number | undefined;
-	eloDelta: number | null;
-	logo: string | null | undefined;
-	won: boolean;
-	align: 'left' | 'right';
-}) {
-	const portrait = captain ? characterImage(captain) : null;
+/** The winner's flag, flown beside their name on the board. */
+function WinFlag() {
 	return (
-		<div
-			className={`flex items-center gap-4 ${align === 'right' ? 'flex-row-reverse text-right' : ''}`}
+		<span
+			title="Winner"
+			className="flex-none bg-[var(--park-accent)] py-1 pl-1.5 pr-3.5 font-display text-xs font-bold leading-none text-[#14140c] [clip-path:polygon(0_0,62%_0,100%_50%,62%_100%,0_100%)]"
 		>
-			<div className="relative shrink-0">
-				{portrait && (
-					<img
-						src={portrait}
-						alt={captain}
-						className={`h-20 w-20 rounded-xl border bg-night-900/80 object-contain p-1 sm:h-24 sm:w-24 ${
-							won ? 'border-star-500/50' : 'border-night-600'
-						}`}
-					/>
-				)}
-				{logo && (
-					<img
-						src={teamImage(logo)}
-						alt={logo}
-						className="absolute -bottom-2 -right-2 h-9 w-9 rounded-full border border-night-600 bg-night-950/90 object-contain p-1"
-					/>
-				)}
-			</div>
-			<div className="min-w-0">
-				{won && <p className="kicker !text-[10px] !text-star-400">Winner</p>}
-				<PlayerLink username={user} className="block truncate font-display text-2xl font-bold" />
-				<p className="truncate text-xs text-fog-500">{captain || '—'}</p>
-				<EloLine elo={elo} delta={eloDelta} />
-			</div>
-		</div>
+			W
+		</span>
 	);
 }
 
-type Tab = 'overview' | 'plays' | 'field' | 'box';
+type Tab = 'book' | 'field' | 'box';
 
 export default function GamePage({ params }: { params: Promise<{ gameID: string }> }) {
 	const { gameID } = use(params);
@@ -293,9 +227,11 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 	const [events, setEvents] = useState<GameEvent[] | null>(null);
 	const [eventsFailed, setEventsFailed] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [tab, setTab] = useState<Tab>('overview');
+	const [tab, setTab] = useState<Tab>('book');
 	const [visualized, setVisualized] = useState<GameEvent | null>(null);
+	const [picked, setPicked] = useState<number | null>(null);
 	const tagsets = useTagsets();
+	useGamePark(info?.stadium);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -337,6 +273,14 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 		[events]
 	);
 
+	const plates = useMemo(() => (events && events.length > 0 ? buildPlates(events) : null), [events]);
+	// Until one is picked, the strip shows the plate appearance that drove in
+	// the most runs.
+	const featured = useMemo(() => {
+		if (!plates || plates.length === 0) return null;
+		return plates.reduce((best, plate) => (plate.rbi > best.rbi ? plate : best), plates[0]).index;
+	}, [plates]);
+
 	// Prefer the exact linescore derived from events over the API's
 	// scoring-runner reconstruction (which miscounts some games).
 	const linescore = useMemo(
@@ -370,7 +314,6 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 	const homeLogo = teamName(homeRoster.map((r) => r.name), info.home_captain ?? '');
 	const awayLogo = teamName(awayRoster.map((r) => r.name), info.away_captain ?? '');
 	const mode = tagSetName(tagsets, info.game_mode as number);
-	const theme3d = getTheme3D(info.stadium);
 	const gameDate = info.date_time_start
 		? new Date(info.date_time_start * 1000).toLocaleDateString(undefined, {
 				year: 'numeric',
@@ -379,12 +322,29 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 			})
 		: null;
 
-	const tabs: { id: Tab; label: string; badge?: string }[] = [
-		{ id: 'overview', label: 'Overview' },
-		{ id: 'plays', label: 'Play-by-Play', badge: events ? String(groupAtBats(events).length) : undefined },
-		{ id: 'field', label: 'Field', badge: events ? String(ballsInPlay) : undefined },
-		{ id: 'box', label: 'Box Score' }
+	const tabs: { id: Tab; label: string; count?: number }[] = [
+		{ id: 'book', label: plates ? 'Scorebook' : 'Overview' },
+		{ id: 'field', label: 'Field', count: events ? ballsInPlay : undefined },
+		{ id: 'box', label: 'Box score' }
 	];
+	const lineTotals = (roster: RosterEntry[]): Record<string, ScorecardTotals> =>
+		Object.fromEntries(
+			roster.map((entry) => [
+				entry.name,
+				{
+					ab: entry.batting?.summary_at_bats ?? 0,
+					h: entry.batting?.summary_hits ?? 0,
+					rbi: entry.batting?.summary_rbi ?? 0
+				}
+			])
+		);
+	const shown = plates ? plates[picked ?? featured ?? 0] : null;
+	const gameTime =
+		info.date_time_start && info.date_time_end
+			? msToTime((info.date_time_end - info.date_time_start) * 1000)
+			: null;
+	const [awayRuns, homeRuns] = linescore ?? [[], []];
+	const shortened = info.innings_played !== info.innings_selected;
 
 	const eventsNotice = eventsFailed ? (
 		<Panel>
@@ -405,147 +365,127 @@ export default function GamePage({ params }: { params: Promise<{ gameID: string 
 
 	return (
 		<div className="space-y-6">
-			{/* ---- Hero scoreboard ---- */}
-			<div className="panel relative overflow-hidden">
-				{/* Stadium-tinted backdrop */}
-				<div
-					className="pointer-events-none absolute inset-0 opacity-25"
-					style={{
-						backgroundImage: `radial-gradient(ellipse 90% 130% at 50% -30%, ${theme3d.skyTop}, transparent 70%)`
-					}}
-				/>
-				<div
-					className="pointer-events-none absolute inset-0"
-					style={{
-						backgroundImage:
-							'radial-gradient(ellipse 70% 120% at 50% -20%, rgb(230 0 18 / 0.14), transparent)'
-					}}
-				/>
-
-				<div className="relative px-6 pb-5 pt-5">
-					<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-fog-500">
-						<div className="flex items-center gap-2">
-							{mode && (
-								<Link href={`/modes/${encodeURIComponent(mode)}`}>
-									<Badge color="red">{mode}</Badge>
-								</Link>
-							)}
-							{gameDate && <span>{gameDate}</span>}
-						</div>
-						<span className="font-display uppercase tracking-widest">
-							{stadiums[info.stadium] ?? 'Unknown'}{' '}
-							<span className="text-fog-500/60">· {theme3d.label}</span>
-						</span>
-					</div>
-
-					<div className="mt-4 grid items-center gap-6 sm:grid-cols-[1fr_auto_1fr]">
-						<HeroSide
-							user={info.away_user}
-							captain={info.away_captain ?? ''}
-							elo={awayElo}
-							eloDelta={awayEloDelta}
-							logo={awayLogo}
-							won={!homeWon}
-							align="left"
-						/>
-
-						<div className="text-center">
-							<div className="flex items-center justify-center gap-4">
-								<span
-									className={`font-display text-6xl font-bold tabular-nums sm:text-7xl ${
-										!homeWon ? 'text-fog-100' : 'text-fog-500'
-									}`}
-								>
-									{info.away_score}
-								</span>
-								<div>
-									<p className="font-display text-xs font-bold uppercase tracking-widest text-fog-500">
-										Final
-									</p>
-									{info.innings_played !== info.innings_selected && (
-										<p className="text-[10px] text-fog-500">
-											{info.innings_played}/{info.innings_selected} inn
-										</p>
-									)}
-								</div>
-								<span
-									className={`font-display text-6xl font-bold tabular-nums sm:text-7xl ${
-										homeWon ? 'text-fog-100' : 'text-fog-500'
-									}`}
-								>
-									{info.home_score}
-								</span>
-							</div>
-						</div>
-
-						<HeroSide
-							user={info.home_user}
-							captain={info.home_captain ?? ''}
-							elo={homeElo}
-							eloDelta={homeEloDelta}
-							logo={homeLogo}
-							won={homeWon}
-							align="right"
-						/>
-					</div>
-				</div>
-
-				{/* Tab bar */}
-				<div className="relative flex overflow-x-auto border-t border-night-700 bg-night-900/80">
-					{tabs.map(({ id, label, badge }) => (
-						<button
-							key={id}
-							className={`relative flex items-center gap-1.5 whitespace-nowrap px-5 py-3 font-display text-sm font-bold uppercase tracking-wider transition-colors ${
-								tab === id ? 'text-fog-100' : 'text-fog-500 hover:text-fog-300'
-							}`}
-							onClick={() => setTab(id)}
-						>
+			<Scoreboard
+				innings={Math.max(awayRuns.length, homeRuns.length, info.innings_played ?? 0)}
+				regulationInnings={info.innings_selected}
+				status={
+					<span className="text-fog-100">
+						Final
+						{shortened && (
+							<span className="ml-2 font-mono text-xs font-medium tracking-normal text-fog-500">
+								{info.innings_played}/{info.innings_selected}
+							</span>
+						)}
+					</span>
+				}
+				header={
+					<>
+						{mode && (
+							<Link href={`/modes/${encodeURIComponent(mode)}`} className="text-fog-100 hover:text-star-400">
+								{mode}
+							</Link>
+						)}
+						<span>{stadiums[info.stadium] ?? 'Unknown'}</span>
+						{gameDate && <span>{gameDate}</span>}
+						{gameTime && <span className="font-mono text-xs normal-case tracking-normal">{gameTime}</span>}
+					</>
+				}
+				teams={[
+					{
+						name: <PlayerLink username={info.away_user} className="!font-normal" />,
+						detail: (
+							<>
+								{info.away_captain || '—'}
+								<EloLine elo={awayElo} delta={awayEloDelta} />
+							</>
+						),
+						image: info.away_captain ? characterImage(info.away_captain) : null,
+						badge: awayLogo ? teamImage(awayLogo) : null,
+						tag: !homeWon ? <WinFlag /> : undefined,
+						runs: awayRuns,
+						total: info.away_score,
+						hits: sum(awayRoster, 'batting', 'summary_hits'),
+						color: AWAY_COLOR,
+						dim: homeWon
+					},
+					{
+						name: <PlayerLink username={info.home_user} className="!font-normal" />,
+						detail: (
+							<>
+								{info.home_captain || '—'}
+								<EloLine elo={homeElo} delta={homeEloDelta} />
+							</>
+						),
+						image: info.home_captain ? characterImage(info.home_captain) : null,
+						badge: homeLogo ? teamImage(homeLogo) : null,
+						tag: homeWon ? <WinFlag /> : undefined,
+						runs: homeRuns,
+						total: info.home_score,
+						hits: sum(homeRoster, 'batting', 'summary_hits'),
+						color: HOME_COLOR,
+						dim: !homeWon
+					}
+				]}
+			>
+				<div role="tablist" className="tab-strip mt-1 border-b-0 border-t border-[var(--rim)] bg-black/35 px-3 pt-2">
+					{tabs.map(({ id, label, count }) => (
+						<button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
 							{label}
-							{badge && (
-								<span className="rounded bg-night-700 px-1.5 py-px font-display text-[10px] font-bold text-fog-300">
-									{badge}
-								</span>
+							{count !== undefined && (
+								<span className="ml-2 font-mono text-xs font-medium tabular-nums opacity-70">{count}</span>
 							)}
-							{tab === id && <span className="absolute inset-x-3 bottom-0 h-0.5 bg-rio-500" />}
 						</button>
 					))}
 				</div>
-			</div>
+			</Scoreboard>
 
 			{/* ---- Tab content ---- */}
-			{tab === 'overview' && (
+			{tab === 'book' && (
 				<div className="space-y-6">
-					<GameLineScore info={info} linescore={linescore} />
-					{linescore && (
-						<RunFlow linescore={linescore} awayUser={info.away_user} homeUser={info.home_user} />
+					{plates && (
+						<>
+							<Scorecard
+								plates={plates}
+								side={0}
+								user={info.away_user}
+								color={AWAY_COLOR}
+								innings={Math.max(awayRuns.length, homeRuns.length)}
+								totals={lineTotals(awayRoster)}
+								selected={shown?.index ?? null}
+								onSelect={setPicked}
+							/>
+							{shown && (
+								<div className="sel sticky bottom-3 z-30 overflow-hidden !bg-night-950">
+									<AtBatRow atBat={shown.atBat} onVisualize={setVisualized} />
+								</div>
+							)}
+							<Scorecard
+								plates={plates}
+								side={1}
+								user={info.home_user}
+								color={HOME_COLOR}
+								innings={Math.max(awayRuns.length, homeRuns.length)}
+								totals={lineTotals(homeRoster)}
+								selected={shown?.index ?? null}
+								onSelect={setPicked}
+							/>
+						</>
 					)}
-					<div className="grid items-stretch gap-6 lg:grid-cols-2">
+					{!plates && !eventsFailed && <Spinner label="Loading the scorebook…" />}
+					<div className="grid items-start gap-6 lg:grid-cols-2">
+						{linescore && (
+							<RunFlow linescore={linescore} awayUser={info.away_user} homeUser={info.home_user} />
+						)}
 						<ContactQuality
 							awayRoster={awayRoster}
 							homeRoster={homeRoster}
 							awayUser={info.away_user}
 							homeUser={info.home_user}
 						/>
-						<div className="relative">
-							<div className="lg:absolute lg:inset-0">
-								<ScoringSummary info={info} />
-							</div>
-						</div>
 					</div>
+					{!plates && eventsFailed && <ScoringSummary info={info} />}
 				</div>
 			)}
-
-			{tab === 'plays' &&
-				(events && events.length > 0 ? (
-					<PlayByPlay
-						events={events}
-						awayUser={info.away_user}
-						homeUser={info.home_user}
-						onVisualize={setVisualized}
-					/>
-				) : (
-					eventsNotice
-				))}
 
 			{tab === 'field' &&
 				(events && events.length > 0 ? (

@@ -10,7 +10,7 @@ export default function TutorialPage() {
 			<p className="text-fog-300">
 				A guide to getting Project Rio set up and ready for online play. Looking to squeeze out more
 				performance? See the{' '}
-				<Link href="/rio-online/optimize" className="text-rio-400 hover:text-rio-300">
+				<Link href="/rio-online/optimize" className="text-star-400 hover:text-star-300">
 					Optimization Guide
 				</Link>
 				.
@@ -25,7 +25,7 @@ export default function TutorialPage() {
 							href="https://github.com/ProjectRio/ProjectRio/releases/latest"
 							target="_blank"
 							rel="noreferrer"
-							className="text-rio-400 hover:text-rio-300"
+							className="text-star-400 hover:text-star-300"
 						>
 							Project Rio
 						</a>
@@ -43,7 +43,7 @@ export default function TutorialPage() {
 							href="https://wiki.dolphin-emu.org/index.php?title=How_to_use_the_Official_GameCube_Controller_Adapter_for_Wii_U_in_Dolphin#Avoid_vJoy"
 							target="_blank"
 							rel="noreferrer"
-							className="text-rio-400 hover:text-rio-300"
+							className="text-star-400 hover:text-star-300"
 						>
 							found here
 						</a>
@@ -52,7 +52,7 @@ export default function TutorialPage() {
 							href="https://docs.google.com/document/d/1cQ3pbKZm_yUtcLK9ZIXyPzVbTJkvnfxKIyvuFMwzWe0/edit"
 							target="_blank"
 							rel="noreferrer"
-							className="text-rio-400 hover:text-rio-300"
+							className="text-star-400 hover:text-star-300"
 						>
 							detailed here
 						</a>
@@ -64,7 +64,7 @@ export default function TutorialPage() {
 							href="https://blippi.gg/optimize"
 							target="_blank"
 							rel="noreferrer"
-							className="text-rio-400 hover:text-rio-300"
+							className="text-star-400 hover:text-star-300"
 						>
 							this guide
 						</a>

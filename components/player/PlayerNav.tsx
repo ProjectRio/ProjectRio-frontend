@@ -14,7 +14,7 @@ export default function PlayerNav({ user }: { user: string }) {
 	];
 
 	return (
-		<div className="mb-6 flex flex-wrap gap-1 border-b border-night-700">
+		<div className="mb-6 flex flex-wrap gap-1 border-b border-night-700 pb-2">
 			{tabs.map((tab) => {
 				const active = pathname === tab.href;
 				return (
@@ -22,8 +22,8 @@ export default function PlayerNav({ user }: { user: string }) {
 						key={tab.href}
 						href={tab.href}
 						aria-current={active ? 'page' : undefined}
-						className={`-mb-px border-b-2 px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
-							active ? 'border-rio-500 text-fog-100' : 'border-transparent text-fog-500 hover:text-fog-300'
+						className={`rounded-md border px-4 py-2 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
+							active ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
 						}`}
 					>
 						{tab.label}

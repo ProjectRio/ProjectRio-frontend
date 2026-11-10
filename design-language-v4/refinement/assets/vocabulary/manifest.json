@@ -1,0 +1,92 @@
+{
+  "attributes": {
+    "batting": "Batting",
+    "pitching": "Pitching",
+    "running": "Running",
+    "fielding": "Fielding"
+  },
+  "results": {
+    "single": {
+      "label": "Single",
+      "code": "1B"
+    },
+    "double": {
+      "label": "Double",
+      "code": "2B"
+    },
+    "triple": {
+      "label": "Triple",
+      "code": "3B"
+    },
+    "home-run": {
+      "label": "Home run",
+      "code": "HR"
+    },
+    "walk": {
+      "label": "Walk",
+      "code": "BB"
+    },
+    "strikeout": {
+      "label": "Strikeout",
+      "code": "K"
+    },
+    "ground-out": {
+      "label": "Groundout",
+      "code": "GO"
+    },
+    "fly-out": {
+      "label": "Flyout",
+      "code": "FO"
+    },
+    "double-play": {
+      "label": "Double play",
+      "code": "DP"
+    },
+    "caught-stealing": {
+      "label": "Caught stealing",
+      "code": "CS"
+    }
+  },
+  "abilities": {
+    "clamber": "Clamber",
+    "wall-jump": "Wall Jump",
+    "super-jump": "Super Jump",
+    "sliding-catch": "Sliding Catch",
+    "wall-splat": "Wall Splat",
+    "ball-dash": "Ball Dash",
+    "super-catch": "Super Catch",
+    "magical-catch": "Magical Catch",
+    "tongue-catch": "Tongue Catch",
+    "suction": "Suction",
+    "laser": "Laser",
+    "quick-throw": "Quick Throw",
+    "super-curve": "Super Curve",
+    "body-check": "Body Check"
+  },
+  "status": [
+    "captain",
+    "superstar"
+  ],
+  "controls": [
+    "search",
+    "filter",
+    "sort",
+    "compare",
+    "expand",
+    "close",
+    "back",
+    "next",
+    "info",
+    "download",
+    "reset",
+    "check"
+  ],
+  "chemistry": [
+    "chemistry",
+    "anti-chemistry",
+    "chemistry-small",
+    "anti-chemistry-small",
+    "chemistry-mark",
+    "anti-chemistry-mark"
+  ]
+}

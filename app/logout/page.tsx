@@ -19,7 +19,7 @@ export default function LogoutPage() {
 	return (
 		<div className="mx-auto max-w-md">
 			<div className="panel p-8 text-center">
-				<h1 className="text-3xl uppercase">{done ? 'Logged Out' : 'Logging out…'}</h1>
+				<h1 className="text-3xl">{done ? 'Logged Out' : 'Logging out…'}</h1>
 				{done && (
 					<>
 						<p className="mt-3 text-sm text-fog-500">You have been successfully logged out.</p>

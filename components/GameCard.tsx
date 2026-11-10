@@ -19,17 +19,17 @@ function TeamRow({ game, side }: { game: GameSummary; side: 'home' | 'away' }) {
 			<div className="min-w-0 flex-1">
 				<Link
 					href={`/users/${encodeURIComponent(user)}`}
-					className={`block truncate font-display text-base font-semibold ${won ? 'text-fog-100' : 'text-fog-500'} hover:text-rio-300`}
+					className={`block truncate font-display text-base font-semibold ${won ? 'text-fog-100' : 'text-fog-500'} hover:text-fog-100`}
 				>
 					{user}
 				</Link>
 				{elo && (
 					<p className="text-xs text-fog-500">
-						ELO {Math.round(elo.before)} → <span className={won ? 'text-emerald-400' : 'text-rio-400'}>{Math.round(elo.after)}</span>
+						ELO <span className="font-mono tabular-nums">{Math.round(elo.before)}</span> → <span className={`font-mono tabular-nums ${won ? 'text-emerald-400' : 'text-rio-400'}`}>{Math.round(elo.after)}</span>
 					</p>
 				)}
 			</div>
-			<span className={`font-display text-3xl font-bold tabular-nums ${won ? 'text-fog-100' : 'text-fog-500'}`}>
+			<span className={`font-mono text-3xl font-semibold tabular-nums [text-shadow:0_2px_0_rgb(0_0_0/0.5)] ${won ? 'text-star-400' : 'text-fog-500'}`}>
 				{score}
 			</span>
 		</div>
@@ -60,7 +60,7 @@ export default function GameCard({ game, tagsets }: { game: GameSummary; tagsets
 				</div>
 				<Link
 					href={`/games/${game.game_id}`}
-					className="font-display text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
+					className="font-display text-xs font-semibold uppercase tracking-wider text-star-400 hover:text-star-300"
 				>
 					Box Score →
 				</Link>

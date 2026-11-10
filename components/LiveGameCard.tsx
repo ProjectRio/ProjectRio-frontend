@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import type { TagSet } from '@/lib/api';
 import { stadiums } from '@/lib/data/characters';
-import { liveTeamImage, liveCharacter, basesImage, outsDisplay, tagSetName } from '@/lib/gameDisplay';
+import { liveTeamImage, liveCharacter, tagSetName } from '@/lib/gameDisplay';
+import { BaseDiamond, OutPips, StarOrbs } from './game/hud';
 import { characterImage } from '@/lib/data/characters';
 import { Badge, LiveDot } from './ui';
 
@@ -17,11 +18,13 @@ function LiveTeamRow({ game, side }: { game: any; side: 'home' | 'away' }) {
 			<div className="min-w-0 flex-1">
 				<p className="truncate font-display text-base font-semibold text-fog-100">
 					{player}
-					{batting && <span className="ml-2 text-xs text-star-400">AT BAT</span>}
+					{batting && <span className="ml-2 text-xs font-bold uppercase tracking-wider text-star-400">At bat</span>}
 				</p>
-				<p className="text-xs text-star-400">{'★'.repeat(stars) + '☆'.repeat(Math.max(5 - stars, 0))}</p>
+				<StarOrbs stars={stars} className="mt-1" />
 			</div>
-			<span className="font-display text-3xl font-bold tabular-nums text-fog-100">{game[`${side}_score`]}</span>
+			<span className="font-mono text-3xl font-semibold tabular-nums text-star-400 [text-shadow:0_2px_0_rgb(0_0_0/0.5)]">
+				{game[`${side}_score`]}
+			</span>
 		</div>
 	);
 }
@@ -36,7 +39,7 @@ export default function LiveGameCard({ game, tagsets }: { game: any; tagsets: Ta
 
 	return (
 		<Link href={`/games/live/${encodeURIComponent(gameId)}`}>
-			<div className="panel panel-glow cursor-pointer hover:bg-night-700 transition-colors">
+			<div className="panel panel-glow cursor-pointer">
 				<div className="flex items-center justify-between border-b border-night-800 px-4 py-2">
 					<span className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-wider text-rio-400">
 						<LiveDot /> Live — {game.half_inning === 0 ? 'Top' : 'Bot'} {game.inning}
@@ -61,16 +64,14 @@ export default function LiveGameCard({ game, tagsets }: { game: any; tagsets: Ta
 							</span>
 						)}
 					</div>
-					<div className="flex items-center gap-2">
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src={basesImage(!!Number(game.runner_on_first), !!Number(game.runner_on_second), !!Number(game.runner_on_third))}
-							alt="Runners on base"
-							className="h-6 w-6 object-contain"
+					<div className="flex items-center gap-3">
+						<BaseDiamond
+							first={!!Number(game.runner_on_first)}
+							second={!!Number(game.runner_on_second)}
+							third={!!Number(game.runner_on_third)}
+							size={26}
 						/>
-						<span className="font-mono text-xs text-fog-300" title={`${game.outs} outs`}>
-							{outsDisplay(game.outs)}
-						</span>
+						<OutPips outs={game.outs} />
 					</div>
 				</div>
 				{mode && (

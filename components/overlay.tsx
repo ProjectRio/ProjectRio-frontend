@@ -21,7 +21,7 @@ export function Modal({
 
 	return (
 		<div
-			className="fixed inset-0 z-[60] flex items-center justify-center bg-night-950/80 p-4 backdrop-blur-sm"
+			className="fixed inset-0 z-[60] flex items-center justify-center bg-night-950/85 p-4"
 			onClick={onClose}
 			role="dialog"
 			aria-modal="true"
@@ -31,7 +31,7 @@ export function Modal({
 				className="panel max-h-[85vh] w-full max-w-lg overflow-y-auto"
 				onClick={(event) => event.stopPropagation()}
 			>
-				<div className="flex items-center justify-between border-b border-night-700 bg-night-850 px-4 py-3">
+				<div className="flex items-center justify-between border-b border-[var(--rim)] bg-black/30 px-4 py-3">
 					<h2 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">{title}</h2>
 					<button
 						type="button"
@@ -60,16 +60,16 @@ export function Tabs({
 	onChange: (id: string) => void;
 }) {
 	return (
-		<div className="mb-6 flex flex-wrap gap-1 border-b border-night-700" role="tablist">
+		<div className="mb-6 flex flex-wrap gap-1 border-b border-night-700 pb-2" role="tablist">
 			{tabs.map((tab) => (
 				<button
 					key={tab.id}
 					role="tab"
 					aria-selected={active === tab.id}
-					className={`-mb-px border-b-2 px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
+					className={`rounded-md border px-4 py-2 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
 						active === tab.id
-							? 'border-rio-500 text-fog-100'
-							: 'border-transparent text-fog-500 hover:text-fog-300'
+							? 'sel text-fog-100'
+							: 'border-transparent text-fog-300 hover:text-fog-100'
 					}`}
 					onClick={() => onChange(tab.id)}
 				>

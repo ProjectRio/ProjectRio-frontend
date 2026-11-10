@@ -18,8 +18,8 @@ import {
 	type ResultCategory
 } from '@/lib/gameEvents';
 
-const AWAY_COLOR = '#4f9dff';
-const HOME_COLOR = '#f43f5e';
+const AWAY_COLOR = 'var(--color-series-1)';
+const HOME_COLOR = 'var(--color-series-2)';
 
 interface SprayPoint {
 	event: GameEvent;
@@ -68,11 +68,11 @@ export default function SprayChart({
 
 	return (
 		<div className="panel">
-			<div className="flex flex-wrap items-center justify-between gap-2 border-b border-night-700 bg-night-850 px-4 py-3">
+			<div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--rim)] bg-black/30 px-4 py-3">
 				<h2 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">
 					Spray Chart
 				</h2>
-				<div className="flex overflow-hidden rounded-lg border border-night-600 text-xs">
+				<div className="flex gap-1 text-xs">
 					{(
 						[
 							['both', 'Both'],
@@ -82,8 +82,8 @@ export default function SprayChart({
 					).map(([value, label]) => (
 						<button
 							key={String(value)}
-							className={`px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
-								side === value ? 'bg-rio-500 text-white' : 'text-fog-300 hover:bg-night-700'
+							className={`rounded-md border px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
+								side === value ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
 							}`}
 							onClick={() => setSide(value as typeof side)}
 						>
@@ -124,7 +124,7 @@ export default function SprayChart({
 
 					{hoveredPoint && (
 						<div
-							className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-night-600 bg-night-950/95 px-2.5 py-1.5 text-xs shadow-xl"
+							className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-[var(--rim-strong)] bg-night-950 px-2.5 py-1.5 text-xs"
 							style={{
 								left: `${hoveredPoint.x}%`,
 								top: `${Math.max(hoveredPoint.y - 6, 2)}%`

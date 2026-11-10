@@ -4,8 +4,24 @@
 		{
 			"name": "next-dev",
 			"runtimeExecutable": "npm",
-			"runtimeArgs": ["run", "dev"],
-			"port": 3000
+			"runtimeArgs": [
+				"run",
+				"dev"
+			],
+			"port": 3000,
+			"autoPort": true
+		},
+		{
+			"name": "next-dev-prod-api",
+			"runtimeExecutable": "env",
+			"runtimeArgs": [
+				"NEXT_PUBLIC_RIO_BACKEND=https://api.projectrio.app",
+				"npm",
+				"run",
+				"dev"
+			],
+			"port": 3000,
+			"autoPort": true
 		}
 	]
 }

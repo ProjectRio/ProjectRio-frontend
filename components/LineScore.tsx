@@ -68,15 +68,15 @@ export default function LineScore({
 											return (
 												<td
 													key={i}
-													className={`min-w-7 px-2.5 py-1 text-center tabular-nums ${
-														hot ? 'rounded bg-rio-500/20 font-bold text-fog-100' : 'text-fog-300'
+													className={`min-w-7 px-2.5 py-1 text-center font-mono tabular-nums ${
+														hot ? 'rounded bg-star-400/15 font-bold text-star-300' : 'text-fog-300'
 													}`}
 												>
 													{team.runs[i - 1] ?? '–'}
 												</td>
 											);
 										})}
-										<td className={`min-w-7 border-l border-night-700 pl-3 text-center font-bold tabular-nums ${tone}`}>
+										<td className={`min-w-7 border-l border-night-700 pl-3 text-center font-mono font-bold tabular-nums ${tone}`}>
 											{team.total}
 										</td>
 									</tr>

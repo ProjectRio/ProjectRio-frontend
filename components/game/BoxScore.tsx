@@ -283,12 +283,12 @@ export function TeamPanel({
 	const [tab, setTab] = useState<'batting' | 'fielding'>('batting');
 
 	const toggle = (
-		<div className="flex overflow-hidden rounded-lg border border-night-600 text-xs">
+		<div className="flex gap-1 text-xs">
 			{(['batting', 'fielding'] as const).map((view) => (
 				<button
 					key={view}
-					className={`px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
-						tab === view ? 'bg-rio-500 text-white' : 'hover:bg-night-700'
+					className={`rounded-md border px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
+						tab === view ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
 					}`}
 					onClick={() => setTab(view)}
 				>

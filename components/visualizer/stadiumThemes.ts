@@ -25,6 +25,10 @@ export interface StadiumTheme3D {
 	emissive: Record<string, string>;
 	foulMult: number;
 	decals?: { x: number; z: number; r: number; color: string }[];
+	/** Horizon ground plane color (fog-faded); the terrain surrounding the arena. */
+	ground?: string;
+	/** Dark-sky theme: the sky dome gets a starfield. */
+	night?: boolean;
 }
 
 // Keyed by stadium_id (matches lib/data/characters.ts `stadiums`).
@@ -53,7 +57,9 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#e8c84a'
 		},
 		emissive: { water: '#2fb8d8' },
-		foulMult: 0.82
+		foulMult: 0.82,
+		// Sunny Island sits in the sea.
+		ground: '#4db4d4'
 	},
 	// Bowser Castle
 	1: {
@@ -79,7 +85,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#ffd03f'
 		},
 		emissive: { pit: '#ff4800', water: '#ff5a00', chomp: '#ffb300' },
-		foulMult: 0.74
+		foulMult: 0.74,
+		ground: '#221419'
 	},
 	// Wario Palace
 	2: {
@@ -105,7 +112,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#e8c34a'
 		},
 		emissive: {},
-		foulMult: 0.8
+		foulMult: 0.8,
+		ground: '#c9a86a'
 	},
 	// Yoshi Park
 	3: {
@@ -131,7 +139,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#e8c84a'
 		},
 		emissive: { water: '#3fa0e0' },
-		foulMult: 0.86
+		foulMult: 0.86,
+		ground: '#54ad46'
 	},
 	// Peach Garden (Peach's Castle)
 	4: {
@@ -157,7 +166,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#e8cf6a'
 		},
 		emissive: { water: '#5fb0e0' },
-		foulMult: 0.84
+		foulMult: 0.84,
+		ground: '#79a468'
 	},
 	// DK Jungle (Donkey Kong Jungle)
 	5: {
@@ -183,7 +193,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 			chomp: '#e0b84a'
 		},
 		emissive: { water: '#6fc0d8' },
-		foulMult: 0.78
+		foulMult: 0.78,
+		ground: '#3d5c36'
 	},
 	// Toy Field
 	6: {
@@ -211,6 +222,8 @@ export const THEMES_3D: Record<number, StadiumTheme3D> = {
 		},
 		emissive: { pit: '#d9a93a' },
 		foulMult: 0.92,
+		ground: '#0a0e1e',
+		night: true,
 		// HIT / COIN / bonus pads — colors only, positions approximate
 		decals: [
 			{ x: -25, z: 50, r: 7, color: '#d42b2b' },

@@ -17,7 +17,7 @@ export function adminGuard({ context, loading, error }: UseCommunityResult) {
 		return (
 			<div className="mx-auto max-w-lg">
 				<div className="panel p-8 text-center">
-					<h1 className="text-2xl uppercase">Admins Only</h1>
+					<h1 className="text-2xl">Admins Only</h1>
 					<p className="mt-3 text-sm text-fog-300">
 						{context.username
 							? `Only ${context.community.name} admins can manage its game modes and tags.`

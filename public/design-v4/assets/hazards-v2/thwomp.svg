@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs>
+ <linearGradient id="stone" x2=".8" y2="1"><stop stop-color="#d2dad7"/><stop offset=".45" stop-color="#95a6ab"/><stop offset="1" stop-color="#61757e"/></linearGradient>
+ <linearGradient id="face" x2="0" y2="1"><stop stop-color="#7e9197"/><stop offset="1" stop-color="#4b616a"/></linearGradient>
+ <radialGradient id="iron" cx=".3" cy=".2" r=".8"><stop stop-color="#5f7690"/><stop offset=".4" stop-color="#243b54"/><stop offset=".78" stop-color="#101d30"/><stop offset="1" stop-color="#080e1b"/></radialGradient>
+ <linearGradient id="red" x1=".1" y1="0" x2=".85" y2="1"><stop stop-color="#ff7356"/><stop offset=".45" stop-color="#dc362e"/><stop offset="1" stop-color="#9a1925"/></linearGradient>
+ <linearGradient id="lip" x2=".7" y2="1"><stop stop-color="#fffce8"/><stop offset=".5" stop-color="#f3edce"/><stop offset="1" stop-color="#bfc5a6"/></linearGradient>
+ <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#96c843"/><stop offset=".45" stop-color="#4f9e3b"/><stop offset="1" stop-color="#236633"/></linearGradient>
+ <linearGradient id="wood" x2="1" y2=".15"><stop stop-color="#71401e"/><stop offset=".24" stop-color="#c58b47"/><stop offset=".55" stop-color="#b57536"/><stop offset="1" stop-color="#6a3d21"/></linearGradient>
+ <linearGradient id="metal" x2="1" y2=".4"><stop stop-color="#63716a"/><stop offset=".25" stop-color="#d4d4ac"/><stop offset=".5" stop-color="#909a85"/><stop offset="1" stop-color="#465a53"/></linearGradient>
+ <linearGradient id="blue" x2=".2" y2="1"><stop stop-color="#74a9db"/><stop offset=".48" stop-color="#4279b5"/><stop offset="1" stop-color="#264d82"/></linearGradient>
+ <radialGradient id="fire" cx=".55" cy=".7" r=".75"><stop stop-color="#fff4a1"/><stop offset=".45" stop-color="#ffcc49"/><stop offset=".75" stop-color="#fb8526"/><stop offset="1" stop-color="#d94b23"/></radialGradient>
+ <linearGradient id="gold" x2=".8" y2="1"><stop stop-color="#fff59d"/><stop offset=".5" stop-color="#f9d449"/><stop offset="1" stop-color="#c68a1e"/></linearGradient>
+ </defs>
+<g stroke="#344e5a" stroke-width="2" stroke-linejoin="round">
+ <path d="M18 22L16 9L31 16L37 4L47 14L61 3L69 13L84 5L90 17L106 10L105 25L120 28L111 42L124 51L113 63L125 76L111 84L120 99L105 102L106 117L91 110L84 123L71 113L61 125L50 114L36 121L31 110L16 116L18 102L4 98L12 84L2 75L13 63L3 51L15 42L6 28Z" fill="url(#stone)"/>
+ <path d="M24 22H101L105 105H22Z" fill="#c4cfcc"/>
+ <path d="M29 28L95 27L100 99L28 102Z" fill="url(#face)"/>
+ <path d="M24 22L29 28L28 102L22 105M95 27L101 22M100 99L105 105" stroke="#ebedd8" stroke-width="1.4"/>
+ <path d="M36 45Q46 39 57 52L55 66L39 65Z" fill="#f1edcb"/>
+ <path d="M90 44Q80 39 68 52L71 66L88 64Z" fill="#f1edcb"/>
+ <path d="M49 49L50 62M76 49L75 62" stroke="#bd4038" stroke-width="6"/><path d="M50 51V62M75 51V62" stroke="#242b33" stroke-width="2.5"/>
+ <path d="M32 39L58 52L59 45L37 35ZM94 38L67 52L66 45L90 34Z" fill="#b4c3c1"/>
+ <path d="M58 61L64 55L70 68L64 72L57 68" fill="#82979b"/>
+ <path d="M39 87Q47 75 61 78Q77 73 88 85L88 95L76 91L64 94L52 91L39 95Z" fill="#263941"/>
+ <path d="M43 85Q61 80 83 84L81 89L43 90Z" fill="#e5e7d1" stroke="none"/>
+ <path d="M50 83V90M60 82V90M71 82V90M80 83V89" stroke="#516165" stroke-width="1.6"/>
+ <path d="M31 69L35 74L32 79M93 71L88 76L93 79M34 29L40 32M91 92L96 94" fill="none" stroke="#b2bcb2" stroke-width="1.4"/>
+</g></svg>

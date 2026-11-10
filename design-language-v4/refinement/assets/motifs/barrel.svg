@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs>
+<g id="thwomp" stroke="#354440" stroke-width="1.5" stroke-linejoin="round">
+ <path d="M10 9L13 1L20 8L27 1L32 7L39 1L44 8L52 2L54 10L62 13L56 21L63 27L57 33L63 40L55 45L60 53L50 55L47 63L39 57L32 64L25 57L18 63L14 55L4 56L8 46L1 41L7 33L1 26L8 20L2 13Z" fill="#9ba69b"/>
+ <rect x="10" y="10" width="44" height="44" rx="3" fill="#73887d"/>
+ <path d="M14 15H50V49H14Z" fill="#647a70" stroke="#bdc2a3"/>
+ <path d="M15 23L29 29L25 34L17 32ZM49 23L35 29L39 34L47 32Z" fill="#e4dfbb"/>
+ <path d="M21 27V32M43 27V32" stroke="#222e2b" stroke-width="3"/>
+ <path d="M19 43L25 38L32 40L39 38L45 43L44 48H20Z" fill="#2f3d37"/>
+ <path d="M22 43H42M25 43V47M32 43V47M39 43V47" stroke="#d1d2b5" stroke-width="1.4"/>
+</g>
+<g id="bubble"><path d="M32 4C31 23 52 20 52 39A20 20 0 0 1 12 39C12 24 27 24 32 4Z" fill="#e8ad56" stroke="#ab6d35" stroke-width="1.4"/><ellipse cx="25" cy="37" rx="3" ry="6" fill="#3b483b"/><ellipse cx="38" cy="37" rx="3" ry="6" fill="#3b483b"/></g>
+<g id="chomp" stroke-linecap="round" stroke-linejoin="round">
+ <g fill="none" stroke="#b1aa8d" stroke-width="3"><ellipse cx="8" cy="53" rx="6" ry="3" transform="rotate(-25 8 53)"/><ellipse cx="18" cy="49" rx="6" ry="3" transform="rotate(-25 18 49)"/><ellipse cx="27" cy="45" rx="6" ry="3"/></g>
+ <path d="M55 31L37 38L55 45A24 24 0 1 1 55 31Z" fill="#223342" stroke="#b5b7a5" stroke-width="1.3"/>
+ <path d="M55 31L47 38L46 33L41 40L39 37L55 45" fill="#eee8cc"/>
+ <ellipse cx="37" cy="24" rx="4.5" ry="7" fill="#f7efcd"/><ellipse cx="39" cy="24" rx="1.8" ry="3.5" fill="#182626"/>
+ <path d="M15 21Q20 12 29 13" fill="none" stroke="#82979e" stroke-width="2"/>
+</g>
+<g id="plant" stroke="#344c31" stroke-width="1.3" stroke-linejoin="round">
+ <path d="M31 58Q39 40 30 27" fill="none" stroke="#779044" stroke-width="6"/>
+ <path d="M33 50Q16 53 13 41Q27 38 33 50M35 44Q49 29 55 41Q50 49 35 44" fill="#8ca34e"/>
+ <path d="M49 10L27 22L50 24A21 21 0 1 1 49 10Z" fill="#b95e4d"/>
+ <path d="M49 10L27 22L50 24" fill="none" stroke="#f2e6c3" stroke-width="5"/>
+ <path d="M41 15L40 20L35 19M41 23L44 19L47 23" fill="#f2e6c3" stroke="none"/>
+ <g fill="#f2e6c3" stroke="none"><ellipse cx="17" cy="19" rx="4" ry="5"/><ellipse cx="27" cy="8" rx="4" ry="3"/><ellipse cx="24" cy="33" rx="4" ry="3"/></g>
+</g>
+<g id="note" stroke="#6d6655" stroke-width="1.5" stroke-linejoin="round">
+ <rect x="7" y="7" width="49" height="49" rx="3" fill="#dfd6b3"/>
+ <path d="M11 50V11H51" fill="none" stroke="#fff0cb" stroke-width="2"/><path d="M14 54H54V14" fill="none" stroke="#b0a583"/>
+ <path d="M38 16V38Q35 44 28 43Q22 42 25 37Q28 33 34 35V19Z" fill="#66564c" stroke="none"/>
+ <path d="M37 16Q41 21 43 25" stroke="#66564c" stroke-width="3" fill="none"/>
+</g>
+<g id="barrel" stroke="#473d2b" stroke-width="1.4">
+ <path d="M13 9Q32 2 51 9Q62 32 51 55Q32 62 13 55Q2 32 13 9Z" fill="#9e7944"/>
+ <path d="M20 8Q12 32 20 56M30 6V59M41 7Q49 32 41 57" fill="none" stroke="#604c30"/>
+ <path d="M9 17Q32 23 55 17L57 24Q32 30 7 24ZM8 42Q32 48 56 42L53 49Q32 55 11 49Z" fill="#b6aa80"/>
+ <ellipse cx="32" cy="9" rx="19" ry="6" fill="#c3a16b"/><ellipse cx="32" cy="9" rx="14" ry="3" fill="#7e613a"/>
+</g>
+<g id="klaptrap" stroke="#354d45" stroke-width="1.2" stroke-linejoin="round">
+ <path d="M7 42L1 30L16 34L23 24L27 32L32 20L38 28L50 22L57 30L54 42L64 45L59 51L27 50L20 57L13 55L15 48Z" fill="#6e9a9d"/>
+ <path d="M35 35L62 34L58 44L32 43Z" fill="#f1e4bf"/><path d="M36 35L39 40L43 35L47 41L51 35L55 41L59 35" fill="none"/>
+ <ellipse cx="42" cy="25" rx="5" ry="7" fill="#e7dfaf"/><ellipse cx="44" cy="25" rx="2" ry="3" fill="#233d36"/>
+</g>
+<g id="ball" fill="#e9e1bd" stroke="#ad9e77" stroke-width="1"><circle cx="32" cy="32" r="23"/><path d="M17 14Q35 32 17 50M47 14Q29 32 47 50" fill="none" stroke="#b57861" stroke-width="1.6"/><path d="M20 18l-5 4m9 2l-5 4m7 3l-5 3m3 4l-5 3m1 2l-4 3M44 18l5 4m-9 2l5 4m-7 3l5 3m-3 4l5 3m-1 2l4 3" stroke="#b57861"/></g>
+<g id="star" fill="#e0bf70" stroke="#87734e" stroke-width="1.3"><path d="M32 4L40 22L60 24L45 38L49 59L32 49L14 59L18 38L3 24L24 22Z"/><path d="M26 26V36M38 26V36" stroke="#5f5940" stroke-width="2.3"/></g>
+</defs><use href="#barrel"/></svg>

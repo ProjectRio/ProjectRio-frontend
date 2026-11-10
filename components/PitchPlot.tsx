@@ -57,7 +57,7 @@ export default function PitchPlot({ pitchInputs, height = 750 }: { pitchInputs: 
 		<svg width={width} height={height} role="img" aria-label="Pitch trajectory plot">
 			<path d={toPath(HOME_PLATE)} fill="none" stroke="#45a3ff" strokeWidth={3} />
 			<path d={toPath(PITCHERS_PLATE)} fill="none" stroke="#45a3ff" strokeWidth={3} />
-			<path d={pitchPath} fill="none" stroke="#5a5a70" strokeWidth={1} />
+			<path d={pitchPath} fill="none" stroke="var(--color-night-600)" strokeWidth={1} />
 			{points.map((frame, index) => (
 				<g key={frame.pitchFrame}>
 					{hovered === index && (

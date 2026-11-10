@@ -41,7 +41,7 @@ function ContactQualityBar({ stats }: { stats: any }) {
 	];
 	return (
 		<div>
-			<p className="text-[11px] font-semibold uppercase tracking-widest text-fog-500">Contact Quality</p>
+			<p className="font-display text-[11px] font-semibold uppercase tracking-widest text-fog-500">Contact Quality</p>
 			<div className="mt-2 flex h-2.5 overflow-hidden rounded-full">
 				{segments.map((segment) => (
 					<div key={segment.label} className={segment.color} style={{ width: `${(segment.count / total) * 100}%` }} />
@@ -164,7 +164,7 @@ export default function PlayerStatsPage({ user, kind }: { user: string; kind: 'b
 								</div>
 								<div className="grid gap-5 border-t border-night-700 pt-5 sm:grid-cols-2">
 									<ContactQualityBar stats={overall} />
-									<div className="text-sm text-fog-500 sm:text-right" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<div className="text-sm text-fog-500 sm:text-right tabular-nums">
 										{getPa(overall)} plate appearances in {mode}
 									</div>
 								</div>

@@ -1,48 +1,75 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import ParkPicker from './ParkPicker';
+import { PARK_THEMES_ENABLED } from '@/lib/parks';
 
+const COLUMNS = [
+	{
+		title: 'Compete',
+		links: [
+			{ href: '/modes', label: 'Ranked ladders' },
+			{ href: '/games/live', label: 'Live games' },
+			{ href: '/games/recent', label: 'Recent games' }
+		]
+	},
+	{
+		title: 'Stats',
+		links: [
+			{ href: '/users', label: 'Players' },
+			{ href: '/characters', label: 'Characters' },
+			{ href: '/tools', label: 'Tools' }
+		]
+	},
+	{
+		title: 'Community',
+		links: [
+			{ href: 'https://discord.gg/c3r9PabfRU', label: 'Discord' },
+			{ href: 'https://www.patreon.com/projectrio/posts', label: 'Patreon' },
+			{ href: 'https://github.com/ProjectRio?tab=repositories', label: 'GitHub' }
+		]
+	}
+];
+
+/** The dugout: below the foul line, on the dirt. */
 export default function Footer() {
 	return (
-		<footer className="mt-16 border-t border-night-700 bg-night-900">
-			<div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-				<div>
-					<div className="flex items-center gap-2">
-						<Image src="/images/RioLogo.png" alt="" width={28} height={28} className="[image-rendering:pixelated]" />
-						<span className="font-display font-bold uppercase tracking-widest">
-							Project<span className="text-rio-500">Rio</span>
-						</span>
+		<footer className="mt-20 bg-[var(--wall)] [box-shadow:0_-3px_0_var(--track-a),0_-6px_0_var(--track-b)]">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="grid gap-10 py-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
+					<div>
+						<div className="flex items-center gap-2.5">
+							<Image src="/images/RioLogo.png" alt="" width={28} height={28} className="[image-rendering:pixelated]" />
+							<span className="font-title text-xl leading-none">
+								Project <span className="text-rio-400">Rio</span>
+							</span>
+						</div>
+						{PARK_THEMES_ENABLED && <ParkPicker />}
 					</div>
-					<p className="mt-3 text-sm text-fog-500">
-						Competitive Mario Superstar Baseball — online ranked play, stats, and community events.
-					</p>
+					{COLUMNS.map((column) => (
+						<div key={column.title}>
+							<h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-fog-500">
+								{column.title}
+							</h3>
+							<ul className="mt-3 space-y-1.5 font-display text-lg font-medium text-fog-300">
+								{column.links.map((link) => (
+									<li key={link.href}>
+										{link.href.startsWith('http') ? (
+											<a href={link.href} target="_blank" rel="noreferrer" className="hover:text-fog-100">
+												{link.label}
+											</a>
+										) : (
+											<Link href={link.href} className="hover:text-fog-100">
+												{link.label}
+											</Link>
+										)}
+									</li>
+								))}
+							</ul>
+						</div>
+					))}
 				</div>
-				<div>
-					<h3 className="kicker">Compete</h3>
-					<ul className="mt-3 space-y-2 text-sm text-fog-300">
-						<li><Link href="/modes" className="hover:text-fog-100">Ranked Ladders</Link></li>
-						<li><Link href="/games/live" className="hover:text-fog-100">Live Games</Link></li>
-						<li><Link href="/games/recent" className="hover:text-fog-100">Recent Games</Link></li>
-					</ul>
-				</div>
-				<div>
-					<h3 className="kicker">Stats</h3>
-					<ul className="mt-3 space-y-2 text-sm text-fog-300">
-						<li><Link href="/users" className="hover:text-fog-100">Player Stats</Link></li>
-						<li><Link href="/characters" className="hover:text-fog-100">Character Stats</Link></li>
-						<li><Link href="/tools/pitch-calculator" className="hover:text-fog-100">Pitch Visualizer</Link></li>
-					</ul>
-				</div>
-				<div>
-					<h3 className="kicker">Community</h3>
-					<ul className="mt-3 space-y-2 text-sm text-fog-300">
-						<li><a href="https://discord.gg/c3r9PabfRU" target="_blank" rel="noreferrer" className="hover:text-fog-100">Discord</a></li>
-						<li><a href="https://www.patreon.com/projectrio/posts" target="_blank" rel="noreferrer" className="hover:text-fog-100">Patreon</a></li>
-						<li><a href="https://github.com/ProjectRio?tab=repositories" target="_blank" rel="noreferrer" className="hover:text-fog-100">GitHub</a></li>
-					</ul>
-				</div>
-			</div>
-			<div className="border-t border-night-800 py-4 text-center text-xs text-fog-500">
-				Project Rio is a fan project and is not affiliated with Nintendo.
+				<div className="chalk" />
+				<p className="py-4 text-xs text-fog-500">Project Rio is a fan project and is not affiliated with Nintendo.</p>
 			</div>
 		</footer>
 	);

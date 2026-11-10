@@ -10,11 +10,8 @@ import { playerWon } from '@/lib/playerHistory';
 export function StatBlock({ label, value, sub }: { label: string; value: ReactNode; sub?: string }) {
 	return (
 		<div className="min-w-0">
-			<p className="text-[11px] font-semibold uppercase tracking-widest text-fog-500">{label}</p>
-			<p
-				className="mt-1 truncate font-display text-2xl font-bold text-fog-100 sm:text-3xl"
-				style={{ fontVariantNumeric: 'tabular-nums' }}
-			>
+			<p className="font-display text-[11px] font-semibold uppercase tracking-widest text-fog-500">{label}</p>
+			<p className="mt-1 truncate font-mono text-2xl font-bold tabular-nums text-fog-100 sm:text-3xl">
 				{value}
 			</p>
 			{sub && <p className="mt-0.5 truncate text-xs text-fog-500">{sub}</p>}
@@ -48,14 +45,14 @@ export function WinRing({ wins, losses, size = 104 }: { wins: number; losses: nu
 					strokeWidth={stroke}
 					strokeLinecap="round"
 					strokeDasharray={`${circumference * pct} ${circumference}`}
-					className="stroke-rio-500"
+					className="stroke-star-400"
 				/>
 			</svg>
 			<div className="absolute inset-0 flex flex-col items-center justify-center">
-				<span className="font-display text-xl font-bold text-fog-100" style={{ fontVariantNumeric: 'tabular-nums' }}>
+				<span className="font-mono text-xl font-bold tabular-nums text-fog-100">
 					{total === 0 ? '—' : `${Math.round(pct * 100)}%`}
 				</span>
-				<span className="text-[10px] font-semibold uppercase tracking-widest text-fog-500">Win rate</span>
+				<span className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Win rate</span>
 			</div>
 		</div>
 	);
@@ -93,13 +90,13 @@ export function Sparkline({
 				strokeWidth={2}
 				strokeLinejoin="round"
 				strokeLinecap="round"
-				className="stroke-rio-400"
+				className="stroke-star-400"
 			/>
 		</svg>
 	);
 }
 
-export function UsageBar({ pct, color = 'bg-rio-500' }: { pct: number; color?: string }) {
+export function UsageBar({ pct, color = 'bg-star-400' }: { pct: number; color?: string }) {
 	return (
 		<div className="h-1.5 w-full overflow-hidden rounded-full bg-night-700">
 			<div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(100, pct * 100)}%` }} />

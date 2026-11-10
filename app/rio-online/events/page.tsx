@@ -13,7 +13,7 @@ export default function EventsPage() {
 						href="https://discord.com/invite/9ZZtpuEPCd"
 						target="_blank"
 						rel="noreferrer"
-						className="text-rio-400 hover:text-rio-300"
+						className="text-star-400 hover:text-star-300"
 					>
 						the Discord
 					</a>{' '}

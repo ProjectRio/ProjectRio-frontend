@@ -21,8 +21,8 @@ import {
 	type AtBat
 } from '@/lib/gameEvents';
 
-const AWAY_COLOR = '#4f9dff';
-const HOME_COLOR = '#f43f5e';
+const AWAY_COLOR = 'var(--color-series-1)';
+const HOME_COLOR = 'var(--color-series-2)';
 
 const SWING_NAMES: Record<number, string> = {
 	0: 'no swing',
@@ -57,7 +57,7 @@ function PitchChip({
 		ball: { glyph: 'B', cls: 'border-sky-400/40 text-sky-300', label: 'Ball' },
 		strike: { glyph: 'S', cls: 'border-fog-500/40 text-fog-300', label: 'Strike' },
 		foul: { glyph: 'F', cls: 'border-fog-500/40 text-fog-500', label: 'Foul' },
-		'in-play': { glyph: '●', cls: 'border-rio-400/60 text-rio-300', label: 'In play' },
+		'in-play': { glyph: '●', cls: 'border-sand-400/60 text-sand-400', label: 'In play' },
 		result: { glyph: '✦', cls: 'border-fog-500/40 text-fog-300', label: 'Result' },
 		event: { glyph: '·', cls: 'border-night-600 text-fog-500', label: 'Event' }
 	};
@@ -76,7 +76,7 @@ function PitchChip({
 	const chip = (
 		<span
 			title={title}
-			className={`inline-flex h-6 min-w-6 items-center justify-center rounded border bg-night-850 px-1 font-display text-[11px] font-bold ${cls} ${
+			className={`inline-flex h-6 min-w-6 items-center justify-center rounded border bg-black/40 px-1 font-display text-[11px] font-bold ${cls} ${
 				flight && onVisualize ? 'cursor-pointer transition-colors hover:border-star-400 hover:text-star-400' : ''
 			}`}
 			onClick={flight && onVisualize ? () => onVisualize(event) : undefined}
@@ -100,7 +100,7 @@ function BaseState({ event }: { event: GameEvent }) {
 	);
 }
 
-function AtBatRow({
+export function AtBatRow({
 	atBat,
 	onVisualize
 }: {
@@ -131,7 +131,7 @@ function AtBatRow({
 				<img
 					src={characterImage(batterName)}
 					alt=""
-					className="h-8 w-8 shrink-0 rounded-full border border-night-600 bg-night-850 object-contain p-0.5"
+					className="h-8 w-8 shrink-0 rounded-full border border-night-600 bg-black/40 object-contain p-0.5"
 				/>
 				<div className="min-w-0">
 					<p className="truncate text-sm font-semibold text-fog-100">
@@ -223,7 +223,7 @@ export default function PlayByPlay({
 					return (
 						<div key={gi}>
 							<button
-								className="flex w-full items-center justify-between bg-night-850 px-4 py-2 text-left transition-colors hover:bg-night-800"
+								className="flex w-full items-center justify-between bg-black/30 px-4 py-2 text-left transition-colors hover:bg-black/50"
 								onClick={() => toggle(gi)}
 							>
 								<span className="font-display text-xs font-bold uppercase tracking-widest">
@@ -234,11 +234,11 @@ export default function PlayByPlay({
 								</span>
 								<span className="flex items-center gap-3">
 									{runs > 0 && (
-										<span className="font-display text-xs font-bold text-star-400">
+										<span className="font-mono text-xs font-bold tabular-nums text-star-400">
 											{runs} run{runs > 1 ? 's' : ''}
 										</span>
 									)}
-									<span className="font-display text-[10px] text-fog-500">
+									<span className="font-mono text-[10px] tabular-nums text-fog-500">
 										{last.awayScoreAfter}–{last.homeScoreAfter}
 									</span>
 									<span className="text-fog-500">{isCollapsed ? '▸' : '▾'}</span>
@@ -260,7 +260,7 @@ export default function PlayByPlay({
 				<span><span className="text-sky-300">B</span> ball</span>
 				<span><span className="text-fog-300">S</span> strike</span>
 				<span><span className="text-fog-500">F</span> foul</span>
-				<span><span className="text-rio-300">●</span> in play</span>
+				<span><span className="text-sand-400">●</span> in play</span>
 				<span><span className="text-star-400">★</span> star pitch</span>
 				<span>click any in-play pitch to open it in 3D</span>
 			</div>

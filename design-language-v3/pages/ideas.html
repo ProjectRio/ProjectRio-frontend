@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Ideas Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#081817; --field:#0c2424;
+  --chrome:rgb(0 0 0 / .40); --chrome-2:rgb(0 0 0 / .58);
+  --rim:rgb(242 239 224 / .15); --rim-2:rgb(242 239 224 / .09);
+  --ink:#f3f0e2; --ink-2:#a9bbb7; --ink-3:#7a8e89;
+  --rio:#e60012; --gold:#fcd20c; --up:#4cc64c; --down:#e0533a;
+  --chem:#ff94b5; --anti:#ad4ad6;
+  --f-display:"Lilita One","Arial Black",sans-serif;
+  --f-label:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --ground:#e9e5d2; --field:#dcd7c0;
+    --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+    --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+    --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+    --gold:#9c7a00; --up:#1c7a2a; --down:#b23720; --anti:#8534a8;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --ground:#e9e5d2; --field:#dcd7c0;
+  --chrome:rgb(12 36 36 / .055); --chrome-2:rgb(12 36 36 / .10);
+  --rim:rgb(22 48 46 / .22); --rim-2:rgb(22 48 46 / .13);
+  --ink:#15302e; --ink-2:#47605c; --ink-3:#798a85;
+  --gold:#9c7a00; --up:#1c7a2a; --down:#b23720; --anti:#8534a8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-label);font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1140px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0}
+p{margin:0 0 1em}p:last-child{margin-bottom:0}
+code{font-family:var(--f-num);font-size:.82em;color:var(--ink-2)}
+a{color:var(--gold)}
+
+header.top{border-bottom:1px solid var(--rim-2)}
+header.top .wrap{padding-block:clamp(36px,7vw,58px) clamp(26px,5vw,40px)}
+.brandline{display:flex;align-items:center;gap:13px;margin-bottom:22px;flex-wrap:wrap}
+.mark{width:38px;height:38px;image-rendering:pixelated;flex:none;display:block}
+.brandline .t{font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+.brandline .t b{color:var(--ink-2);font-weight:600}
+h1{font-size:clamp(38px,7.6vw,72px);line-height:.94;margin-bottom:18px}
+.dek{font-size:clamp(16.5px,2.2vw,19px);line-height:1.46;max-width:64ch;color:var(--ink-2)}
+.dek b{color:var(--ink);font-weight:600}
+
+/* ── control bar ───────────────────────────────────────────────────────── */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--ground) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--rim-2)}
+.bar .wrap{padding-block:11px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+button{font:inherit;cursor:pointer}
+.chip{
+  font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink-3);background:var(--chrome);border:1px solid var(--rim-2);
+  border-radius:4px;padding:6px 10px;white-space:nowrap}
+.chip:hover{color:var(--ink-2);border-color:var(--rim)}
+.chip[aria-pressed="true"]{color:var(--ink);border-color:var(--ink-3);background:var(--chrome-2)}
+.chip .ct{font-family:var(--f-num);font-size:10.5px;opacity:.65;margin-left:5px}
+.chip:focus-visible,.pick:focus-visible,.act:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.act{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink);background:var(--chrome-2);border:1px solid var(--rim);
+  border-radius:4px;padding:6px 11px;white-space:nowrap}
+.act:hover{border-color:var(--ink-3)}
+.act b{font-family:var(--f-num);color:var(--gold)}
+
+/* ── groups ────────────────────────────────────────────────────────────── */
+.grp{border-bottom:1px solid var(--rim-2)}
+.grp > .wrap{padding-block:clamp(28px,4.4vw,42px)}
+.ghead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+h2{font-size:clamp(23px,3.6vw,32px);line-height:1.06}
+.groute{font-family:var(--f-num);font-size:11.5px;color:var(--ink-3)}
+.gnote{max-width:68ch;color:var(--ink-2);margin-bottom:22px;font-size:15.5px}
+
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(324px,1fr))}
+.card{background:var(--chrome);border:1px solid var(--rim);border-radius:6px;
+  padding:15px 16px;display:flex;flex-direction:column;gap:8px;position:relative}
+.card.on{border-color:var(--gold);background:var(--chrome-2)}
+.ctop{display:flex;align-items:flex-start;gap:10px}
+.idn{font-family:var(--f-num);font-size:11.5px;color:var(--ink-3);padding-top:3px;flex:none}
+.ctitle{font-family:var(--f-display);font-size:17.5px;line-height:1.16;flex:1;min-width:0}
+.pick{flex:none;width:24px;height:24px;border-radius:4px;background:transparent;
+  border:1px solid var(--rim);color:transparent;display:grid;place-items:center;
+  font-size:13px;line-height:1;padding:0}
+.pick:hover{border-color:var(--ink-3)}
+.card.on .pick{background:var(--gold);border-color:var(--gold);color:#1a1405}
+.cbody{font-size:14.5px;color:var(--ink-2);margin:0}
+.csrc{font-family:var(--f-num);font-size:11px;color:var(--ink-3);line-height:1.5}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.tag{font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.09em;
+  padding:3px 7px;border-radius:3px;border:1px solid var(--rim-2);color:var(--ink-3)}
+.tag.ready{color:var(--up);border-color:color-mix(in srgb,var(--up) 45%,transparent)}
+.tag.art{color:var(--chem);border-color:color-mix(in srgb,var(--chem) 45%,transparent)}
+.tag.data{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+.tag.call{color:var(--anti);border-color:color-mix(in srgb,var(--anti) 48%,transparent)}
+.tag.fix{color:var(--down);border-color:color-mix(in srgb,var(--down) 45%,transparent)}
+
+.empty{padding:40px 0;color:var(--ink-3);text-align:center}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-3);margin-top:18px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+
+.note{padding:15px 17px;border-radius:5px;background:var(--chrome);
+  border:1px solid var(--rim);font-size:15px;color:var(--ink-2)}
+.note b{color:var(--ink)}
+
+footer{padding-block:32px 52px;color:var(--ink-3);font-size:14px}
+footer .wrap > div{max-width:74ch}
+footer b{color:var(--ink-2)}
+
+/* shortlist sheet */
+dialog{border:1px solid var(--rim);border-radius:6px;background:var(--ground);color:var(--ink);
+  max-width:min(680px,92vw);width:100%;padding:0}
+dialog::backdrop{background:rgb(0 0 0 / .62)}
+.dh{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:15px 18px;border-bottom:1px solid var(--rim-2)}
+.dh h3{font-size:20px}
+.db{padding:16px 18px;max-height:56vh;overflow:auto}
+.db textarea{width:100%;min-height:230px;background:var(--chrome);color:var(--ink);
+  border:1px solid var(--rim);border-radius:5px;padding:11px;
+  font-family:var(--f-num);font-size:12.5px;line-height:1.6;resize:vertical}
+.df{padding:13px 18px;border-top:1px solid var(--rim-2);display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+
+@media (max-width:640px){
+  .cards{grid-template-columns:1fr}
+  /* the wrapped chip rows are too tall to pin on a phone */
+  .bar{position:static}
+  .bar .wrap{padding-block:11px}
+  .chips{flex:1 0 100%;order:2}
+  .act{order:1}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandline">
+      <img class="mark" src="RioLogo.png" alt="" width="38" height="38">
+      <span class="t"><b>Project Rio</b> · the ideas board · companion to Three Registers</span>
+    </div>
+    <h1><span id="totalN">104</span> things<br>we could build</h1>
+    <p class="dek">Every idea here is tied to a <b>real route</b> in the frontend and a <b>real thing the game does</b>. Nothing is a mood or a vibe — each one names its source so you can check it. Tick the ones you want and copy the shortlist out at the end. <b>Three Registers</b> is the law; this is the menu.</p>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="chips" id="chips"></div>
+    <button class="act" id="shortlistBtn">Shortlist <b id="pickCount">0</b></button>
+    <button class="act" id="clearBtn">Clear</button>
+  </div>
+</div>
+
+<main id="board"></main>
+
+<section class="grp">
+  <div class="wrap">
+    <div class="note">
+      <b>How to read the tags.</b> <span style="color:var(--up)">READY</span> means we already have everything needed — data, art and API. <span style="color:var(--gold)">DATA</span> needs a backend field or an endpoint that doesn't exist yet. <span style="color:var(--chem)">ART</span> needs something drawn or extracted. <span style="color:var(--anti)">YOUR CALL</span> is blocked on a decision only you can make. <span style="color:var(--down)">FIX</span> is a defect, not an enhancement.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p><b>Provenance.</b> Sources are texture ids from <code>Mario Superstar Baseball (USA).iso</code> (GYQE01) read in place with MSSB-Editor, symbol names from <code>mssb-dtk</code>, strings from text tables T79 and T83, and routes from this repo's <code>app/</code> tree. Where an idea rests on something we inferred rather than read, the source line says so.</p>
+      <p><b>This is a menu, not a plan.</b> A hundred-odd ideas is far more than should be built — the point is to choose. Ticks are stored in this browser only; they are not shared and they do not reach me unless you paste the shortlist back.</p>
+    </div>
+  </div>
+</footer>
+
+<dialog id="sheet">
+  <div class="dh">
+    <h3>Your shortlist</h3>
+    <button class="act" id="closeSheet">Close</button>
+  </div>
+  <div class="db">
+    <textarea id="sheetText" readonly aria-label="Shortlist text"></textarea>
+  </div>
+  <div class="df">
+    <button class="act" id="copyBtn">Copy to clipboard</button>
+  </div>
+</dialog>
+
+<script>
+const GROUPS = [
+  {id:"shell", name:"Shell and chrome", route:"global", note:"The parts every page wears. Getting these right is most of the change, because they are what a visitor sees fifty times a session."},
+  {id:"motion", name:"Motion and feedback", route:"global", note:"The game's menus are keyframe animations with exact frame counts, not tweens. These are the most portable findings on the board — every one of them is a CSS value you can paste in."},
+  {id:"hub", name:"The hub", route:"/", note:"What is happening now, in order. Data above the fold, never a blurred hero with two calls to action."},
+  {id:"ladder", name:"Ladder and ranking", route:"/modes/[gamemode]/ladder · /peak", note:"Credibility lives in a stable table and a named metric. The game has its own ranking language and it is better than generic tiers."},
+  {id:"game", name:"Game page and live", route:"/games/[gameID] · /games/live · /streaming/scoreboard", note:"The richest surface we have, and the one where the HUD's own component list maps almost one-to-one."},
+  {id:"player", name:"Player pages", route:"/users/[user] · /modes/player/[player]", note:"Identity first, then record. The game recognises people by naming them, not by grading them."},
+  {id:"char", name:"Characters", route:"/characters · /[char] · /analytics · /swing-lab", note:"Fifty-four slots with real published stats, a symmetric chemistry matrix, and thirty-two bios already written."},
+  {id:"park", name:"Stadiums", route:"/games/[gameID] visualizer · park pages", note:"A park is a material and a hazard, and only then a colour. Seven accent hues is not seven themes."},
+  {id:"team", name:"Teams and rosters", route:"team pickers · lineup builder", note:"Forty-eight names in three renderings each already exist on the disc, with per-captain palettes."},
+  {id:"league", name:"Communities and competitions", route:"/communities · /collections · /competitions", note:"Season structure, drafts and brackets. The game's Grand Prix and records book are the closest models."},
+  {id:"tools", name:"Tools and Rio Online", route:"/tools · /codes · /rio-online", note:"Utility surfaces, where the game's settings copy and its challenge shop are directly reusable."},
+  {id:"auth", name:"Auth and onboarding", route:"/login · /signup · /rio-online/tutorial", note:"The least designed part of most sites, and the one where a game's vocabulary pays off fastest."},
+  {id:"sys", name:"System and process", route:"globals.css · PRSH · CI", note:"Things that keep the language from drifting back once it ships."}
+];
+
+const T = {ready:["ready","Ready"],data:["data","Needs data"],art:["art","Needs art"],call:["call","Your call"],fix:["fix","Fix"],quick:["","Quick"],big:["","Big"]};
+
+const IDEAS = [
+// ── shell ────────────────────────────────────────────────────────────────
+{g:"shell",t:"One loud slot per route",b:"A <LoudSlot> component that throws in development if a second one mounts. The colour budget stops being a guideline and becomes a thing the build enforces.",s:"Derived: the game quarantines its clashing register to minigame logos and place badges only.",tags:["ready","quick"]},
+{g:"shell",t:"The real selection bar as :focus-visible",b:"The game's cursor is a translucent rounded bar assembled from a cap, a repeating middle and a mirrored cap. Black at 57% behind a warm three-row rim, about 5px rounded. It works on any background and needs no accent colour.",s:"1745:027 middle (uniform columns, so it tiles) + 1745:028 cap. Column profile: #bbaaaa a109 / #b5ada5 a255 / #887777 a219 / black a146. Opaque twin at 1744:029-030.",tags:["ready","quick"]},
+{g:"shell",t:"Loading tips, rotating, in the game's frame",b:"A dimmed park backdrop, outlined title, halftone vignette, and a tip underneath. Seventeen are written already and Rio's own can be added in the same voice.",s:"Banners 2536-2552, bodies T79 #146-162, verbatim.",tags:["ready"]},
+{g:"shell",t:"The swing changes with context",b:"The loader's batter is the captain whose page you are opening, or who won the game you are loading. One 16-frame strip per captain, built the same way Bowser's was.",s:"Entry 262 body, bank 264, clip b09_ba_008. Pipeline proven; 11 more captains to render.",tags:["art","big"]},
+{g:"shell",t:"404 is a foul ball",b:"The ball leaves the park and the page says so in the game's voice. The trajectory maths is already ported to TypeScript in this repo.",s:"lib/mssb/BattingSimulation — the physics port with golden-vector sync.",tags:["ready"]},
+{g:"shell",t:"Empty states are drawn as absence",b:"An unfilled roster slot hides its bars and portrait rather than greying them out — the game's own empty state. Note this no longer rests on a 'slot' texture: there isn't one.",s:"rosterCharID CHAR_ID_NONE (-1), rosterSpotFilledInd FALSE; the character-select screen hides the bars and portrait.",tags:["ready","quick"]},
+{g:"shell",t:"Toasts as result banners",b:"Banded gradient on a dark keyline, the way the game announces a result. Short-lived, loud, and they do not count against the page's loud slot because they are transient.",s:"2516:027 'Last ball!' stamp; place badges 1745:166-170.",tags:["ready","quick"]},
+{g:"shell",t:"Nav as floating labels, not pills",b:"Condensed uppercase with a dark outline on transparent. No chips, no plates, no background. The game never puts a plate behind a label.",s:"1745:142-145 stat labels, 100x22, white text with dark outline on transparent.",tags:["ready","quick"]},
+{g:"shell",t:"Pips for every small bounded count",b:"Balls, strikes, outs, games remaining, slots used, roster spots filled. Always one fewer pip than the count that ends the state, which is the game's own convention.",s:"HUD element 0x107 — 3 ball pips, 2 strike, 2 out.",tags:["ready","quick"]},
+{g:"shell",t:"A banded-gradient utility",b:"Ship --band-gold, --band-hot and --band-cool in globals.css as five-to-seven hard stops. One token and every gradient on the site stops looking like Tailwind's default.",s:"Measured: #ff9400 to #ffb500 to #ffce00 to #ffb500 to #ff9400 to #f77b00 to #b54200.",tags:["ready","quick"]},
+{g:"shell",t:"Replace #07070b with #0c2424",b:"The current ground is a cold neutral the game never uses. #0c2424 is present in all seven parks at about 4.5% and reads warm and sunk instead of flat.",s:"Sampled across all seven park texture sets.",tags:["ready","quick"]},
+{g:"shell",t:"Spacing scale from the logo grid",b:"The mark is sixteen cells. At 64px that is a 4px cell, so take 4px as the base unit and every step is a whole number of logo pixels.",s:"public/images/RioLogo.png resolves to a true 16x16 grid.",tags:["ready","quick"]},
+{g:"shell",t:"Real controller glyphs",b:"A, B, X, Y, L, R, Z with their actual colours wherever the site documents an input, instead of generic keyboard chips.",s:"Entry 80, 27x22 each. A #00a563, B #ef2929, X/Y grey pills, Z purple.",tags:["art","quick"]},
+{g:"shell",t:"Screen transitions with weight",b:"Route changes get a directional wipe rather than a cross-fade, matching how the game moves between menus. Needs the choreography pass to land before the shape is settled.",s:"Pending: menu transition implementation in the decomp.",tags:["data"]},
+// ── hub ──────────────────────────────────────────────────────────────────
+{g:"hub",t:"Live games first, with one red pip",b:"The live indicator is the only thing on the hub allowed to use Rio red. Losses, deltas and chart series take the game's #e0533a instead.",s:"Resolves the current site's one-red-three-jobs problem.",tags:["ready","quick"]},
+{g:"hub",t:"Past, now, next as a phase stepper",b:"Three states in a row rather than a countdown as centrepiece. A countdown is the single most common generated-landing-page tell.",s:"Pattern, not sourced from the game.",tags:["ready"]},
+{g:"hub",t:"Today at the park",b:"One park themes the hub each day — its material as the backdrop, its hazard named in the strap. Seven days, seven genuinely different hubs, and no new art.",s:"Procedural material recipes; hazards verbatim from T79 #151-162.",tags:["ready"]},
+{g:"hub",t:"The tip of the day",b:"One rotating tip on the hub in the game's frame, drawn from the seventeen plus Rio's own. Teaches the game and sets the voice in the same element.",s:"T79 #146-162.",tags:["ready","quick"]},
+{g:"hub",t:"A chemistry moment feed",b:"When a live game has three buddy links on base, the power multiplier is at 1.50 and something is about to happen. Surface that as a live card — no scoreboard anywhere shows it.",s:"chemBobbleMults: power x1.10 / x1.25 / x1.50 by links on base.",tags:["data"]},
+{g:"hub",t:"Records watch",b:"Who is close to a records-book record right now, with the gap stated. Turns a static leaderboard into something with stakes.",s:"Records book index: Past MVPs, Trophies Won, Past Superstars, Toy Field Records, Minigame Records, Grand Prix Medals.",tags:["data"]},
+// ── ladder ───────────────────────────────────────────────────────────────
+{g:"ladder",t:"The gold rail down the left",b:"A 30x276 capped rail with a banded gold fill, run vertically beside the ladder and filled to your position. Gold is already the game's ranking colour.",s:"1745:033 — 2px black keyline, dark gold #948408, banded #fff721 to #ffde4a to #ffbd00, cap #bda500.",tags:["ready"]},
+{g:"ladder",t:"The game's progression nouns",b:"A per-character growth-title ladder exists and ends in 'Star'. Use those nouns instead of Shell/Mushroom/Flower/Star/Special/Legend invented tiers.",s:"T83 growth titles. Note: my reading of the top rungs comes from the string table's layout, not from clearing the missions.",tags:["call"]},
+{g:"ladder",t:"Cut lines drawn on the page",b:"Qualification shown as a labelled rule between rows, not implied by a highlight. Say what the cut is for and how many advance.",s:"Pattern from Liquipedia and Slippi, not from the game.",tags:["ready","quick"]},
+{g:"ladder",t:"Call it Past Superstars",b:"The records book's own section title, and a better page name than Leaderboard. Costs nothing and immediately sounds like this game.",s:"T83 records book index, verbatim.",tags:["ready","quick"]},
+{g:"ladder",t:"Peak as a records-book spread",b:"The /peak route rendered as a two-page book layout rather than another table. The records book is the game's own way of showing bests.",s:"Entry 1744, 32 textures; panel is black at 50% with a 1px white @30% + 1px grey @50% rim.",tags:["ready"]},
+{g:"ladder",t:"Rank delta as pips",b:"Movement shown as filled pips in the direction travelled, not a coloured arrow with a number. Keeps green and red for genuine win and loss only.",s:"Extends the game's pip convention; not drawn this way on the disc.",tags:["ready","quick"]},
+{g:"ladder",t:"Superstars Off and On as the game's toggle",b:"The mode bracket is a real game setting with its own label on the disc. Use the game's switch treatment rather than a generic segmented control.",s:"1745:155 'Superstars' menu header; settings copy 'Star Skills — Turn Star Skills ON or OFF.'",tags:["ready","quick"]},
+{g:"ladder",t:"Stop grading",b:"No star ratings, no A-to-F scale. The recognition the game actually ships is MVP, medals and trophies. Softened from an earlier flat claim: see the note on the gold letters below.",s:"No grade scale found in the records book or results atlases. But entry 2513 holds a gold display alphabet and seven result bands reference it — mapping undecoded.",tags:["call","quick"]},
+{g:"ladder",t:"Settle the gold letters",b:"Entry 2513 has big gold letters G A N C B W F D S L K and two hyphens. There is no E, and W, K, N, G and L are in no grade scale, so this is an alphabet for composing call-outs. But seven Grand Prix score bands reference it and nobody has rendered them, so it is not closed.",s:"2513:328-354, 117x106 and 108x109 C4, beside STEAL!, Nice game!, TWO and THREE. Bands at lbl_80109400 = {7000, 6500, 6000, 5500, 5000, 4000}.",tags:["call"]},
+{g:"ladder",t:"Buddy list on row hover",b:"Hovering a ladder row reveals that player's most-used characters and their buddy and anti lists. Chemistry as a reason the record looks the way it does.",s:"ChemistryTable, 0x36 bytes per character at CharacterStats+0x3B.",tags:["data"]},
+// ── game ─────────────────────────────────────────────────────────────────
+{g:"game",t:"Innings as results rings",b:"A coloured 4px rim carrying inning state around a neutral black core carrying the run count. Five ring colours already exist and differ only in rim hue.",s:"2516:001-005 — 4px ring around a disc of black at 85%.",tags:["ready"]},
+{g:"game",t:"The on-base chemistry link, drawn as the HUD draws it",b:"A bubble and note badge over each occupied base, exactly as the game does it. This is the single strongest token we have and nothing on the site uses it.",s:"draw_OnBaseChemLinks: element 0x11 bubble tex 0x118 36x36, 0x12 note tex 0x119, bits 0/1/2 per base.",tags:["ready"]},
+{g:"game",t:"The escalating multiplier as live state",b:"One, two, three links on base is x1.10, x1.25, x1.50 on power. A real-time thing happening that no scoreboard currently shows.",s:"chemBobbleMults, verified in the roster table.",tags:["data"]},
+{g:"game",t:"Star Chances marked in the event log",b:"The game's own banner treatment on the log entry, so a Star Chance reads as the moment it is rather than another row.",s:"2538 'Star Chance!' banner; T79 #148.",tags:["ready"]},
+{g:"game",t:"The diamond mini-map with the HUD's own mapping",b:"A 92x92 diamond with runners placed by the game's real formula, so our map and the game's agree pixel for pixel.",s:"HUD element 0xA1; runner map x = 556 + 2.3*x, y = 102 - 2.3*z.",tags:["ready"]},
+{g:"game",t:"The box score's own eighteen columns",b:"B, B.K, D.P, D.S, DB, E, F.C, H, K, O, P, P.S, PH, PR, R, S, T.P, W.P. The set is the game's; the expansions are not shipped, so state that they are our reading.",s:"Scorecard abbreviations, T83. No expansions exist in the table.",tags:["ready"]},
+{g:"game",t:"Name the special",b:"Fireball, Banana Ball, Heart Ball, Flower Ball, Killer Ball, Garlic, Liar Ball, cursed balls. An event log that names the pitch is doing something no generic log can.",s:"Per-character special names from T79 and the mission text.",tags:["ready"]},
+{g:"game",t:"The walk-off takes the loud slot",b:"One banded stamp per game page, claimed by whatever actually mattered. If nothing did, the page stays quiet, and that silence is meaningful.",s:"2516:027 'Last ball!' — banded gradient on a dark keyline.",tags:["ready"]},
+{g:"game",t:"Team Stars on the scoreboard",b:"Five 13x13 orange orbs per team, in their orange slotted frame. A finished widget sitting unused.",s:"HUD element 0x18, tex 0x115.",tags:["ready"]},
+{g:"game",t:"Visualizer frame carries the park's materials",b:"The 3D scene already themes per park; the frame around it should too — its surface, its trim, its hazard named. Not a single accent colour.",s:"components/visualizer/stadiumThemes.ts, extended additively.",tags:["ready"]},
+{g:"game",t:"The overlay and the site share one token set",b:"PRSH already defines --side1, --side2 and --accent as runtime seams. Feed both from the same tokens so a stream overlay and a match page cannot drift.",s:"PRSH public/design/{default,classic}, 12 elements each.",tags:["call"]},
+{g:"game",t:"The pitch charge meter, for real",b:"A 9x106 capsule with 107 frames exists. Where the site talks about charge — the pitch calculator, a live game — use the real thing rather than a progress bar.",s:"ChargePitchType meter, frames 0-106. Note: there is no stamina gauge; I previously said there was and that was wrong.",tags:["art"]},
+// ── player ───────────────────────────────────────────────────────────────
+{g:"player",t:"Chemistry as a relationship",b:"A player's page shows their row of the matrix — who they are at 90 or above with, who they are under 20 with. In the game's vocabulary: buddies, and the anti list.",s:"Symmetric 54x54 table; 101 pairs at 90+, 53 under 20, mean 59.9.",tags:["ready"]},
+{g:"player",t:"Most-used characters as portrait chips",b:"Vectorizer already holds 55 cleaned and upscaled per-character images named exactly like the roster. No extraction needed.",s:"~/GitHub/Vectorizer final/ and broadcast/, locked spec 2026-06-26.",tags:["ready"]},
+{g:"player",t:"Per-season table in the game's wording",b:"Team Total, Hits, RBI, Home Runs, Bases Stolen, Special, Batting Avg., Big Plays, Hits Allowed, Strikeouts, Runs Allowed, ERA.",s:"HUD stat wording, verbatim.",tags:["ready","quick"]},
+{g:"player",t:"Identity as a wordmark plate",b:"A player's handle set on a pennant plate with their most-played captain's palette, in place of an avatar circle.",s:"865 wordmarks, 153x54, per-captain palettes; each its own silhouette.",tags:["art"]},
+{g:"player",t:"Trophies Won",b:"A section modelled on the records book rather than an achievements grid with badges. Trophies and medals, named, with when.",s:"Records book index, verbatim.",tags:["data"]},
+{g:"player",t:"Peak and now as two rings",b:"Two results rings side by side instead of a sparkline. Reads instantly and uses a form the game already owns.",s:"2516:001-005.",tags:["ready","quick"]},
+{g:"player",t:"The handle, everywhere",b:"Identify people by their Rio handle in every surface, including exports and overlays. Never the email.",s:"Convention, not sourced.",tags:["ready","quick"]},
+{g:"player",t:"Park splits that look like their parks",b:"A player's per-stadium rows each carry that park's material as a left-edge surface, so the table scans by venue without a legend.",s:"Procedural material recipes, seven parks.",tags:["ready"]},
+// ── characters ───────────────────────────────────────────────────────────
+{g:"char",t:"The 54x54 matrix as a triangle",b:"It is perfectly symmetric — zero of 1431 pairs disagree — so half of it is redundant. Three bands, not a ramp, because the thresholds are real.",s:"Verified against the decompressed roster in entry 7.",tags:["ready"]},
+{g:"char",t:"Stat bars as the game's capsules",b:"Rounded ends, a light top cap, a continuous fill, a darker rail behind. No ticks, no segments, and the label floats beside rather than sitting in a chip.",s:"1745:150 fill #21639c with outline #001063; labels 1745:142-145.",tags:["ready","quick"]},
+{g:"char",t:"Thirty-two bios, already written",b:"The character dashboards ship with placeholder writeups waiting on community content. Thirty-two finished bios in the game's own voice exist on the disc today.",s:"T83, 32 bios. Mario's runs to five sentences.",tags:["ready","quick"]},
+{g:"char",t:"Fielding abilities as named icons",b:"A fourteen-ability bitmask with real names: Wall Splat, Clamber, Sliding Catch, Laser, Quick Throw, Super Jump, Magical Catch, Tongue Catch, Suction, Ball Dash, Body Check, Super Curve.",s:"FIELDING_ABILITIES in include/game/character_stats.h.",tags:["art"]},
+{g:"char",t:"Drop the class label",b:"Show trajectory and contact instead. CharacterClass exists in the stat table but it compresses away the two things that actually decide how someone plays.",s:"StatTable: HitTrajectoryPushPull, SlapContactSize, ChargeHitPower.",tags:["ready","quick"]},
+{g:"char",t:"State the Star Swing cost",b:"Captain, CaptainStarHitPitch and NonCaptainStarSwing are real published fields. What a star costs you is more useful than a rating.",s:"include/game/character_stats.h.",tags:["ready"]},
+{g:"char",t:"Swing Lab in the map register",b:"The frame-by-stick grid is terrain, not chrome: flat saturated colour, no outlines at all. It is the one place on the site where the map register genuinely belongs.",s:"Challenge map terrain treatment.",tags:["ready"]},
+{g:"char",t:"A tier list without tiers",b:"Rank them, then say what each is for. 'Best contact in the game, no power' beats an S. The game refuses to grade and it is right.",s:"Derived from the absence of any grade on the disc.",tags:["call"]},
+{g:"char",t:"Per-character growth ladder",b:"Each character has their own progression title ladder. Shown on their page, it gives the roster a dimension the site has nothing like.",s:"T83 growth titles, four rungs per character. Beware index overflow past the fourth rung.",tags:["data"]},
+{g:"char",t:"The game's own portrait frame",b:"Entry 2528 holds the portrait treatment. Use that framing rather than a circular crop, which is the most generic possible choice.",s:"Entry 2528 character portraits.",tags:["art"]},
+{g:"char",t:"The Buddy Emblem as a toggle",b:"It adds 50 to chemistry, clamped at 100, and does not apply in exhibition. A switch on the matrix that shows how the relationships redraw.",s:"Verified in the roster table.",tags:["ready"]},
+{g:"char",t:"The analytics page keeps one loud moment",b:"The WAE lab stays entirely chrome except for its single headline finding, which gets the stamp. Dense analysis plus one shout reads as confident.",s:"Register budget.",tags:["ready"]},
+// ── parks ────────────────────────────────────────────────────────────────
+{g:"park",t:"Add materials, voice and motifs to the theme file",b:"Extend stadiumThemes.ts additively with a surface list, a broadcaster line and a list of procedural recipe kinds. Keep the existing labels — Molten Keep and Picture-Book Meadow are doing real work.",s:"components/visualizer/stadiumThemes.ts is colour-only today.",tags:["ready"]},
+{g:"park",t:"A park page opens with its hazard",b:"Thwomps, Chain Chomps, barrels, Piranha Plants, blocks, the Star Panel. Named in the game's own words, above any statistic.",s:"T79 #151-162, verbatim.",tags:["ready","quick"]},
+{g:"park",t:"Filter chips carry material, not a dot",b:"A park chip shows a swatch of its surface — brick, plank, dune, starfield — instead of a coloured circle. Seven chips that are actually distinguishable.",s:"Procedural recipes over generic materials.",tags:["ready","quick"]},
+{g:"park",t:"Mario Stadium's emptiness is the point",b:"It is the only park with no hazard tip. Make that explicit and make it the default, rather than quietly treating it as the boring one.",s:"Verified absence across T79 #151-162.",tags:["ready","quick"]},
+{g:"park",t:"Reconcile the two theme files, in writing",b:"stadiumThemes.ts and RioVisualizer/web/themes.js disagree on fog density, Bowser's hemi and sun, and six Wario keys. Pick a direction and record which wins.",s:"Mario fog 0.0028 vs 0.0014; Bowser hemi #5a3a32/0.7 vs #8c88a8/1.3.",tags:["fix","call"]},
+{g:"park",t:"Park records",b:"Toy Field Records is already a records-book section, so per-park record pages have a precedent in the game rather than being an invention.",s:"T83 records book index.",tags:["data"]},
+{g:"park",t:"Crop the hero the way the game frames it",b:"The disc ships its own preview scene for six of seven parks. Use their framing and aspect for the park page hero rather than a 16:9 default.",s:"Entry 1746: 065 Mario, 066 Peach, 067 Wario, 068 Yoshi, 069 DK, 070 Bowser. Toy Field has none.",tags:["art"]},
+{g:"park",t:"Never sample Bowser from entry 13",b:"Entry 13 sits in Bowser Castle's slot but holds Mario Stadium content — 144 textures against Bowser's real 77, sharing 142 with entry 8. Use 11 and 12.",s:"Verified by running stadiums.summary() against the DOL table. This trap has been hit twice.",tags:["fix","quick"]},
+// ── teams ────────────────────────────────────────────────────────────────
+{g:"team",t:"Pennant as a section device",b:"A standings banner, a bracket header, a league marker. One shape used structurally, rather than a template stamped out forty-eight times.",s:"865 wordmarks are each their own silhouette — no shared plate exists.",tags:["ready"]},
+{g:"team",t:"Three renderings, three sizes",b:"Wordmark at 153x54 for headers, emblem at 90x90 for chips, text strip at 250x26 for rows. The game already decided which reads at which size.",s:"865 is 48 names x 3 renderings; index = captain*4 + slot.",tags:["ready"]},
+{g:"team",t:"Fix the four swapped team ids",b:"0x4 and 0x5 (Leapers, Mansioneers) and 0x14 and 0x15 (Fans, Bows) are reversed against both the textures and the decomp. pyrio has the same swap.",s:"Texture 100 reads 'Luigi Leapers'; texture 116 reads 'Birdo Fans'.",tags:["fix","quick"]},
+{g:"team",t:"Also fix Lilies and the punctuation",b:"The wordmark spells LILIES where the frontend has Lillies, and the punctuation is dropped from All-Stars, Smart-Alecks and Jr.",s:"865 wordmarks read directly.",tags:["fix","quick"]},
+{g:"team",t:"Team colour on the rim, never the fill",b:"Take each team's hue from its own wordmark palette and apply it as a 4px edge around a neutral core. This is how seven parks and forty-eight teams coexist without fighting.",s:"2516:001-005 — five rings differing only in rim hue.",tags:["ready"]},
+{g:"team",t:"Withdrawn: the slot-and-lip",b:"I had 1745:027/028 as a recessed slot and built a rule on it — one mechanical object, reserved for bounded resources. Those two textures are the selection bar's middle and cap. There is no slot, and the rule is gone.",s:"Measured: 027 has uniform columns (a tiling middle), 028 is the rounded cap. See the selection-bar card.",tags:["fix","quick"]},
+{g:"team",t:"Buddy links in the lineup builder",b:"Adjacent batters at 90 or above get the bubble-and-note between them, so building a batting order becomes the chemistry puzzle it actually is. Worth doing, but know that this one is ours.",s:"Settled: there is NO connector sprite. The lineup screen gives each buddy teammate a single element (0x2B) and draws no line. The only in-match chem visual is the per-base HUD icon.",tags:["ready"]},
+{g:"team",t:"Star meter in its orange frame",b:"Zero to five stars in the orange slotted frame the team-select screen uses, rather than five loose icons.",s:"Team-select star meter.",tags:["art"]},
+// ── league ───────────────────────────────────────────────────────────────
+{g:"league",t:"A community picks a pennant and a park",b:"Two choices at creation give every community a visual identity for free, drawn from systems that already exist.",s:"48 wordmarks, 7 park material sets.",tags:["ready"]},
+{g:"league",t:"A season is a Grand Prix",b:"Medals rather than placings. Gold, silver and bronze textures exist, though the thresholds were never found on the disc.",s:"Records book: Grand Prix Medals Won. Cutoffs not located.",tags:["data"]},
+{g:"league",t:"The draft room keeps its density",b:"Do not decorate it. The loud slot goes to the pick that just landed and nothing else, so the room stays readable at speed.",s:"Register budget applied to the existing /leagues preview.",tags:["ready"]},
+{g:"league",t:"Settings copy in the game's register",b:"Short, imperative, a dash between label and explanation. 'Mercy — End a game if the score differential reaches 10 runs.' Match it and the writing stops sounding like a product.",s:"Settings strings, T79, verbatim.",tags:["ready","quick"]},
+{g:"league",t:"Brackets built from results rings",b:"Round state on the rim, score in the neutral core. A bracket that uses one consistent object instead of boxes and lines.",s:"2516:001-005.",tags:["ready"]},
+{g:"league",t:"The records book as the league IA",b:"Past MVPs, Trophies Won, Past Superstars, Toy Field Records, Minigame Records, Grand Prix Medals Won. A navigation structure the game already shipped.",s:"T83 index, verbatim.",tags:["ready"]},
+{g:"league",t:"Invite copy from the flag line",b:"'Players will join you when you get all their flags.' The game's own framing for recruitment, and better than 'Invite members'.",s:"T79, verbatim.",tags:["ready","quick"]},
+{g:"league",t:"Competition export matches the overlay",b:"Whatever a competition exports should be the same tokens PRSH renders, so a bracket graphic and a stream overlay are visibly the same product.",s:"PRSH runtime seams --side1, --side2, --accent.",tags:["call"]},
+// ── tools ────────────────────────────────────────────────────────────────
+{g:"tools",t:"Pitch calculator with real glyphs and a real meter",b:"Controller icons from the disc and the actual 107-frame charge capsule, in place of generic chips and a progress bar.",s:"Entry 80 glyphs; ChargePitchType meter 9x106.",tags:["art"]},
+{g:"tools",t:"/codes as the challenge shop",b:"An item row with an icon, a name, a cost and an owned state. The game shipped a nineteen-item shop and its row layout is directly reusable.",s:"Challenge shop, 19 items. Layout details pending.",tags:["data"]},
+{g:"tools",t:"The tutorial as star missions",b:"Ten per topic, each with a cleared stamp. The game's own completion feedback instead of a checklist with ticks.",s:"10 star missions per character, ~50 types, ~25 still UNK_ in the decomp.",tags:["data"]},
+{g:"tools",t:"Optimize page in the settings register",b:"Reuse the game's exact phrasing pattern for every option on /rio-online/optimize. It is already the clearest settings copy available to us.",s:"T79 settings strings.",tags:["ready","quick"]},
+{g:"tools",t:"Version history as a book spread",b:"Two-column, dated, with the records-book panel treatment. Turns a changelog into something people read.",s:"Entry 1744 panel: black at 50%, 1px white @30% + 1px grey @50% rim.",tags:["ready"]},
+{g:"tools",t:"Muddyball gets the Toy Field register",b:"Smooth painted plastic, riveted panels, a starfield, and no natural texture anywhere. A whole visual register the game reserves for one place.",s:"Entry 20, 32 textures; #0c249c and #fcfc24.",tags:["ready"]},
+{g:"tools",t:"Scoreboard overlay shares the HUD's geometry",b:"Canvas 640x448, centre origin, no reflow anywhere. If the streaming scoreboard matched that grid it would composite over gameplay without looking bolted on.",s:"HUD canvas; trans = pos - canvas/2.",tags:["ready"]},
+// ── auth ─────────────────────────────────────────────────────────────────
+{g:"auth",t:"Signup is character select",b:"Pick your captain during sign-up and that becomes your identity palette across the site. Onboarding that does something, using art we already have.",s:"48 per-captain palettes; Vectorizer's 55 portraits.",tags:["ready"]},
+{g:"auth",t:"The login empty state waits",b:"An empty selection bar with nothing in it, rather than a centred logo on a gradient. It implies something is missing, which is accurate.",s:"The selection bar, 1745:027 + 028. Not the 'slot' I previously called it.",tags:["ready","quick"]},
+{g:"auth",t:"First run is a tip sequence",b:"Three loading-tip cards in the game's frame, teaching the site the way the game teaches itself.",s:"Tip banner frame, 2536-2552.",tags:["ready"]},
+{g:"auth",t:"Reset-password copy in the settings register",b:"Short and imperative with a dash. Even transactional mail can sound like this game rather than like a SaaS template.",s:"T79 settings strings.",tags:["ready","quick"]},
+{g:"auth",t:"Onboarding progress as flags",b:"'Players will join you when you get all their flags.' Collected flags, not a percentage bar.",s:"T79, verbatim.",tags:["ready"]},
+{g:"auth",t:"Say what Rio is in the game's voice",b:"The signup page currently has to explain the project. The game's register — short, concrete, no marketing — is a better fit than any landing-page copy we would write.",s:"Settings and tip copy as the model.",tags:["ready","quick"]},
+// ── system ───────────────────────────────────────────────────────────────
+{g:"sys",t:"Ship the tokens to PRSH",b:"One token source feeding both the site and the overlay themes, so the two cannot drift apart. PRSH's default theme currently shares the tokens this language replaces.",s:"PRSH default uses #0B0B12, #E60012, #F5F5F8, Inter — the same set being retired here.",tags:["call"]},
+{g:"sys",t:"Lint the register",b:"Fail CI when a loud token is used outside a loud slot. The budget only holds if something checks it.",s:"Derived from the register model.",tags:["ready"]},
+{g:"sys",t:"Write down what ships and what is redrawn",b:"The frontend already ships 48 emblems and character art; PRSH ships none because it redistributes as an installer. That split is a real policy and it should be stated once rather than re-litigated per asset.",s:"PRSH PRODUCT.md versus public/images/Teams and Characters.",tags:["call"]},
+{g:"sys",t:"Write Rio's own loading tips",b:"A content task rather than a design one, and the highest-leverage writing on the list. Twenty tips in the game's voice about netplay, ranking and the client.",s:"T79 #146-162 as the model.",tags:["ready"]},
+{g:"sys",t:"Delete mushroom-pixel.svg",b:"The real mark was already a pixel logo with a mono SVG companion. The redrawn one in public/images should go before it spreads.",s:"public/images/RioLogo.png is a true 16x16, three colours.",tags:["fix","quick"]},
+{g:"sys",t:"Strip the DOCTYPE from RioLogo.svg",b:"It carries a DTD, which some publishing paths refuse outright. A one-line fix that prevents a confusing failure later.",s:"Hit while publishing this package.",tags:["fix","quick"]},
+
+// ── motion ───────────────────────────────────────────────────────────────
+{g:"motion",t:"The cursor takes fourteen frames, and you cannot interrupt it",b:"A row step plays a fourteen-frame highlight and input is locked until it lands — about 233ms at 60Hz. Deliberate weight instead of instant snapping, and it is why the menus feel like an object rather than a list.",s:"fn_2_73BF0 plays keyframes 15-29 down, 30-44 up. makeCursorUnmovable / makeCursorMovable gate input until the target frame is reached.",tags:["ready"]},
+{g:"motion",t:"Wrapping around looks different from stepping",b:"Going off the bottom back to the top plays frames 0 to 14; going off the top plays 54 down to 45, backward. The list tells you it wrapped rather than teleporting the highlight.",s:"fn_2_73B94 / fn_2_73B54, main menu cursor.",tags:["ready"]},
+{g:"motion",t:"Selected pulses forever, confirm punches once",b:"The selected row loops frames 14 to 55 indefinitely. Pressing confirm plays 55 to 65 once — ten frames, about 167ms — and only then re-enables input. Two states, precisely specified.",s:"fn_2_747FC, src/menus/text_744C8.c. This is the only press feedback in the menu code; no flash or shake exists.",tags:["ready"]},
+{g:"motion",t:"Paste the fade curve in verbatim",b:"Text fades in over sixteen ticks on an integer exponential ease: 64, 112, 148, 175, 196, 211, 223, 232, 238, 243, 247, 250, 252, 253, 254, 255. That is a CSS linear() function, exactly, and it is free authenticity.",s:"fn_2_653D4, src/menus/text_636A4.c — step = gap/4 + 1. About 267ms at 60Hz.",tags:["ready","quick"]},
+{g:"motion",t:"One easing curve for the whole site",b:"Menu keyframes interpolate on a standard cubic Bezier with control constants read straight from the DOL. Use it everywhere and the site's motion has a single accent instead of per-component guesses.",s:"BezierInterpolate, src/Unknown/File_0x80009e94.c; constants 7, 6, 12, -1, 3, -3, 1, -6.",tags:["ready"]},
+{g:"motion",t:"Nothing staggers in",b:"No per-index delay constant exists in the menu code — list items appear at frame 0 together. The fashionable staggered cascade is exactly the thing this game does not do.",s:"Searched menu code; no stagger constant found. Any stagger would be baked into undecoded layout keyframes.",tags:["ready","quick"]},
+{g:"motion",t:"Three sounds, and only two repeat",b:"Navigation, confirm and cancel. Confirm and cancel are edge-triggered on the input frame; navigation uses processed input so holding a direction repeats it. Worth matching if the site ever gets audio.",s:"cursorSndFx, src/menus/main_menu.c:639 — nav 0x1B7, confirm 0x1B8, cancel 0x1B9, volume 0x3F.",tags:["call"]},
+{g:"motion",t:"Find the transition, or decide we have none",b:"The menu exit hook exists but has no decompiled body and could not be disassembled, so whether the game wipes between screens is still unknown. Either finish that dig or choose a cut deliberately rather than defaulting to a fade.",s:"fn_8004D0F0 at 0x8004D0F0, size 0x370. No PowerPC support in the available objdump.",tags:["data"]},
+
+// ── characters, from the roster dig ──────────────────────────────────────
+{g:"char",t:"Four bars, not nine",b:"At selection the game shows exactly Batting, Pitching, Running and Fielding on a 1-10 scale. Speed, contact, power and pitch values are deliberately hidden. This is the game's own answer to what matters when you pick someone, and our pages currently guess.",s:"gfx_cssCharStatBars_and_sthgElse, src/menus/text_744C8.c:255. Base values live in .bss so they load at runtime and were not extracted.",tags:["ready"]},
+{g:"char",t:"Starring is plus two, capped at ten",b:"Superstar status adds 2 to every bar and clamps at 10. A toggle on a character page that redraws all four bars shows what Superstars On actually changes, which no current surface explains.",s:"orderchange.c.",tags:["ready"]},
+{g:"char",t:"Captain select is twelve in a 2x6 grid",b:"Not a 54-slot browser. Twelve captains, two rows of six, left and right wrap within a row, up and down toggle rows. The roster browser's own geometry is not in the decomp, so the 54-grid is ours to design.",s:"captainSelect_processCursorMovement_getCharID, src/Unknown/File_0x8004e62c.c. Screen 640x480, two 3D models at (-225,-35,0) and (95,-35,0).",tags:["ready"]},
+
+// ── teams, from the roster dig ───────────────────────────────────────────
+{g:"team",t:"The lineup is a swap, not a drag",b:"Press to pick a player, press again to place him, and the two trade places. Pairwise swap is far easier to build accessibly than drag and drop, and it is what the game actually does.",s:"A picks and places, B cancels, L/R switch batting order and defence, X cycles stance and throwing arm through 4 states, Y toggles star.",tags:["ready"]},
+{g:"team",t:"One screen, two views",b:"L and R flip between the batting order and the defensive diamond rather than putting them on separate pages. In the defence view the cursor moves across the diamond by fielding position.",s:"team_management_screens.c.",tags:["ready"]},
+{g:"team",t:"The star meter is chemistry with the captain",b:"Those 0-5 stars are not a rating — they are the average non-captain chemistry with the captain. 70 or more is five stars, 55-69 four, 35-54 three, 15-34 two, 1-14 one. A derived number we can compute and explain.",s:"Team select star meter, 5 records.",tags:["ready"]},
+{g:"team",t:"An empty slot is a real state",b:"CHAR_ID_NONE, with the bars and the portrait hidden rather than greyed. The absence is drawn as absence, which is the honest version of an empty state.",s:"rosterCharID -1 or placeholder 54, rosterSpotFilledInd FALSE.",tags:["ready","quick"]},
+{g:"team",t:"Beat the game on error states",b:"An illegal team start is silent — the screen simply waits for both ready flags. A duplicate-character check exists but has no message attached. Here we should do better than the source rather than copy it.",s:"captainSelectScreen_manager case 4; findRosterOverlap, text_0323C.c. No error string found.",tags:["ready"]},
+{g:"team",t:"Team select copy, verbatim",b:"'Select players and form a team.' · 'Select members and form a team.' · 'Are you sure this is the team you want?' · 'You didn't win. No one joined your team.' Four strings that cover most of a team builder's writing.",s:"T79 n245, n341, n398; T82 n26.",tags:["ready","quick"]},
+
+// ── leagues and tools, from the progression dig ──────────────────────────
+{g:"league",t:"Twelve scout banners, all recovered",b:"Get a hit! · Get the player out! · Score a run! · Strike 'em out! · Get a double play! · Mount a comeback! · Don't let them score even one run! · Finish them off in 3 batters! · Hit a sacrifice fly! · Drop a successful squeeze bunt! · Steal a base! · Win the game! A complete challenge vocabulary in the game's voice.",s:"Entry 2513 texts 243-246, 320-326, 358. 231-450 x 44 C4. Frame mapping via scoutMissionBannerFrames[] and layout element 0x65.",tags:["ready"]},
+{g:"league",t:"Grand Prix scores in seven bands",b:"7000, 6500, 6000, 5500, 5000, 4000 — six cutoffs making seven bands, band 0 at the top. A real scoring ladder for season or event scoring, straight out of the DOL.",s:"fn_8006C100 reading lbl_80109400 at main.dol 0x8006C100. Note: these are score bands, not medal tiers; gold/silver/bronze cutoffs are still not found.",tags:["ready"]},
+{g:"league",t:"The minigame top-five board is the leaderboard model",b:"A rank frame, four-digit score cells, a score-or-count insert rule and a highlight on the row that just entered. A complete, decompiled leaderboard pattern we can follow row for row.",s:"MinigameResultEntry in the decomp. Note this is the minigame results screen, not the records book.",tags:["ready"]},
+{g:"league",t:"Result words with their real colours",b:"MVP!! in yellow #f0f040 and orange #e09000 with white and black outline. Too Bad!! in blue and white. MERCY, BALL DEAD, and 'Your Team is Number 7!' in gold on brown. The game's full vocabulary for ending a game.",s:"2513:203, 204, 360, 361, 362. Colours are 16-step buckets, so approximate.",tags:["ready"]},
+{g:"tools",t:"The shop has its art ready",b:"Twenty item icons at 100x100 and twenty plates at 114x34, both already in shop order, plus a coin for currency and a SOLD stamp. Everything /codes needs except the row geometry, which is not decoded.",s:"1742:126-145 icons, 162-181 plates, 1742:003 coin, 1742:040 Coins plate, 1742:125 SOLD at 46x25.",tags:["art"]},
+{g:"tools",t:"Cleared banners for finished work",b:"Four cleared-state banners at 284x16, plus level medallions at 75x75. The game's own way of marking something done, for a tutorial or a checklist.",s:"1742:196-199 banners; 2516:011-014 medallions; level icons 1742:150-153 at 34x29 with labels 192-195.",tags:["art"]}
+];
+
+// ── render ────────────────────────────────────────────────────────────────
+const KEY = "rio-ideas-picks-v1";
+let picks = new Set();
+try { picks = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch(e){}
+let filter = "all";
+
+IDEAS.forEach((d,i)=> d.n = i+1);
+
+const board = document.getElementById("board");
+const chips = document.getElementById("chips");
+
+function tagEl(k){
+  const map = {ready:"Ready",data:"Needs data",art:"Needs art",call:"Your call",fix:"Fix",quick:"Quick",big:"Big"};
+  const cls = ["ready","data","art","call","fix"].includes(k) ? " "+k : "";
+  return '<span class="tag'+cls+'">'+map[k]+'</span>';
+}
+
+function cardEl(d){
+  const on = picks.has(d.n);
+  return '<article class="card'+(on?" on":"")+'" data-n="'+d.n+'">'
+    + '<div class="ctop"><span class="idn">'+String(d.n).padStart(2,"0")+'</span>'
+    + '<h3 class="ctitle">'+d.t+'</h3>'
+    + '<button class="pick" aria-pressed="'+on+'" aria-label="Shortlist idea '+d.n+': '+d.t.replace(/"/g,"&quot;")+'">&#10003;</button></div>'
+    + '<p class="cbody">'+d.b+'</p>'
+    + '<div class="csrc">'+d.s+'</div>'
+    + '<div class="tags">'+d.tags.map(tagEl).join("")+'</div>'
+    + '</article>';
+}
+
+function render(){
+  let html = "";
+  let shown = 0;
+  GROUPS.forEach(g=>{
+    const items = IDEAS.filter(d=> d.g===g.id && (filter==="all" || d.tags.includes(filter)));
+    if(!items.length) return;
+    shown += items.length;
+    html += '<section class="grp"><div class="wrap">'
+      + '<div class="ghead"><h2>'+g.name+'</h2><span class="groute">'+g.route+'</span></div>'
+      + '<p class="gnote">'+g.note+'</p>'
+      + '<div class="cards">'+items.map(cardEl).join("")+'</div>'
+      + '</div></section>';
+  });
+  if(!shown) html = '<div class="wrap"><p class="empty">Nothing matches that filter.</p></div>';
+  board.innerHTML = html;
+}
+
+function renderChips(){
+  const defs = [["all","Everything"],["ready","Ready"],["data","Needs data"],["art","Needs art"],["call","Your call"],["fix","Fix"],["quick","Quick wins"]];
+  chips.innerHTML = defs.map(([k,label])=>{
+    const n = k==="all" ? IDEAS.length : IDEAS.filter(d=>d.tags.includes(k)).length;
+    return '<button class="chip" data-f="'+k+'" aria-pressed="'+(filter===k)+'">'+label+'<span class="ct">'+n+'</span></button>';
+  }).join("");
+}
+
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify([...picks])); } catch(e){}
+  document.getElementById("pickCount").textContent = picks.size;
+}
+
+chips.addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  filter = b.dataset.f; renderChips(); render();
+});
+
+board.addEventListener("click", e=>{
+  const b = e.target.closest(".pick"); if(!b) return;
+  const card = b.closest(".card");
+  const n = Number(card.dataset.n);
+  if(picks.has(n)) picks.delete(n); else picks.add(n);
+  card.classList.toggle("on", picks.has(n));
+  b.setAttribute("aria-pressed", picks.has(n));
+  save();
+});
+
+const sheet = document.getElementById("sheet");
+document.getElementById("shortlistBtn").addEventListener("click", ()=>{
+  const chosen = IDEAS.filter(d=>picks.has(d.n));
+  const g = id => (GROUPS.find(x=>x.id===id)||{}).name || id;
+  document.getElementById("sheetText").value = chosen.length
+    ? "Project Rio — shortlist (" + chosen.length + " of " + IDEAS.length + ")\n\n"
+      + chosen.map(d=>"#"+d.n+"  ["+g(d.g)+"]  "+d.t+"\n    "+d.b).join("\n\n")
+    : "Nothing ticked yet. Use the check button on any card.";
+  sheet.showModal();
+});
+document.getElementById("closeSheet").addEventListener("click", ()=> sheet.close());
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  const ta = document.getElementById("sheetText");
+  const btn = document.getElementById("copyBtn");
+  try { await navigator.clipboard.writeText(ta.value); }
+  catch(e){ ta.removeAttribute("readonly"); ta.select(); document.execCommand("copy"); ta.setAttribute("readonly",""); }
+  btn.textContent = "Copied"; setTimeout(()=> btn.textContent = "Copy to clipboard", 1600);
+});
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  picks.clear(); save(); render();
+});
+
+document.getElementById("totalN").textContent = IDEAS.length;
+renderChips(); render(); save();
+</script>
+</body>
+</html>

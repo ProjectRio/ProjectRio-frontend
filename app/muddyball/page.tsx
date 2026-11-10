@@ -259,12 +259,12 @@ function MuddyballDraft() {
 						</div>
 
 						{/* View tabs */}
-						<div className="flex overflow-hidden rounded-lg border border-night-600 text-sm">
+						<div className="flex gap-1 text-sm">
 							{(['lineup', 'field'] as const).map((view) => (
 								<button
 									key={view}
-									className={`flex-1 py-1.5 font-display font-semibold uppercase tracking-wider transition-colors ${
-										rosterView === view ? 'bg-rio-500 text-white' : 'hover:bg-night-700'
+									className={`flex-1 rounded-md border py-1.5 font-display font-semibold uppercase tracking-wider transition-colors ${
+										rosterView === view ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
 									}`}
 									onClick={() => setRosterView(view)}
 								>
@@ -286,7 +286,7 @@ function MuddyballDraft() {
 											role="listitem"
 											className={`flex cursor-grab select-none items-center gap-2 rounded-lg p-1.5 transition-all active:cursor-grabbing ${
 												name ? 'bg-night-800' : 'border border-dashed border-night-600 opacity-50'
-											} ${isDragSource ? 'scale-95 opacity-40' : ''} ${isDragTarget ? 'scale-[1.02] ring-2 ring-rio-500' : ''}`}
+											} ${isDragSource ? 'scale-95 opacity-40' : ''} ${isDragTarget ? 'scale-[1.02] ring-2 ring-star-400' : ''}`}
 											onDragStart={(event) => {
 												setLineupDragFrom(li);
 												event.dataTransfer.effectAllowed = 'move';
@@ -306,13 +306,13 @@ function MuddyballDraft() {
 											}}
 										>
 											<span className="shrink-0 text-sm leading-none text-fog-500">⠿</span>
-											<span className="w-4 shrink-0 text-xs text-fog-500">{li + 1}</span>
+											<span className="w-4 shrink-0 font-mono text-xs tabular-nums text-fog-500">{li + 1}</span>
 											{name ? (
 												<>
 													{/* eslint-disable-next-line @next/next/no-img-element */}
 													<img src={characterImage(name)} alt={name} className="h-7 w-7 shrink-0 object-contain" />
 													<span className="flex-1 truncate text-xs">{name}</span>
-													<span className="font-mono text-xs text-rio-300">${priceMap[name]}</span>
+													<span className="font-mono text-xs tabular-nums text-star-400">${priceMap[name]}</span>
 													<button
 														className="h-5 w-5 rounded text-xs leading-none text-rio-400 hover:bg-rio-500/20"
 														onClick={() => removeAt(rosterIdx)}
@@ -452,7 +452,7 @@ function MuddyballDraft() {
 						<div
 							className={`flex cursor-pointer items-center justify-between rounded-lg border p-2 transition-colors ${
 								stadiumPicked
-									? 'border-rio-500 bg-rio-500/10'
+									? 'sel'
 									: remaining >= STADIUM_PRICE
 										? 'border-night-600 hover:bg-night-800'
 										: 'cursor-not-allowed border-night-600 opacity-40'
@@ -475,13 +475,13 @@ function MuddyballDraft() {
 								<div className="text-xs text-fog-500">optional add-on</div>
 							</div>
 							<div className="flex items-center gap-2">
-								<span className="rounded bg-rio-500 px-1.5 font-mono text-xs text-white">$3</span>
+								<span className="rounded bg-star-400 px-1.5 font-mono text-xs text-night-950">$3</span>
 								<div
 									className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 ${
-										stadiumPicked ? 'border-rio-500 bg-rio-500' : 'border-night-600'
+										stadiumPicked ? 'border-star-400 bg-star-400' : 'border-night-600'
 									}`}
 								>
-									{stadiumPicked && <span className="text-xs text-white">✓</span>}
+									{stadiumPicked && <span className="text-xs text-night-950">✓</span>}
 								</div>
 							</div>
 						</div>
@@ -521,7 +521,7 @@ function MuddyballDraft() {
 						<div className="flex flex-wrap items-start gap-x-6 gap-y-4">
 							{tiers.map((tier) => (
 								<div key={tier} className="flex flex-col gap-1">
-									<span className="self-start rounded bg-rio-500 px-1.5 font-mono text-xs text-white">${tier}</span>
+									<span className="self-start rounded bg-star-400 px-1.5 font-mono text-xs text-night-950">${tier}</span>
 									<div className="flex flex-wrap gap-1.5">
 										{filtered
 											.filter((c) => c.price === tier)
@@ -575,7 +575,7 @@ function CharButton({
 	return (
 		<button
 			className={`panel flex flex-col items-center gap-0.5 p-1.5 text-center transition-all ${
-				affordable ? 'cursor-pointer hover:scale-105 hover:border-rio-500/50' : 'cursor-not-allowed'
+				affordable ? 'panel-glow cursor-pointer hover:scale-105' : 'cursor-not-allowed'
 			}`}
 			style={affordable ? undefined : { opacity: 0.3, filter: 'grayscale(1)' }}
 			onClick={() => onAdd(char.name)}
@@ -585,7 +585,7 @@ function CharButton({
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img src={characterImage(char.name)} alt={char.name} className="h-10 w-10 object-contain" />
 			<span className="text-[10px] leading-tight">{char.name}</span>
-			{showPrice && <span className="rounded bg-rio-500 px-1 font-mono text-[10px] text-white">${char.price}</span>}
+			{showPrice && <span className="rounded bg-star-400 px-1 font-mono text-[10px] text-night-950">${char.price}</span>}
 		</button>
 	);
 }

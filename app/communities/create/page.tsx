@@ -43,7 +43,7 @@ export default function CreateCommunityPage() {
 		return (
 			<div className="mx-auto max-w-lg">
 				<div className="panel p-8 text-center">
-					<h1 className="text-3xl uppercase">Community Created</h1>
+					<h1 className="text-3xl">Community Created</h1>
 					<p className="mt-3 text-sm text-fog-300">“{created.name}” is ready.</p>
 					{created.url && (
 						<div className="mt-5 text-left">
@@ -103,7 +103,7 @@ export default function CreateCommunityPage() {
 					<label className="flex items-center gap-2 text-sm text-fog-300">
 						<input
 							type="checkbox"
-							className="accent-rio-500"
+							className="accent-star-400"
 							checked={isPrivate}
 							onChange={(event) => setIsPrivate(event.target.checked)}
 						/>
@@ -113,7 +113,7 @@ export default function CreateCommunityPage() {
 						<label className="ml-6 flex items-center gap-2 text-sm text-fog-300">
 							<input
 								type="checkbox"
-								className="accent-rio-500"
+								className="accent-star-400"
 								checked={globalLink}
 								onChange={(event) => setGlobalLink(event.target.checked)}
 							/>
@@ -124,7 +124,7 @@ export default function CreateCommunityPage() {
 						<label className="flex items-center gap-2 text-sm text-fog-300">
 							<input
 								type="checkbox"
-								className="accent-rio-500"
+								className="accent-star-400"
 								checked={official}
 								onChange={(event) => setOfficial(event.target.checked)}
 							/>

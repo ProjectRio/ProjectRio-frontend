@@ -137,7 +137,7 @@ function GroupsPanel() {
 					action={
 						<button
 							type="button"
-							className="text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
+							className="font-display text-xs font-semibold uppercase tracking-wider text-star-400 hover:text-star-300"
 							onClick={loadMembers}
 						>
 							{members ? 'Reload' : 'Load'}
@@ -187,7 +187,7 @@ function PatronsPanel() {
 				action={
 					<button
 						type="button"
-						className="text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300"
+						className="font-display text-xs font-semibold uppercase tracking-wider text-star-400 hover:text-star-300"
 						onClick={load}
 					>
 						{patrons ? 'Reload' : 'Load'}
@@ -237,7 +237,7 @@ export default function AdminPage() {
 		return (
 			<div className="mx-auto max-w-md">
 				<div className="panel p-8 text-center">
-					<h1 className="text-3xl uppercase">Rio Admin</h1>
+					<h1 className="text-3xl">Rio Admin</h1>
 					<p className="mt-3 text-sm text-fog-500">
 						This console is for Rio staff. {username ? 'Your account is not in the Admin group.' : 'Log in to continue.'}
 					</p>

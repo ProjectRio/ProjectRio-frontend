@@ -29,7 +29,7 @@ export default function ModePicker({
 
 	return (
 		<label className="flex items-center gap-2 text-sm text-fog-300">
-			<span className="text-[11px] font-semibold uppercase tracking-widest text-fog-500">Game Mode</span>
+			<span className="font-display text-[11px] font-semibold uppercase tracking-widest text-fog-500">Game Mode</span>
 			<select className="input !w-auto" value={value} onChange={(event) => onChange(event.target.value)}>
 				{played.length > 0 ? (
 					<>

@@ -1,0 +1,41 @@
+import Link from 'next/link';
+import s from '@/components/v4/v4.module.css';
+import { roster } from '@/components/v4/data';
+
+export default function Clubhouse() {
+  return <>
+    <section className={s.hero}>
+      <div className={s.heroCopy}>
+        <p className={s.eyebrow}><span className={s.diamond} /> THE MARIO SUPERSTAR BASEBALL CLUBHOUSE</p>
+        <h1>Your ballpark.<br />Your <em>people.</em></h1>
+        <p className={s.heroDescription}>One more game. One more rival. One more reason to keep a GameCube classic going.</p>
+        <p className={s.heroSub}>Play Mario Baseball online with Project Rio. Find your crew, know your nine, and make the next game a good one.</p>
+        <div className={s.actions}><Link className={s.primary} href="/rio-online/tutorial">Get in the game <span>↗</span></Link><Link className={s.textLink} href="/games/recent">Head to the game center →</Link></div>
+        <div className={s.heroFoot}><img src="/images/baseball.png" width="21" height="21" alt="" /> The game you remember. A community still playing.</div>
+      </div>
+      <div className={s.heroArt} aria-label="Mario, Yoshi, and Bowser from Mario Superstar Baseball" role="img">
+        <div className={s.artGrid} /><div className={s.fieldDiamond} /><span className={s.artWord}>PLAY<br />BALL!</span>
+        <span className={s.artLabel}>HOME OF THE<br /><b>EXTRA INNING.</b></span>
+        <img className={s.heroYoshi} src={roster[6].portrait} alt="" fetchPriority="high" />
+        <img className={s.heroBowser} src={roster[9].portrait} alt="" fetchPriority="high" />
+        <img className={s.heroMario} src={roster[0].portrait} alt="" fetchPriority="high" />
+        <span className={s.artTicket}><img src="/images/RioLogo.png" alt="" width="23" height="23" /><b>ALL SKILL LEVELS.<br />SAME LOVE OF THE GAME.</b></span>
+        <span className={s.artCaption}>MARIO SUPERSTAR BASEBALL / PROJECT RIO</span>
+      </div>
+    </section>
+    <section className={s.routeStrip} aria-label="Your next play">
+      <Link href="/rio-online/tutorial"><span>01 / PLAY</span><strong>Your first pitch starts here.</strong><p>Set up Rio and find an opponent.</p><b>↗</b></Link>
+      <Link href="/v4/roster"><span>02 / BUILD</span><strong>There’s a team in these 54.</strong><p>Meet the roster. Find the chemistry.</p><b>↗</b></Link>
+      <Link href="/games/recent"><span>03 / FOLLOW</span><strong>Every game has a story.</strong><p>Box scores, play-by-play, and the big hits.</p><b>↗</b></Link>
+    </section>
+    <section className={s.homeRoster}>
+      <div className={s.sectionIntro}><p className={s.eyebrow}>THE SCOUTING REPORT</p><h2>Nine slots.<br />A lot of personality.</h2><p>A big bat is a start. A teammate who clicks with it? That’s where it gets interesting.</p><Link className={s.darkButton} href="/v4/roster">Find your nine <span>→</span></Link></div>
+      <div className={s.scoutingCards}>{[9, 6, 4].map((id) => { const c = roster[id]; return <Link key={id} href={`/v4/roster?character=${id}`} className={s.scoutCard} data-class={c.className}><span className={s.scoutNumber}>NO. {String(id + 1).padStart(2, '0')}</span><img src={c.portrait} alt="" loading="lazy" /><div><span>{c.className} / Captain</span><h3>{c.name}</h3><p>{id === 9 ? 'Bring the big bat.' : id === 6 ? 'Cover some ground.' : 'Work the corners.'} <b>↗</b></p></div></Link>; })}</div>
+    </section>
+    <section className={s.dugout}>
+      <div><p className={s.eyebrow}>PULL UP A SEAT</p><h2>The best part isn’t<br />on the stat sheet.</h2><p>The rival who runs it back. The friend who teaches you to pitch.<br />The Discord call that goes one game too long.</p><a className={s.creamButton} href="https://discord.gg/c3r9PabfRU" target="_blank" rel="noreferrer">Meet the Rio community <span>↗</span></a></div>
+      <div className={s.teamWall} aria-label="In-game team logos">{['Mario Fireballs', 'Yoshi Eggs', 'DK Kongs', 'Peach Monarchs', 'Bowser Monsters', 'Wario Greats'].map(team => <img src={`/images/Teams/${team}.png`} alt={team} key={team} loading="lazy" />)}</div>
+    </section>
+    <div className={s.homeNote}><b>A new view from the dugout.</b><p>This is the v4 design playground. Explore the roster and ballparks here; game records, setup, and community links take you to the existing Rio experience.</p><Link href="/v4/review">Read the design review →</Link></div>
+  </>;
+}

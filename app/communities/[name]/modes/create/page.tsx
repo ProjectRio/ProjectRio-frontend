@@ -76,7 +76,7 @@ function CreateGameModeForm({ context }: { context: CommunityContext }) {
 		return (
 			<div className="mx-auto max-w-lg">
 				<div className="panel p-8 text-center">
-					<h1 className="text-3xl uppercase">Game Mode Created</h1>
+					<h1 className="text-3xl">Game Mode Created</h1>
 					<p className="mt-3 text-sm text-fog-300">
 						“{name}” is live for {community.name}.
 					</p>
@@ -92,7 +92,7 @@ function CreateGameModeForm({ context }: { context: CommunityContext }) {
 		<div className="mx-auto max-w-2xl">
 			<PageHeader kicker={community.name} title="Create a Game Mode" />
 			{context.sponsor === null && (
-				<p className="mb-4 rounded-lg border border-night-700 bg-night-900 p-3 text-sm text-fog-300">
+				<p className="mb-4 rounded-lg border border-[var(--rim)] bg-black/60 p-3 text-sm text-fog-300">
 					This community has no sponsor on record — the backend only allows sponsored communities to create game
 					modes, so this may be rejected.
 				</p>

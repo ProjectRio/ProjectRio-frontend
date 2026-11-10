@@ -32,7 +32,7 @@ export default function ChangePasswordPage({ params }: { params: Promise<{ activ
 	return (
 		<div className="mx-auto max-w-md">
 			<div className="panel p-8">
-				<h1 className="text-center text-3xl uppercase">New Password</h1>
+				<h1 className="text-center text-3xl">New Password</h1>
 				{done ? (
 					<div className="mt-6 text-center">
 						<p className="text-sm text-fog-300">Your password has been successfully changed.</p>

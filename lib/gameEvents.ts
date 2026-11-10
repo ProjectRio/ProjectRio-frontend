@@ -95,10 +95,10 @@ export function resultCategory(resultOfAb: number): ResultCategory {
 export const RESULT_COLORS: Record<ResultCategory, string> = {
 	hr: '#ffd23f',
 	hit: '#34d399',
-	out: '#8f8fa3',
+	out: '#93a498',
 	walk: '#4f9dff',
 	error: '#c084fc',
-	other: '#c9c9d6'
+	other: '#cdd3c6'
 };
 
 export type PitchOutcome = 'ball' | 'strike' | 'foul' | 'in-play' | 'result' | 'event';

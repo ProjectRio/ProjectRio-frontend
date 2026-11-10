@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { getLiveGames, getRecentGames, type GameSummary } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
 import { tagSetName, didHomeWin } from '@/lib/gameDisplay';
@@ -51,12 +52,10 @@ function pastItem(game: GameSummary, mode: string): TickerItem {
 function TeamLine({ team }: { team: { name: string; score: number; lead: boolean } }) {
 	return (
 		<div className="flex items-center justify-between gap-2">
-			<span
-				className={`truncate font-display text-sm font-semibold ${team.lead ? 'text-fog-100' : 'text-fog-500'}`}
-			>
+			<span className={`truncate font-display text-[0.95rem] font-semibold ${team.lead ? 'text-fog-100' : 'text-fog-500'}`}>
 				{team.name}
 			</span>
-			<span className={`font-display text-sm font-bold tabular-nums ${team.lead ? 'text-fog-100' : 'text-fog-500'}`}>
+			<span className={`font-mono text-sm font-semibold tabular-nums ${team.lead ? 'text-star-400' : 'text-fog-500'}`}>
 				{team.score}
 			</span>
 		</div>
@@ -67,9 +66,9 @@ function TickerBox({ item }: { item: TickerItem }) {
 	return (
 		<Link
 			href={item.href}
-			className="block w-44 shrink-0 rounded-lg border border-night-700 bg-night-850 px-3 py-2 transition-colors hover:border-night-600 hover:bg-night-800"
+			className="block w-44 shrink-0 rounded-md border border-[var(--rim)] bg-black/55 px-3 py-1.5 transition-colors duration-[233ms] hover:border-rim"
 		>
-			<div className="mb-1 flex items-center justify-between gap-2">
+			<div className="mb-0.5 flex items-center justify-between gap-2">
 				<span
 					className={`flex items-center gap-1 font-display text-[0.65rem] font-bold uppercase tracking-wider ${
 						item.live ? 'text-rio-400' : 'text-fog-500'
@@ -91,7 +90,12 @@ function TickerBox({ item }: { item: TickerItem }) {
 	);
 }
 
+/** The landing page shows these games on its own board, so the strip stays off it. */
 export default function GamesTicker() {
+	return usePathname() === '/' ? null : <Ticker />;
+}
+
+function Ticker() {
 	const [items, setItems] = useState<TickerItem[]>([]);
 	const tagsets = useTagsets();
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -152,13 +156,13 @@ export default function GamesTicker() {
 	if (items.length === 0) return null;
 
 	return (
-		<div className="sticky top-16 z-40 border-b border-night-700 bg-night-900/95 backdrop-blur">
+		<div className="sticky top-[67px] z-40 bg-[var(--wall)] [box-shadow:0_3px_0_var(--track-a),0_6px_0_var(--track-b)]">
 			<div className="relative mx-auto max-w-7xl">
 				{edges.left && (
 					<button
 						aria-label="Scroll left"
 						onClick={() => scrollBy(-1)}
-						className="absolute left-0 top-0 bottom-0 z-10 flex w-9 items-center justify-center bg-gradient-to-r from-night-900 to-transparent text-fog-300 hover:text-fog-100"
+						className="absolute left-0 top-0 bottom-0 z-10 flex w-9 items-center justify-center bg-[var(--wall)] text-fog-300 hover:text-fog-100"
 					>
 						‹
 					</button>
@@ -176,7 +180,7 @@ export default function GamesTicker() {
 					<button
 						aria-label="Scroll right"
 						onClick={() => scrollBy(1)}
-						className="absolute right-0 top-0 bottom-0 z-10 flex w-9 items-center justify-center bg-gradient-to-l from-night-900 to-transparent text-fog-300 hover:text-fog-100"
+						className="absolute right-0 top-0 bottom-0 z-10 flex w-9 items-center justify-center bg-[var(--wall)] text-fog-300 hover:text-fog-100"
 					>
 						›
 					</button>

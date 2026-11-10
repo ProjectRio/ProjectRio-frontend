@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAllTagSets, type TagSet } from './api';
+import { BACKEND, getAllTagSets, type TagSet } from './api';
 
 // Tag sets change rarely (new game modes are added infrequently), so we persist
 // them to localStorage and only re-fetch in the background once the cached copy
@@ -9,7 +9,11 @@ import { getAllTagSets, type TagSet } from './api';
 // a stale cache still self-heals on the next visit after it expires. Management
 // pages call invalidateTagsets() after a create/edit/delete so every mounted
 // hook re-fetches immediately regardless of the TTL.
-const STORAGE_KEY = 'rio_tagsets_v1';
+// Keyed by backend: a local snapshot and production carry different mode
+// lists, so a cache shared between them serves modes the other server has
+// never heard of — which comes back as a 400 "Unknown tag(s)" on every
+// subsequent call, not as an obviously stale mode list.
+const STORAGE_KEY = `rio_tagsets_v1:${BACKEND}`;
 const TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 
 let cache: TagSet[] | null = null;
