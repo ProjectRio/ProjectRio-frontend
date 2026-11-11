@@ -67,7 +67,7 @@ for sid,key in enumerate(parks):
  if sid==1:
   pieces.append('<path d="M0 0L-19 -19L0 -38L19 -19Z" stroke="#414b38" stroke-width="1.1"/><circle cx="0" cy="-18.4" r="5" stroke="#4e543b" stroke-width=".8"/>')
  if sid!=6:
-  pieces.append('<g stroke="#eee7bd" stroke-width=".42" stroke-linejoin="round" opacity=".87"><path d="M-54 -54L0 0L54 -54"/><path d="M-2.6 1.5V-3.5H-1.1V1.5ZM1.1 1.5V-3.5H2.6V1.5Z"/></g>')
+  pieces.append('<g stroke="#eee7bd" stroke-width=".42" stroke-linejoin="round" opacity=".87"><path d="M-54 -54L0 0L54 -54"/><path d="M-2.6 1.1V-1.3H-1.1V1.1ZM1.1 1.1V-1.3H2.6V1.1Z"/></g>')
   for x,z in [(-19,19),(0,38),(19,19)]:
    pieces.append(polygon(f'{x-1},-{z} {x},-{z+1} {x+1},-{z} {x},-{z-1}','#f0e8c8'))
   pieces.append('<path d="M-.7 -.8H.7V0L0 .6L-.7 0Z" fill="#f2eacb"/><path d="M-1.1 -18.4H1.1" stroke="#f2eacb" stroke-width=".5"/>')

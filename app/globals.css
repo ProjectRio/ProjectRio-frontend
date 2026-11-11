@@ -486,6 +486,8 @@
 	/* Title screen — the landing page. A foul line runs the full width under
 	   the title; the menu and the board hang from it at the same height. */
 	.title-screen {
+		/* The park may run wider than the page, never taller than its section. */
+		overflow-x: clip;
 		--row: 60px;
 		--row-gap: 6px;
 		--row-text: 1.95rem;
@@ -509,8 +511,26 @@
 			inset 0 0 0 1px rgb(0 0 0 / 0.6),
 			0 10px 0 rgb(0 0 0 / 0.28);
 	}
+	/* The park keeps the camera it was drawn for: tipped 48deg about its own
+	   centre, seen from 1.2 widths up. Width is in the board's container
+	   units and the camera scales with it, so the picture is the same at
+	   every size and its near edge always lands 0.416 widths below centre.
+	   That lets the park hang with that edge exactly --park-peek below the
+	   board; the page reserves the same room, so the next section never
+	   cuts the stadium. */
+	.title-stage {
+		container-type: inline-size;
+	}
 	.title-park {
-		transform: translate(-50%, -27%) perspective(1100px) rotateX(48deg);
+		--w: var(--park-w, 112cqw);
+		position: absolute;
+		left: 50%;
+		top: 100%;
+		width: var(--w);
+		max-width: none;
+		pointer-events: none;
+		transform: translate(-50%, calc(var(--park-peek, 18rem) - 0.8645 * var(--w))) perspective(calc(1.2 * var(--w)))
+			rotateX(48deg);
 		filter: drop-shadow(0 16px 0 rgb(0 0 0 / 0.35));
 	}
 

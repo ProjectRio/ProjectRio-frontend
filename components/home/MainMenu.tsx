@@ -2,18 +2,7 @@
 
 import Link from 'next/link';
 import GCButton from '@/components/GCButton';
-
-export const MENU_ITEMS = [
-	{ key: 'live', href: '/games/live', label: 'Live games' },
-	{ key: 'ranked', href: '/modes', label: 'Ranked ladders' },
-	{ key: 'recent', href: '/games/recent', label: 'Recent games' },
-	{ key: 'players', href: '/users', label: 'Players' },
-	{ key: 'communities', href: '/communities', label: 'Communities' },
-	{ key: 'tools', href: '/tools', label: 'Tools' }
-] as const;
-
-export type MenuKey = (typeof MENU_ITEMS)[number]['key'];
-
+import { MENU_ITEMS } from './menu';
 
 /**
  * The front door, built as the game's main menu: one selection bar that steps

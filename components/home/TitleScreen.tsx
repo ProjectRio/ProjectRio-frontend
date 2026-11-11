@@ -1,67 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getLiveGames, getRecentGames, type GameSummary } from '@/lib/api';
-import { useTagsets } from '@/lib/useTagsets';
+import { useState } from 'react';
 import GCButton from '@/components/GCButton';
-import MainMenu, { MENU_ITEMS, type MenuKey } from './MainMenu';
-import {
-	CommunitiesBoard,
-	LiveBoard,
-	PlayersBoard,
-	RankedBoard,
-	RecentBoard,
-	ToolsBoard,
-	type BoardData
-} from './boards';
-
-const LIVE_WINDOW_SECONDS = 60 * 60;
-const REFRESH_MS = 30_000;
-
-const BOARDS: Record<MenuKey, (props: BoardData) => React.ReactNode> = {
-	live: LiveBoard,
-	ranked: RankedBoard,
-	recent: RecentBoard,
-	players: PlayersBoard,
-	communities: CommunitiesBoard,
-	tools: ToolsBoard
-};
+import MainMenu from './MainMenu';
+import { BoardStage, ControlsHint, Park } from './parts';
+import { useHomeData } from './useHomeData';
 
 /**
  * The landing page as the game's title menu: the list on the left is the whole
  * site, and the board on the right shows what is behind the lit row, live.
  */
 export default function TitleScreen() {
+	const data = useHomeData();
 	const [index, setIndex] = useState(0);
-	const [live, setLive] = useState<any[] | null>(null);
-	const [recent, setRecent] = useState<GameSummary[] | null>(null);
-	const tagsets = useTagsets();
-
-	useEffect(() => {
-		let cancelled = false;
-		getRecentGames({ limit: 24, rosters: true })
-			.then((games) => !cancelled && setRecent(games))
-			.catch(() => !cancelled && setRecent([]));
-
-		function loadLive() {
-			getLiveGames(LIVE_WINDOW_SECONDS)
-				.then((games) => !cancelled && setLive(games))
-				.catch(() => !cancelled && setLive([]));
-		}
-		loadLive();
-		const interval = setInterval(loadLive, REFRESH_MS);
-		return () => {
-			cancelled = true;
-			clearInterval(interval);
-		};
-	}, []);
-
-	const item = MENU_ITEMS[index];
-	const Board = BOARDS[item.key];
 
 	return (
-		<div className="title-screen relative overflow-hidden">
-			<div className="mx-auto w-full max-w-[1480px] px-5 pb-14 pt-4 sm:px-8 lg:flex lg:min-h-[calc(100dvh-67px)] lg:flex-col lg:justify-center lg:px-12 lg:pb-[clamp(2.5rem,9vh,6rem)] lg:pt-0">
+		<div className="title-screen relative [--park-peek:18rem]">
+			<div className="mx-auto w-full max-w-[1480px] px-5 pb-14 pt-4 sm:px-8 lg:flex lg:min-h-[calc(100dvh-67px)] lg:flex-col lg:justify-center lg:px-12 lg:pb-[var(--park-peek)] lg:pt-0">
 				{/* The masthead is every page's header at full size: pennant, title, foul line. */}
 				<div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-5">
 					<div>
@@ -83,34 +38,13 @@ export default function TitleScreen() {
 
 				<div className="mt-[clamp(1.5rem,4vh,2.5rem)] grid grid-cols-[minmax(0,1fr)] gap-x-14 gap-y-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
 					<div className="relative z-10 flex flex-col justify-between gap-6">
-						<MainMenu index={index} onIndex={setIndex} live={live ? live.length : null} />
-						<p className="hidden items-center gap-4 pl-5 font-display text-sm font-semibold uppercase tracking-[0.12em] text-fog-500 lg:flex">
-							<span className="flex items-center gap-1.5">
-								<GCButton button="stick" size={18} /> Move
-							</span>
-							<span className="flex items-center gap-1.5">
-								<GCButton button="a" size={18} /> Select
-							</span>
-						</p>
+						<MainMenu index={index} onIndex={setIndex} live={data.live ? data.live.length : null} />
+						<ControlsHint className="pl-5" />
 					</div>
 
-					<div className="relative">
-						{/* Mario Stadium, laid back behind the board like the game's HUD over the field. */}
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src="/images/parks/mario.svg"
-							alt=""
-							className="title-park pointer-events-none absolute left-1/2 top-1/2 hidden w-[112%] max-w-none lg:block"
-						/>
-						<section
-							aria-label={item.label}
-							aria-live="polite"
-							className="title-board relative flex flex-col p-4 sm:p-5 lg:h-[var(--board-h)]"
-						>
-							<div key={item.key} className="route-in flex min-h-0 flex-1 flex-col">
-								<Board live={live} recent={recent} tagsets={tagsets} />
-							</div>
-						</section>
+					<div className="title-stage relative">
+						<Park />
+						<BoardStage index={index} data={data} />
 					</div>
 				</div>
 			</div>

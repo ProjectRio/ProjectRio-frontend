@@ -187,7 +187,8 @@ export function RecentBoard({ recent, tagsets }: BoardData) {
 	if (recent === null) return <Waiting />;
 	if (recent.length === 0) return <Quiet>The scores are not coming through right now.</Quiet>;
 	return (
-		<div className="flex flex-1 flex-col justify-between gap-1">
+		// The board is shorter on a short window: the seventh final would spill out of it.
+		<div className="flex flex-1 flex-col justify-between gap-1 [@media(max-height:820px)]:[&>*:nth-child(n+7)]:hidden">
 			{recent.slice(0, 7).map((game) => (
 				<FinalRow key={game.game_id} game={game} tagsets={tagsets} />
 			))}
