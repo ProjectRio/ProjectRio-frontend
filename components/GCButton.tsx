@@ -124,7 +124,8 @@ export default function GCButton({
 			viewBox={viewBox}
 			height={size}
 			width={(size * w) / h}
-			className={`inline-block flex-none align-[-0.25em] ${className}`}
+			// A glyph's letter never takes the text shadow of the words it sits beside.
+			className={`inline-block flex-none align-[-0.25em] [text-shadow:none] ${className}`}
 			role="img"
 			aria-label={`${button === 'c' ? 'C-stick' : button === 'stick' ? 'Control stick' : button.toUpperCase()} button`}
 		>

@@ -154,10 +154,13 @@ export async function getRecentGames(opts: {
 	mode?: string;
 	rosters?: boolean;
 	username?: string;
+	/** Per-inning runs and every scoring play, as the box-score page uses. */
+	linescore?: boolean;
 }): Promise<GameSummary[]> {
 	const params =
 		`?limit_games=${opts.limit}` +
 		(opts.rosters ? '&include_teams=1' : '') +
+		(opts.linescore ? '&include_linescore=1&include_scoring_plays=1' : '') +
 		(opts.mode ? `&tag=${encodeURIComponent(opts.mode)}` : '') +
 		(opts.username ? `&username=${encodeURIComponent(opts.username)}` : '');
 	const res = await apiGet(STAT_ENDPOINTS.GAMES, params);

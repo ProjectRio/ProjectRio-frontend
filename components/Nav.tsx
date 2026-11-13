@@ -2,27 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useUsername } from '@/lib/useUsername';
 import { useRioStaff } from '@/lib/useRioStaff';
-
-const NAV_LINKS = [
-	{ href: '/games/recent', label: 'Games' },
-	{ href: '/games/live', label: 'Live' },
-	{ href: '/modes', label: 'Ranked' },
-	{ href: '/users', label: 'Players' },
-	// '/characters' is intentionally unlisted while we rethink that page;
-	// it (and /characters/analytics) stay reachable by URL.
-	{ href: '/communities', label: 'Communities' },
-	{ href: '/tools', label: 'Tools' }
-];
-
-const SOCIAL_LINKS = [
-	{ href: 'https://discord.gg/c3r9PabfRU', label: 'Discord' },
-	{ href: 'https://www.patreon.com/projectrio/posts', label: 'Patreon' },
-	{ href: 'https://github.com/ProjectRio?tab=repositories', label: 'GitHub' }
-];
+import { SECTIONS, sectionFor } from '@/lib/siteMap';
 
 function AccountMenu({ username }: { username: string }) {
 	const [open, setOpen] = useState(false);
@@ -83,22 +66,23 @@ function AccountMenu({ username }: { username: string }) {
 }
 
 /**
- * Primary links with the game's menu cursor: one selection bar that rests on
- * the current section and steps to whatever is hovered or focused. A step
- * takes 14 frames, as it does on the disc.
+ * The site's sections (lib/siteMap.ts), the same list the landing page stands
+ * up as its title menu, laid down with the same cursor: one selection bar
+ * that rests on the section you are in and steps to whatever is hovered or
+ * focused. A step takes 14 frames, as it does on the disc.
  */
 function PrimaryLinks({ pathname }: { pathname: string }) {
 	const navRef = useRef<HTMLElement>(null);
 	const [hovered, setHovered] = useState<string | null>(null);
 	const [bar, setBar] = useState<{ left: number; width: number } | null>(null);
-	const active = NAV_LINKS.find((link) => pathname === link.href || pathname.startsWith(link.href + '/'))?.href;
+	const active = sectionFor(pathname)?.key;
 	const target = hovered ?? active ?? null;
 
 	useLayoutEffect(() => {
 		const nav = navRef.current;
 		if (!nav) return;
 		function measure() {
-			const el = target ? nav!.querySelector<HTMLElement>(`[data-href="${target}"]`) : null;
+			const el = target ? nav!.querySelector<HTMLElement>(`[data-section="${target}"]`) : null;
 			setBar(el ? { left: el.offsetLeft, width: el.offsetWidth } : null);
 		}
 		measure();
@@ -111,7 +95,7 @@ function PrimaryLinks({ pathname }: { pathname: string }) {
 	return (
 		<nav
 			ref={navRef}
-			className="relative hidden flex-1 items-center gap-1 lg:flex"
+			className="relative hidden flex-1 items-center xl:flex"
 			aria-label="Primary"
 			onMouseLeave={() => setHovered(null)}
 			onBlur={() => setHovered(null)}
@@ -121,20 +105,19 @@ function PrimaryLinks({ pathname }: { pathname: string }) {
 				className="sel pointer-events-none absolute top-1/2 h-9 -translate-y-1/2 transition-[left,width,opacity] duration-[233ms] ease-[var(--ease-step)] motion-reduce:transition-none"
 				style={bar ? { left: bar.left, width: bar.width, opacity: 1 } : { left: 0, width: 0, opacity: 0 }}
 			/>
-			{NAV_LINKS.map((link) => (
+			{SECTIONS.map((section) => (
 				<Link
-					key={link.href}
-					href={link.href}
-					data-href={link.href}
-					aria-current={link.href === active ? 'page' : undefined}
-					onMouseEnter={() => setHovered(link.href)}
-					onFocus={() => setHovered(link.href)}
-					className={`relative flex items-center gap-1.5 px-3.5 py-2 font-display text-[1.05rem] font-semibold uppercase tracking-wider outline-none transition-colors ${
-						link.href === target ? 'text-fog-100' : 'text-fog-300'
+					key={section.key}
+					href={section.href}
+					data-section={section.key}
+					aria-current={section.key === active ? 'page' : undefined}
+					onMouseEnter={() => setHovered(section.key)}
+					onFocus={() => setHovered(section.key)}
+					className={`relative whitespace-nowrap px-3 py-2 font-display text-[1.05rem] font-semibold uppercase tracking-wider outline-none transition-colors ${
+						section.key === target ? 'text-fog-100' : 'text-fog-300'
 					}`}
 				>
-					{link.href === '/games/live' && <span className="h-2 w-2 rounded-full bg-rio-500" />}
-					{link.label}
+					{section.label}
 				</Link>
 			))}
 		</nav>
@@ -161,29 +144,23 @@ export default function Nav() {
 					home ? 'max-w-[1480px] px-5 sm:px-8 lg:px-12' : 'max-w-7xl px-4 sm:px-6 lg:px-8'
 				}`}
 			>
-				<Link href="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
-					<Image src="/images/RioLogo.png" alt="Project Rio logo" width={36} height={36} className="[image-rendering:pixelated]" />
-					{!home && (
+				{/* The landing page carries the mark in its own masthead, beside the title. */}
+				{!home && (
+					<Link href="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
+						{/* A 16 by 16 pixel mark, drawn as vectors and shown at a whole multiple of 16. */}
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img src="/images/RioMark.svg" alt="" width={32} height={32} />
 						<span className="font-title text-2xl leading-none [text-shadow:0_2px_0_rgb(0_0_0/0.5)]">
 							Project <span className="text-rio-400">Rio</span>
 						</span>
-					)}
-				</Link>
+					</Link>
+				)}
 
-				{home ? <div className="hidden flex-1 lg:block" /> : <PrimaryLinks pathname={pathname} />}
+				{/* The title screen is the menu, so its header carries no section links. */}
+				{home ? <div className="flex-1" /> : <PrimaryLinks pathname={pathname} />}
 
-				<div className="hidden items-center gap-3 lg:flex">
-					{SOCIAL_LINKS.map((link) => (
-						<a
-							key={link.href}
-							href={link.href}
-							target="_blank"
-							rel="noreferrer"
-							className="text-xs font-medium text-fog-500 transition-colors hover:text-fog-100"
-						>
-							{link.label}
-						</a>
-					))}
+				{/* Eight section links need the xl width; without them the account buttons fit from lg. */}
+				<div className={`hidden items-center gap-3 ${home ? 'lg:flex' : 'xl:flex'}`}>
 					{username ? (
 						<AccountMenu username={username} />
 					) : (
@@ -202,7 +179,7 @@ export default function Nav() {
 				</div>
 
 				<button
-					className="ml-auto p-2 text-fog-100 lg:hidden"
+					className={`ml-auto p-2 text-fog-100 ${home ? 'lg:hidden' : 'xl:hidden'}`}
 					aria-label="Toggle menu"
 					aria-expanded={open}
 					onClick={() => setOpen(!open)}
@@ -214,10 +191,10 @@ export default function Nav() {
 			</div>
 
 			{open && (
-				<nav className="border-t border-night-700 bg-[var(--wall)] px-4 py-4 lg:hidden" aria-label="Mobile">
+				<nav className={`border-t border-night-700 bg-[var(--wall)] px-4 py-4 ${home ? 'lg:hidden' : 'xl:hidden'}`} aria-label="Mobile">
 					<ul className="space-y-1">
-						{NAV_LINKS.map((link) => (
-							<li key={link.href}>
+						{SECTIONS.map((link) => (
+							<li key={link.key}>
 								<Link
 									href={link.href}
 									className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-fog-300 hover:text-fog-100"

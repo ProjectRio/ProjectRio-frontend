@@ -1,30 +1,35 @@
+import { SECTIONS, type SectionKey } from '@/lib/siteMap';
 import {
+	CharactersBoard,
 	CommunitiesBoard,
+	EveryPitchBoard,
 	LiveBoard,
-	PlayersBoard,
+	PlayBoard,
 	RankedBoard,
-	RecentBoard,
-	ToolsBoard,
 	type BoardData
 } from './boards';
 
 /**
- * The landing page's menu, in one place: each row is a destination and the
- * board that previews it. Every layout reads this list, so changing what the
- * front door offers is an edit here and nowhere else.
+ * The landing page's menu: the site's sections (lib/siteMap.ts) that have a
+ * board to show, in the site's order and under the site's names. A board
+ * proves its row from live data. `fold` says how much of the stadium the row
+ * hands back: 'bug' folds the board down to a scorebug over a game on the
+ * field, 'bare' drops the board's box altogether and leaves its controls
+ * standing over the park (the Ranked ladder flies as flags over the outfield wall instead).
+ * Below the desktop breakpoint there is no park and every board is a full card.
  */
-export const MENU_ITEMS = [
-	{ key: 'live', href: '/games/live', label: 'Live games', Board: LiveBoard },
-	{ key: 'ranked', href: '/modes', label: 'Ranked ladders', Board: RankedBoard },
-	{ key: 'recent', href: '/games/recent', label: 'Recent games', Board: RecentBoard },
-	{ key: 'players', href: '/users', label: 'Players', Board: PlayersBoard },
-	{ key: 'communities', href: '/communities', label: 'Communities', Board: CommunitiesBoard },
-	{ key: 'tools', href: '/tools', label: 'Tools', Board: ToolsBoard }
-] as const satisfies readonly {
-	key: string;
-	href: string;
-	label: string;
-	Board: (props: BoardData) => React.ReactNode;
-}[];
+export type Fold = 'bug' | 'bare' | 'none';
 
-export type MenuKey = (typeof MENU_ITEMS)[number]['key'];
+const BOARDS: Partial<Record<SectionKey, { Board: (props: BoardData) => React.ReactNode; fold: Fold }>> = {
+	play: { Board: PlayBoard, fold: 'none' },
+	live: { Board: LiveBoard, fold: 'bug' },
+	pitch: { Board: EveryPitchBoard, fold: 'bug' },
+	ranked: { Board: RankedBoard, fold: 'bare' },
+	characters: { Board: CharactersBoard, fold: 'none' },
+	communities: { Board: CommunitiesBoard, fold: 'none' }
+};
+
+export const MENU_ITEMS = SECTIONS.flatMap((section) => {
+	const board = BOARDS[section.key];
+	return board ? [{ ...section, ...board }] : [];
+});

@@ -61,7 +61,7 @@ for sid,key in enumerate(parks):
  for role in [8,1,6,9,10,11]:
   if role not in layers: continue
   d=path(layers[role]); fill=mapping[role]
-  pieces.append(f'<path d="{d}" fill="{fill}" stroke="{fill}" stroke-width=".11" stroke-linejoin="round"/>')
+  pieces.append(f'<path d="{d}" fill="{fill}" stroke="{fill}" stroke-width=".6" stroke-linejoin="round"/>')
  pieces.append(f'<path d="{"".join(wall)}" stroke="{rim}" stroke-width="1.5" stroke-linecap="round"/>')
  # Original, simplified paint marks. Standard diamond proportions, not extracted decals.
  if sid==1:

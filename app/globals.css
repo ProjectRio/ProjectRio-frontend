@@ -81,6 +81,14 @@
 
 	--chrome: rgb(0 0 0 / 0.6);
 	--chrome-deep: rgb(0 0 0 / 0.72);
+	/* Cards: a slab of the outfield wall's green, with no line round it. Black
+	   and an outline belong to the selection bar alone. The slab has a side
+	   (its own green, darkened), a lit top edge, and a hard shadow on the grass. */
+	--card: rgb(7 30 22 / 0.74);
+	--card-deep: rgb(5 22 16 / 0.86);
+	--card-side: #04140e;
+	--card-cap: rgb(255 255 255 / 0.1);
+	--card-cast: rgb(0 0 0 / 0.26);
 	--rim: rgb(181 173 165 / 0.3);
 	--rim-strong: rgb(181 173 165 / 0.62);
 }
@@ -200,31 +208,99 @@
 }
 
 @layer components {
-	/* Chrome — the standard surface. Translucent black, warm neutral rim. */
-	.panel {
-		background-color: var(--chrome);
-		border: 1px solid var(--rim);
-		border-radius: 0.5rem;
+	/* Card — the standard surface: a slab in the outfield wall's green with
+	   no line round it. An outline on this site means one thing, the
+	   selection bar (black, warm rim), so nothing at rest has one.
+	   The slab is a thing with thickness, lit from above like the park
+	   behind it: a light cap along the top of its face, a solid side under
+	   it, and a short hard shadow past that. Nothing is blurred or blended.
+	   --edge is the side's height; --lift is how far the face is off its
+	   resting height (the base never moves). */
+	.panel,
+	.title-board {
+		--edge: 5px;
+		--lift: 0px;
+		position: relative;
+		border-radius: 8px;
 		overflow: hidden;
+		box-shadow:
+			0 calc(var(--edge) + var(--lift)) 0 var(--card-side),
+			0 calc(var(--edge) + var(--lift) + 4px) 0 var(--card-cast);
+	}
+	/* The cap is laid over the card, so a header band inside does not dull it. */
+	.panel::after,
+	.title-board::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		z-index: 1;
+		height: 2px;
+		background: var(--card-cap);
+		pointer-events: none;
+	}
+	.panel {
+		background-color: var(--card);
+		border: 1px solid transparent;
 	}
 
-	/* Hover is the game's selection bar: the rim comes up, nothing glows. */
+	/*
+	 * The selection bar inside the app. One look, three places it lands:
+	 *   .panel-glow  a whole card you can open: the bar is the card's own edge
+	 *   .pick        a row in a card: the bar sits 4px inside the card's edge
+	 *                and the row's words stay on the card's own margin
+	 *   .stat-table  a table row: the same bar, 4px inside the table's edge
+	 * Cards with rows in them are padded 1rem, so the three line up.
+	 */
 	.panel-glow {
+		transform: translateY(calc(-1 * var(--lift)));
 		transition:
-			border-color var(--step) var(--ease-step),
-			background-color var(--step) var(--ease-step),
-			box-shadow var(--step) var(--ease-step);
+			transform 120ms var(--ease-step),
+			box-shadow 120ms var(--ease-step),
+			border-color 120ms linear,
+			background-color 120ms linear;
 	}
+	/* Under the cursor the face rises a little; pressed, it goes down onto
+	   its base and the side closes up beneath it. */
 	.panel-glow:hover,
 	.panel-glow:focus-visible {
-		background-color: var(--chrome-deep);
+		--lift: 2px;
+		background-color: rgb(0 0 0 / 0.55);
 		border-color: var(--color-rim);
-		box-shadow:
-			inset 0 0 0 1px rgb(136 119 119 / 0.86),
-			0 0 0 1px rgb(187 170 170 / 0.43);
+	}
+	.panel-glow:active {
+		--lift: calc(-1 * var(--edge));
 	}
 
-	/* The selection bar on its own, for cursors and current items. */
+	.pick {
+		position: relative;
+		margin-inline: -0.75rem;
+		padding: 0.4rem 0.75rem;
+		border: 1px solid transparent;
+		border-radius: 6px;
+		outline: none;
+		transition:
+			background-color 120ms linear,
+			border-color 120ms linear;
+	}
+	/* A block of a card rather than one row of it: the bar keeps the same 4px all round. */
+	.pick-block {
+		margin: -0.75rem;
+		padding: 0.75rem;
+	}
+	.pick:hover,
+	.pick:focus-visible {
+		border-color: var(--color-rim);
+		background-color: rgb(0 0 0 / 0.55);
+	}
+	/* A row lit from elsewhere (the scoring play drawn on the field), where there is a field. */
+	@media (min-width: 1024px) {
+		.pick[data-lit='true'] {
+			border-color: var(--color-rim);
+			background-color: rgb(0 0 0 / 0.55);
+		}
+	}
+
+	/* The selection bar: the cursor, and the mark on the current item. */
 	.sel {
 		background-color: rgb(0 0 0 / 0.573);
 		border: 1px solid var(--color-rim);
@@ -334,8 +410,19 @@
 	.stat-table {
 		width: 100%;
 		font-size: 0.9rem;
-		border-collapse: collapse;
+		/* Separate, so a hovered row's cells can be rounded into the bar. */
+		border-collapse: separate;
+		border-spacing: 0;
 		font-variant-numeric: tabular-nums;
+	}
+	/* The 4px the bar stands in from each edge; the header band still runs the full width. */
+	.stat-table :is(th, td):first-child {
+		border-left: 4px solid transparent;
+		padding-left: calc(0.75rem - 4px);
+	}
+	.stat-table :is(th, td):last-child {
+		border-right: 4px solid transparent;
+		padding-right: calc(0.75rem - 4px);
 	}
 
 	.stat-table thead th {
@@ -358,12 +445,32 @@
 		white-space: nowrap;
 	}
 
-	.stat-table tbody tr {
-		transition: background-color 120ms linear;
+	/* The selection bar on a row, built from its cells. */
+	.stat-table tbody tr:hover td {
+		background-color: rgb(0 0 0 / 0.55);
+		background-clip: padding-box;
+		border-bottom-color: transparent;
+		box-shadow:
+			inset 0 1px 0 var(--color-rim),
+			inset 0 -1px 0 var(--color-rim);
 	}
-	.stat-table tbody tr:hover {
-		background-color: rgb(247 243 232 / 0.07);
-		box-shadow: inset 0 0 0 1px var(--rim-strong);
+	.stat-table tbody tr:hover td:first-child {
+		border-radius: 10px 0 0 10px;
+		box-shadow:
+			inset 1px 0 0 var(--color-rim),
+			inset 0 1px 0 var(--color-rim),
+			inset 0 -1px 0 var(--color-rim);
+	}
+	.stat-table tbody tr:hover td:last-child {
+		border-radius: 0 10px 10px 0;
+		box-shadow:
+			inset -1px 0 0 var(--color-rim),
+			inset 0 1px 0 var(--color-rim),
+			inset 0 -1px 0 var(--color-rim);
+	}
+	.stat-table tbody tr:hover td:only-child {
+		border-radius: 10px;
+		box-shadow: inset 0 0 0 1px var(--color-rim);
 	}
 
 	.stat-table tbody tr:last-child td {
@@ -492,6 +599,8 @@
 		--row-gap: 6px;
 		--row-text: 1.95rem;
 		--board-h: 31rem;
+		/* The board folded down to a scorebug, when the game is on the field. */
+		--bug-h: 14.25rem;
 	}
 	@media (max-height: 820px) {
 		.title-screen {
@@ -501,37 +610,216 @@
 			--board-h: 26.5rem;
 		}
 	}
-	/* The board is the one piece of chrome on the page, a size up from a
-	   panel; Mario Stadium lies back behind it. */
+	/* On a desktop the whole title screen is drawn at 80%: the masthead, menu,
+	   board and park keep their proportions, and the park fits on the page.
+	   Browser zoom still scales it like everything else. */
+	@media (min-width: 1024px) {
+		.title-screen {
+			--scale: 0.8;
+			zoom: var(--scale);
+		}
+		/* Lengths inside the box are scaled with it, so the window's height
+		   is divided back out to fill it. */
+		.title-fill {
+			min-height: calc((100dvh - 67px) / var(--scale));
+		}
+	}
+	/* The board is the page's one card: the same unlined slab, thin enough
+	   that the diamond behind it still reads through. */
 	.title-board {
-		background-color: rgb(0 0 0 / 0.8);
-		border: 2px solid var(--rim-strong);
-		border-radius: 0.75rem;
-		box-shadow:
-			inset 0 0 0 1px rgb(0 0 0 / 0.6),
-			0 10px 0 rgb(0 0 0 / 0.28);
+		padding: 1rem;
+		background-color: rgb(7 30 22 / 0.64);
+	}
+	@media (min-width: 1024px) {
+		/* Folding is a cursor step, like every other move on the menu. */
+		.title-board {
+			height: var(--board-h);
+			transition: height var(--step) var(--ease-step);
+		}
+		.title-board[data-fold='bug'] {
+			height: var(--bug-h);
+		}
+		/* No box at all: the board's controls stand over the park. */
+		.title-board[data-fold='bare'] {
+			height: auto;
+			padding: 0;
+			background: none;
+			box-shadow: none;
+			overflow: visible;
+			transition: none;
+		}
+		.title-board[data-fold='bare']::after {
+			content: none;
+		}
 	}
 	/* The park keeps the camera it was drawn for: tipped 48deg about its own
-	   centre, seen from 1.2 widths up. Width is in the board's container
+	   centre, seen from 1.2 widths up. Width is in the stage's container
 	   units and the camera scales with it, so the picture is the same at
-	   every size and its near edge always lands 0.416 widths below centre.
-	   That lets the park hang with that edge exactly --park-peek below the
-	   board; the page reserves the same room, so the next section never
-	   cuts the stadium. */
+	   every size: the near edge lands 0.4157 widths below the centre and the
+	   centre-field wall 0.2022 widths above it. The park's drawn near edge
+	   stands on the stage's bottom edge, and .title-peek holds the stage open far enough
+	   that the wall clears a folded board, so the whole field is on the page
+	   and the next section never cuts it. components/home/scene.ts does the
+	   same sum to draw a ball's flight over the picture. */
 	.title-stage {
 		container-type: inline-size;
+		--w: var(--park-w, 128cqw);
+		/* The art runs on past the backstop with nothing drawn; that much of
+		   it hangs below the stage instead of holding the page open. */
+		--sink: 0.035;
+	}
+	.title-peek {
+		height: max(0px, calc(var(--bug-h) + (0.64 - var(--sink)) * var(--w) - var(--board-h)));
 	}
 	.title-park {
-		--w: var(--park-w, 112cqw);
 		position: absolute;
 		left: 50%;
-		top: 100%;
+		bottom: calc(-1 * var(--sink) * var(--w));
 		width: var(--w);
+		/* The art is 156 by 140; holding that shape keeps the picture placed
+		   before the image has loaded. */
+		aspect-ratio: 156 / 140;
 		max-width: none;
 		pointer-events: none;
-		transform: translate(-50%, calc(var(--park-peek, 18rem) - 0.8645 * var(--w))) perspective(calc(1.2 * var(--w)))
-			rotateX(48deg);
+		transform: translate(-50%, calc(0.033 * var(--w))) perspective(calc(1.2 * var(--w))) rotateX(48deg);
 		filter: drop-shadow(0 16px 0 rgb(0 0 0 / 0.35));
+	}
+	/* The park's centre on the page: a ball's flight is drawn from here. */
+	.title-field {
+		position: absolute;
+		left: 50%;
+		bottom: calc((0.4157 - var(--sink)) * var(--w));
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+	/* A ball's flight, drawn from the bat out. */
+	.title-flight {
+		position: absolute;
+		left: calc(-0.5 * var(--w));
+		top: calc(-0.5 * var(--w));
+		width: var(--w);
+		height: var(--w);
+		overflow: visible;
+		fill: none;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	.title-flight polyline {
+		vector-effect: non-scaling-stroke;
+	}
+	.title-flight polyline[pathLength] {
+		stroke-dasharray: 1;
+		animation: flight-in 480ms var(--ease-step) both;
+	}
+
+	/* A player standing on the field: feet on the spot, drawn upright. */
+	.title-head {
+		position: absolute;
+		left: calc(var(--x) * var(--w));
+		top: calc(var(--y) * var(--w));
+		width: calc(var(--size) * var(--w));
+		height: calc(var(--size) * var(--w));
+		max-width: none;
+		object-fit: contain;
+		transform: translate(-50%, -94%);
+		filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.45));
+	}
+
+	/* A flag in the row over the outfield wall. The pole comes up out of the
+	   warning track, then the flag is run up it; the next place along starts a
+	   few frames later, first place last. Type is sized from the park. */
+	.flag {
+		position: absolute;
+		left: calc(var(--x) * var(--w));
+		top: calc(var(--top) * var(--w));
+		width: 0;
+		height: calc(var(--pole) * var(--w));
+		font-size: calc(0.0165 * var(--w));
+		--wait: calc((var(--n) - 1 - var(--i)) * 100ms);
+	}
+	.flag-pole {
+		position: absolute;
+		left: -0.11em;
+		top: 0;
+		bottom: 0;
+		width: 0.22em;
+		border-radius: 0.11em 0.11em 0 0;
+		background: var(--color-fog-300);
+		box-shadow: inset -0.07em 0 0 rgb(0 0 0 / 0.32);
+		transform-origin: bottom;
+		animation: pole-up var(--step) var(--ease-step) var(--wait) both;
+	}
+	.flag-pole::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: -0.3em;
+		width: 0.56em;
+		height: 0.56em;
+		border-radius: 50%;
+		background: var(--color-fog-100);
+		box-shadow: inset -0.1em -0.1em 0 rgb(0 0 0 / 0.25);
+		transform: translateX(-50%);
+	}
+	.flag-cloth {
+		position: absolute;
+		left: 0.11em;
+		top: 0.5em;
+		display: flex;
+		flex-direction: column;
+		width: calc(0.156 * var(--w));
+		padding: 0.22em 1.15em 0.36em 0.5em;
+		pointer-events: auto;
+		outline: none;
+		color: #14140c;
+		background: var(--color-fog-100);
+		/* A swallowtail: felt, cut to two points at the fly. */
+		clip-path: polygon(0 0, 100% 0, calc(100% - 0.8em) 50%, 100% 100%, 0 100%);
+		animation: flag-up 300ms cubic-bezier(0.3, 1.3, 0.45, 1) calc(var(--wait) + 150ms) both;
+	}
+	.flag-cloth[data-first='true'] {
+		background: var(--color-star-400);
+	}
+	.flag-name {
+		display: flex;
+		align-items: center;
+		height: 1.9em;
+		overflow: hidden;
+		white-space: nowrap;
+		font-family: var(--font-display);
+		font-weight: 700;
+		line-height: 1;
+	}
+	.flag-cloth:hover .flag-name,
+	.flag-cloth:focus-visible .flag-name {
+		text-decoration: underline;
+		text-decoration-thickness: 0.06em;
+		text-underline-offset: 0.1em;
+	}
+	.flag-line {
+		display: flex;
+		align-items: baseline;
+		gap: 0.55em;
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		line-height: 1.1;
+	}
+	.flag-place {
+		font-family: var(--font-display);
+		font-size: 0.86em;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	.flag-record {
+		font-size: 0.74em;
+		color: rgb(20 20 12 / 0.66);
+	}
+	.flag-rating {
+		margin-left: auto;
+		font-size: 1.06em;
+		font-weight: 600;
 	}
 
 	/* Form inputs */
@@ -608,6 +896,32 @@
 	}
 }
 
+@keyframes flight-in {
+	from {
+		stroke-dashoffset: 1;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes pole-up {
+	from {
+		transform: scaleY(0);
+	}
+}
+
+/* From lying at the foot of its pole to flying at the top. */
+@keyframes flag-up {
+	from {
+		opacity: 0;
+		transform: translateY(calc(var(--pole) * var(--w) - 100% - 0.5em));
+	}
+	12% {
+		opacity: 1;
+	}
+}
+
 @keyframes swing-sprite {
 	to {
 		background-position: -2208px 0;
@@ -651,8 +965,15 @@
 
 	.mushroom-sway,
 	.float-gently,
-	.route-in {
+	.route-in,
+	.flag-pole,
+	.flag-cloth,
+	.title-flight polyline[pathLength] {
 		animation: none;
+	}
+
+	.title-board {
+		transition: none;
 	}
 
 	.swing-sprite {
@@ -663,5 +984,10 @@
 	.btn-primary:active,
 	.btn-secondary:active {
 		transform: none;
+	}
+
+	.panel-glow {
+		transform: none;
+		transition: none;
 	}
 }

@@ -1,14 +1,20 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import GCButton from '@/components/GCButton';
 import { MENU_ITEMS } from './menu';
 
 /**
  * The front door, built as the game's main menu: one selection bar that steps
- * between rows in 14 frames. Arrow keys move it, as the stick would. The
- * selection drives the board beside it, so the page owns the index. Row size
- * comes from --row on .title-screen, which shortens on a short window.
+ * between rows in 14 frames. The selection drives the board beside it, so the
+ * page owns the index. Row size comes from --row on .title-screen, which
+ * shortens on a short window.
+ *
+ * The arrow keys move the bar from anywhere on the page, as the stick would,
+ * and Enter opens the lit row. Off either end of the list the keys are left
+ * alone, so they still scroll the page.
  */
 export default function MainMenu({
 	index,
@@ -19,17 +25,38 @@ export default function MainMenu({
 	onIndex: (index: number) => void;
 	live: number | null;
 }) {
-	function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
-		const delta = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0;
-		if (!delta) return;
-		event.preventDefault();
-		const next = (index + delta + MENU_ITEMS.length) % MENU_ITEMS.length;
-		onIndex(next);
-		event.currentTarget.querySelectorAll<HTMLAnchorElement>('a')[next]?.focus();
-	}
+	const router = useRouter();
+	const navRef = useRef<HTMLElement>(null);
+
+	useEffect(() => {
+		function onKeyDown(event: KeyboardEvent) {
+			const nav = navRef.current;
+			if (!nav || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+			const target = event.target instanceof Element ? event.target : null;
+			// Typing, and controls that use these keys themselves, keep them.
+			if (target?.closest('input, textarea, select, [contenteditable="true"], [role="menu"]')) return;
+			// Scrolled past the menu, the keys go back to the page.
+			const box = nav.getBoundingClientRect();
+			if (box.bottom <= 0 || box.top >= window.innerHeight) return;
+
+			if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+				const next = index + (event.key === 'ArrowDown' ? 1 : -1);
+				if (next < 0 || next >= MENU_ITEMS.length) return;
+				event.preventDefault();
+				onIndex(next);
+				// Keep keyboard focus on the bar when it is already in the menu.
+				if (target && nav.contains(target)) nav.querySelectorAll<HTMLAnchorElement>('a')[next]?.focus();
+			} else if (event.key === 'Enter' && !target?.closest('a, button, summary')) {
+				event.preventDefault();
+				router.push(MENU_ITEMS[index].href);
+			}
+		}
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	}, [index, onIndex, router]);
 
 	return (
-		<nav aria-label="Main menu" className="relative w-full" onKeyDown={onKeyDown}>
+		<nav ref={navRef} aria-label="Main menu" className="relative w-full">
 			<span
 				aria-hidden
 				className="sel pointer-events-none absolute inset-x-0 top-0 transition-transform duration-[233ms] ease-[var(--ease-step)] motion-reduce:transition-none"
@@ -56,7 +83,7 @@ export default function MainMenu({
 					{/* The prompt rides on the cursor, the way the game shows A on the lit row. */}
 					<GCButton
 						button="a"
-						size={24}
+						size={26}
 						pressed
 						className={`transition-opacity duration-[120ms] max-lg:!hidden ${i === index ? 'opacity-100' : 'opacity-0'}`}
 					/>

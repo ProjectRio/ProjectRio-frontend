@@ -20,8 +20,9 @@ export const PARK_EVENT = 'rio-park-change';
 
 /**
  * Park theming is parked while the design settles on Mario Stadium: with this
- * off, every page uses the default park, a saved choice is ignored and the
- * picker is hidden. Flip it to bring the other six back.
+ * off, every page uses the default park and a saved choice is ignored. The
+ * picker (components/ParkPicker.tsx) is no longer mounted anywhere; bringing
+ * the other six back means flipping this and giving the picker a home again.
  */
 export const PARK_THEMES_ENABLED = false;
 

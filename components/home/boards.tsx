@@ -2,26 +2,42 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { getAllUsers, getTagSetLadder, type GameSummary, type LadderPlayer, type TagSet } from '@/lib/api';
-import { characterImage, stadiums } from '@/lib/data/characters';
-import { TOOLS } from '@/lib/data/tools';
+import type { GameSummary, ScoringPlay, TagSet } from '@/lib/api';
+import type { LandingRow } from '@/lib/landingData';
+import { buildTeamRows, characterGroups, charStats, fetchModeGames, type CharAgg } from '@/lib/charAnalytics';
+import { characterImage, characterName, stadiums } from '@/lib/data/characters';
 import { didHomeWin, liveCharacter, liveTeamImage, recentTeamImage, tagSetName } from '@/lib/gameDisplay';
+import { atBatResultName } from '@/lib/mssb/constants';
 import { getTimeSince } from '@/lib/time';
 import { BaseDiamond, OutPips, StarOrbs } from '@/components/game/hud';
 import { LiveDot } from '@/components/ui';
+import { hitsBySide, keyPlays } from './scene';
+import { useSeasonModes, type Ranked } from './useRanked';
 
-/** What every board can draw from; fetched once by the title screen. */
-export interface BoardData {
+/** What the page fetches once for every board. */
+export interface HomeData {
 	live: any[] | null;
 	recent: GameSummary[] | null;
+	/** The latest final with its line score; undefined while loading, null if there is none. */
+	featured: GameSummary | null | undefined;
+	/** Where every ball of the featured final came down; null until it loads. */
+	landings: LandingRow[] | null;
 	tagsets: TagSet[];
 }
 
+/** What a board is given: the data, the ladder, and the scoring play lit on the field. */
+export interface BoardData extends HomeData {
+	ranked: Ranked;
+	headline: ScoringPlay | null;
+	lit: ScoringPlay | null;
+	onLit: (play: ScoringPlay | null) => void;
+}
+
 const LABEL = 'font-display text-sm font-semibold uppercase tracking-[0.14em] text-fog-500';
-/** A board row that takes the selection bar on hover or focus. */
-const ROW =
-	'rounded-md border border-transparent outline-none transition-colors duration-[120ms] hover:border-[var(--color-rim)] hover:bg-black/55 focus-visible:border-[var(--color-rim)] focus-visible:bg-black/55';
+/** A board row you can open: the selection bar lands on it (.pick in globals.css). */
+const ROW = 'pick';
+/** The same for a whole block of a board, such as a scorebug. */
+const BLOCK = 'pick pick-block';
 
 function Waiting() {
 	return <div className="swing-sprite m-auto" role="status" aria-label="Loading" />;
@@ -35,27 +51,110 @@ function liveHref(game: any) {
 	return `/games/live/${encodeURIComponent(`${game.start_time}-${game.home_player}-${game.away_player}`)}`;
 }
 
-/* ---------- Live ---------- */
-
-function LiveSide({ game, side }: { game: any; side: 'home' | 'away' }) {
-	const batting = (game.half_inning === 0) === (side === 'away');
+/** The tools that explain a board, as quiet links along its foot. Dropped on a short desktop window. */
+function Related({ links }: { links: { href: string; label: string }[] }) {
 	return (
-		<div className="flex items-center gap-4">
-			{/* eslint-disable-next-line @next/next/no-img-element */}
-			<img src={liveTeamImage(game, side)} alt="" className="h-16 w-16 shrink-0 object-contain sm:h-20 sm:w-20" />
-			<div className="min-w-0 flex-1">
-				<p className="truncate font-title text-2xl leading-tight sm:text-3xl">{game[`${side}_player`]}</p>
-				<div className="mt-1.5 flex items-center gap-3">
-					<StarOrbs stars={game[`${side}_stars`] ?? 0} />
-					{batting && (
-						<span className="font-display text-xs font-bold uppercase tracking-[0.14em] text-star-400">At bat</span>
+		<p className="flex flex-wrap gap-x-6 gap-y-1 border-t border-[var(--rim)] pt-3 lg:[@media(max-height:820px)]:hidden">
+			{links.map((link) => (
+				<Link key={link.href} href={link.href} className={`${LABEL} transition-colors hover:text-fog-100`}>
+					{link.label} ›
+				</Link>
+			))}
+		</p>
+	);
+}
+
+/* ---------- Line score ---------- */
+
+interface LineSide {
+	image: string;
+	name: string;
+	/** Rides beside the name: star power, for a game in progress. */
+	note?: React.ReactNode;
+	runs: (number | 'X' | null | undefined)[];
+	total: number;
+	/** Fills an H column when both sides have it. */
+	hits?: number;
+	/** Chalk and gold for the side that is ahead; a finished game dims the loser. */
+	strong: boolean;
+}
+
+/** The scorebug's body: two sides, a run for every inning, the total in gold. */
+function LineScore({ innings, sides }: { innings: number; sides: LineSide[] }) {
+	const withHits = sides.every((side) => side.hits !== undefined);
+	// On a phone the name takes a line of its own and the innings run under it.
+	const columns = withHits
+		? 'grid-cols-[repeat(var(--innings),minmax(0,1fr))_2.5rem_1.75rem] sm:grid-cols-[minmax(5rem,1fr)_repeat(var(--innings),minmax(0,2.1rem))_minmax(2.5rem,auto)_minmax(2.25rem,auto)]'
+		: 'grid-cols-[repeat(var(--innings),minmax(0,1fr))_2.5rem] sm:grid-cols-[minmax(5rem,1fr)_repeat(var(--innings),minmax(0,2.1rem))_minmax(2.5rem,auto)]';
+	const grid = `grid gap-x-1 max-sm:gap-x-0.5 ${columns}`;
+	return (
+		<div style={{ '--innings': innings } as React.CSSProperties}>
+			<div className={`${grid} max-sm:tracking-normal ${LABEL}`}>
+				<span className="max-sm:hidden" />
+				{Array.from({ length: innings }, (_, i) => (
+					<span key={i} className="text-center">
+						{i + 1}
+					</span>
+				))}
+				<span className="text-right">R</span>
+				{withHits && <span className="text-right">H</span>}
+			</div>
+			{sides.map((side, row) => (
+				<div key={row} className={`${grid} items-center py-1`}>
+					<span className="flex min-w-0 items-center gap-2.5 max-sm:col-span-full">
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img src={side.image} alt="" className="h-10 w-10 shrink-0 object-contain max-sm:h-8 max-sm:w-8" />
+						<span className={`truncate font-title text-2xl leading-tight max-sm:text-xl ${side.strong ? 'text-fog-100' : 'text-fog-500'}`}>
+							{side.name}
+						</span>
+						{side.note}
+					</span>
+					{Array.from({ length: innings }, (_, i) => (
+						<span
+							key={i}
+							className={`text-center font-mono text-xl tabular-nums max-sm:text-base ${side.runs[i] ? 'text-fog-100' : 'text-fog-500'}`}
+						>
+							{side.runs[i] ?? ''}
+						</span>
+					))}
+					<span
+						className={`text-right font-mono text-4xl font-semibold tabular-nums [text-shadow:0_3px_0_rgb(0_0_0/0.5)] max-sm:text-2xl ${side.strong ? 'text-star-400' : 'text-fog-500'}`}
+					>
+						{side.total}
+					</span>
+					{withHits && (
+						<span className={`text-right font-mono text-xl tabular-nums max-sm:text-base ${side.strong ? 'text-fog-100' : 'text-fog-500'}`}>
+							{side.hits}
+						</span>
 					)}
 				</div>
-			</div>
-			<span className="font-mono text-6xl font-semibold tabular-nums text-star-400 [text-shadow:0_3px_0_rgb(0_0_0/0.5)] sm:text-7xl">
-				{game[`${side}_score`]}
-			</span>
+			))}
 		</div>
+	);
+}
+
+/** The line across the top of a scorebug: the game's state, then where it is being played. */
+function BugHeader({ state, mode, stadium }: { state: React.ReactNode; mode: string; stadium: string }) {
+	return (
+		<div className="flex items-center justify-between gap-4">
+			<span className="flex shrink-0 items-center gap-2 whitespace-nowrap font-display text-base font-bold uppercase tracking-[0.12em] text-fog-100">
+				{state}
+			</span>
+			<span className={`${LABEL} min-w-0 truncate`}>{[mode, stadium].filter(Boolean).join(' · ')}</span>
+		</div>
+	);
+}
+
+/* ---------- Live ---------- */
+
+function Matchup({ name, line }: { name: string; line: string }) {
+	return (
+		<span className="flex min-w-0 items-center gap-1.5">
+			{/* eslint-disable-next-line @next/next/no-img-element */}
+			<img src={characterImage(name)} alt="" className="h-8 w-8 shrink-0 object-contain" />
+			<span className="truncate">{name}</span>
+			<span className="shrink-0 font-mono text-sm font-normal tabular-nums text-fog-500 max-sm:hidden">{line}</span>
+		</span>
 	);
 }
 
@@ -65,7 +164,7 @@ export function LiveBoard({ live, recent, tagsets }: BoardData) {
 	if (live.length === 0) {
 		const last = recent?.[0];
 		return (
-			<div className="m-auto flex w-full max-w-md flex-col gap-5">
+			<div className="m-auto flex w-full max-w-md flex-col gap-3">
 				<p className="text-center font-title text-2xl text-fog-300">Nobody is on the field right now.</p>
 				{last && (
 					<div>
@@ -77,74 +176,62 @@ export function LiveBoard({ live, recent, tagsets }: BoardData) {
 		);
 	}
 
-	const [game, ...others] = live;
-	const battingSide = game.half_inning === 0 ? 'away' : 'home';
-	const pitchingSide = game.half_inning === 0 ? 'home' : 'away';
-	const batter = liveCharacter(game, battingSide, 'batter');
-	const pitcher = liveCharacter(game, pitchingSide, 'pitcher');
-	const mode = tagSetName(tagsets, game.tag_set);
+	const game = live[0];
+	const top = game.half_inning === 0;
+	const batter = liveCharacter(game, top ? 'away' : 'home', 'batter');
+	const pitcher = liveCharacter(game, top ? 'home' : 'away', 'pitcher');
+	const innings = Math.max(
+		game.innings_selected ?? 9,
+		game.away_inning_scores?.length ?? 0,
+		game.home_inning_scores?.length ?? 0
+	);
+	const first = !!Number(game.runner_on_first);
+	const second = !!Number(game.runner_on_second);
+	const third = !!Number(game.runner_on_third);
+
+	const side = (which: 'away' | 'home'): LineSide => ({
+		image: liveTeamImage(game, which),
+		name: game[`${which}_player`],
+		note: <StarOrbs stars={game[`${which}_stars`] ?? 0} className="shrink-0" />,
+		runs: game[`${which}_inning_scores`] ?? [],
+		total: game[`${which}_score`],
+		strong: true
+	});
 
 	return (
-		<div className="flex min-h-0 flex-1 flex-col gap-3">
-			<Link href={liveHref(game)} className={`${ROW} flex flex-1 flex-col justify-between gap-4 p-3 sm:p-4`}>
-				<div className="flex items-center justify-between gap-4">
-					<span className="flex shrink-0 items-center gap-2 whitespace-nowrap font-display text-base font-bold uppercase tracking-[0.12em] text-rio-400">
-						<LiveDot /> {game.half_inning === 0 ? 'Top' : 'Bot'} {game.inning}
+		<Link href={liveHref(game)} className={`${BLOCK} flex min-h-0 flex-1 flex-col gap-2`}>
+			<BugHeader
+				state={
+					<span className="flex items-center gap-2 text-rio-400">
+						<LiveDot /> {top ? 'Top' : 'Bot'} {game.inning}
 					</span>
-					<span className={`${LABEL} min-w-0 truncate`}>
-						{[mode, stadiums[game.stadium_id]].filter(Boolean).join(' · ')}
-					</span>
-				</div>
-				<div className="space-y-3">
-					<LiveSide game={game} side="away" />
-					<LiveSide game={game} side="home" />
-				</div>
-				<div className="flex items-center justify-between gap-4 border-t border-[var(--rim)] pt-3">
-					<div className="flex min-w-0 items-center gap-3 font-display text-lg font-semibold">
-						{batter && (
-							<span className="flex min-w-0 items-center gap-1.5">
-								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src={characterImage(batter)} alt="" className="h-8 w-8 object-contain" />
-								<span className="truncate">{batter}</span>
-							</span>
-						)}
-						{batter && pitcher && <span className="text-sm uppercase tracking-wider text-fog-500">vs</span>}
-						{pitcher && (
-							<span className="flex min-w-0 items-center gap-1.5">
-								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src={characterImage(pitcher)} alt="" className="h-8 w-8 object-contain" />
-								<span className="truncate">{pitcher}</span>
-							</span>
-						)}
-					</div>
-					<div className="flex shrink-0 items-center gap-4">
-						<BaseDiamond
-							first={!!Number(game.runner_on_first)}
-							second={!!Number(game.runner_on_second)}
-							third={!!Number(game.runner_on_third)}
-							size={38}
+				}
+				mode={tagSetName(tagsets, game.tag_set)}
+				stadium={stadiums[game.stadium_id]}
+			/>
+			<LineScore innings={innings} sides={[side('away'), side('home')]} />
+			<div className="mt-auto flex items-center justify-between gap-x-4 gap-y-2 border-t border-[var(--rim)] pt-2 max-sm:flex-wrap">
+				<div className="flex min-w-0 items-center gap-3 font-display text-lg font-semibold max-sm:w-full">
+					{batter && (
+						<Matchup
+							name={batter}
+							line={game.batter_stats ? `${game.batter_stats.Hits ?? 0} for ${game.batter_stats['At Bats'] ?? 0}` : ''}
 						/>
-						<OutPips outs={game.outs} />
-					</div>
+					)}
+					{batter && pitcher && <span className="text-sm uppercase tracking-wider text-fog-500">vs</span>}
+					{pitcher && (
+						<Matchup
+							name={pitcher}
+							line={game.pitcher_stats ? `${game.pitcher_stats['Pitches Thrown'] ?? 0} pitches` : ''}
+						/>
+					)}
 				</div>
-			</Link>
-			{others.slice(0, 2).map((other) => (
-				<Link
-					key={liveHref(other)}
-					href={liveHref(other)}
-					className={`${ROW} grid grid-cols-[4.5rem_1fr_auto_1fr] items-center gap-3 px-3 py-2 font-display text-lg font-semibold`}
-				>
-					<span className="text-sm font-bold uppercase tracking-[0.12em] text-rio-400">
-						{other.half_inning === 0 ? 'Top' : 'Bot'} {other.inning}
-					</span>
-					<span className="truncate text-right">{other.away_player}</span>
-					<span className="font-mono text-xl tabular-nums text-star-400">
-						{other.away_score}–{other.home_score}
-					</span>
-					<span className="truncate">{other.home_player}</span>
-				</Link>
-			))}
-		</div>
+				<div className="flex shrink-0 items-center gap-4">
+					<BaseDiamond first={first} second={second} third={third} size={34} />
+					<OutPips outs={game.outs} />
+				</div>
+			</div>
+		</Link>
 	);
 }
 
@@ -158,7 +245,7 @@ function FinalRow({ game, tagsets }: { game: GameSummary; tagsets: TagSet[] }) {
 	return (
 		<Link
 			href={`/games/${game.game_id}`}
-			className={`${ROW} grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 px-2 py-1.5 sm:px-3`}
+			className={`${ROW} grid grid-cols-[1fr_auto_1fr] items-center gap-x-3`}
 		>
 			<span className="flex min-w-0 items-center justify-end gap-2.5">
 				<span className={name(!homeWon)}>{game.away_user}</span>
@@ -183,76 +270,109 @@ function FinalRow({ game, tagsets }: { game: GameSummary; tagsets: TagSet[] }) {
 	);
 }
 
-export function RecentBoard({ recent, tagsets }: BoardData) {
-	if (recent === null) return <Waiting />;
-	if (recent.length === 0) return <Quiet>The scores are not coming through right now.</Quiet>;
+/* ---------- Every pitch ---------- */
+
+/** One scoring play. Lighting it draws that ball's flight on the field. */
+function PlayChip({
+	play,
+	href,
+	lit,
+	onLit
+}: {
+	play: ScoringPlay;
+	href: string;
+	lit: boolean;
+	onLit: (play: ScoringPlay) => void;
+}) {
+	const batter = characterName(play.batter);
 	return (
-		// The board is shorter on a short window: the seventh final would spill out of it.
-		<div className="flex flex-1 flex-col justify-between gap-1 [@media(max-height:820px)]:[&>*:nth-child(n+7)]:hidden">
-			{recent.slice(0, 7).map((game) => (
-				<FinalRow key={game.game_id} game={game} tagsets={tagsets} />
-			))}
+		<Link
+			href={href}
+			onMouseEnter={() => onLit(play)}
+			onFocus={() => onLit(play)}
+			aria-current={lit}
+			data-lit={lit}
+			className="pick mx-0 flex min-w-0 items-center gap-2 font-display text-lg font-semibold leading-tight"
+		>
+			<span className={`${LABEL} shrink-0`}>
+				{play.half_inning === 0 ? 'Top' : 'Bot'} {play.inning}
+			</span>
+			{/* eslint-disable-next-line @next/next/no-img-element */}
+			<img src={characterImage(batter)} alt="" className="h-7 w-7 shrink-0 object-contain" />
+			<span className="truncate">{batter}</span>
+			<span className="shrink-0 text-fog-300">{atBatResultName(play.result_of_ab)}</span>
+			{play.result_rbi > 1 && <span className="shrink-0 text-sm uppercase tracking-wider text-fog-500">{play.result_rbi} RBI</span>}
+		</Link>
+	);
+}
+
+export function EveryPitchBoard({ featured, landings, tagsets, headline, lit, onLit }: BoardData) {
+	if (featured === undefined) return <Waiting />;
+	if (!featured?.linescore) return <Quiet>The last scorecard is not coming through right now.</Quiet>;
+
+	const game = featured;
+	const href = `/games/${game.game_id}`;
+	const innings = Math.max(game.linescore![0].length, game.linescore![1].length);
+	const homeWon = didHomeWin(game);
+	const plays = keyPlays(game.scoring_plays ?? [], headline, 3);
+	const hits = landings && hitsBySide(game, landings);
+
+	const side = (which: 'away' | 'home', runs: (number | 'X')[], won: boolean): LineSide => ({
+		image: recentTeamImage(game, which),
+		name: game[`${which}_user`],
+		runs,
+		total: game[`${which}_score`],
+		hits: hits?.[which],
+		strong: won
+	});
+
+	return (
+		<div className="flex min-h-0 flex-1 flex-col gap-2">
+			<Link href={href} className={`${BLOCK} flex flex-col gap-2`}>
+				<BugHeader
+					state={`Final${game.date_time_end ? ` · ${getTimeSince(game.date_time_end)}` : ''}`}
+					mode={tagSetName(tagsets, game.game_mode as number)}
+					stadium={stadiums[game.stadium]}
+				/>
+				<LineScore innings={innings} sides={[side('away', game.linescore![0], !homeWon), side('home', game.linescore![1], homeWon)]} />
+			</Link>
+			{plays.length > 0 && (
+				// Leaving the row hands the field back to the game's headline play.
+				<div className="mt-auto border-t border-[var(--rim)] pt-1.5">
+					<div className="-mx-3 grid grid-cols-1 gap-x-1 sm:grid-cols-2 lg:flex" onMouseLeave={() => onLit(null)}>
+						{plays.map((play) => (
+							<PlayChip key={play.event_num} play={play} href={href} lit={lit === play} onLit={onLit} />
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
 
 /* ---------- Ranked ---------- */
 
-const ladderCache = new Map<string, LadderPlayer[]>();
-
-export function RankedBoard({ recent, tagsets }: BoardData) {
-	// Official ladders still in season, busiest first going by the latest finals.
-	const modes = useMemo(() => {
-		const now = Date.now() / 1000;
-		const played = new Map<number, number>();
-		for (const game of recent ?? []) {
-			const id = game.game_mode as number;
-			played.set(id, (played.get(id) ?? 0) + 1);
-		}
-		return tagsets
-			.filter((t) => t.comm_type === 'Official' && (t.end_date ?? 0) >= now)
-			.sort((a, b) => (played.get(b.id) ?? 0) - (played.get(a.id) ?? 0) || (b.start_date ?? 0) - (a.start_date ?? 0))
-			.slice(0, 4);
-	}, [recent, tagsets]);
-
-	const [picked, setPicked] = useState<string | null>(null);
-	const mode = picked ?? modes[0]?.name ?? null;
-	const [players, setPlayers] = useState<LadderPlayer[] | null>(null);
-	const [failed, setFailed] = useState(false);
-
-	useEffect(() => {
-		if (!mode) return;
-		let cancelled = false;
-		setFailed(false);
-		const cached = ladderCache.get(mode);
-		setPlayers(cached ?? null);
-		if (cached) return;
-		getTagSetLadder(mode)
-			.then((result) => {
-				ladderCache.set(mode, result);
-				if (!cancelled) setPlayers(result);
-			})
-			.catch(() => {
-				if (!cancelled) setFailed(true);
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [mode]);
+/**
+ * On a desktop the ladder is not on the board at all: the top five fly as
+ * flags over the outfield wall (Flags.tsx) and the board is only the season
+ * picker. Without a park to fly them over, a phone gets the ladder as a list.
+ */
+export function RankedBoard({ tagsets, ranked }: BoardData) {
+	const { modes, mode, pick, players, failed } = ranked;
 
 	if (tagsets.length === 0) return <Waiting />;
-	if (!mode) return <Quiet>No official ladder is in season.</Quiet>;
+	if (!mode) return <Quiet>No ranked season is being played right now.</Quiet>;
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col gap-3">
-			<div className="seg max-w-full self-start overflow-x-auto [scrollbar-width:none]" role="tablist" aria-label="Ladder">
+			<div className="seg max-w-full self-start overflow-x-auto [scrollbar-width:none]" role="tablist" aria-label="Season">
 				{modes.map((t) => (
 					<button
 						key={t.id}
 						type="button"
 						role="tab"
 						aria-selected={t.name === mode}
-						onClick={() => setPicked(t.name)}
+						onClick={() => pick(t.name)}
 						className="shrink-0 whitespace-nowrap !py-1 !text-sm"
 					>
 						{t.name}
@@ -266,12 +386,12 @@ export function RankedBoard({ recent, tagsets }: BoardData) {
 			) : players.length === 0 ? (
 				<Quiet>Nobody is ranked here yet.</Quiet>
 			) : (
-				<ol className="flex flex-1 flex-col justify-between">
+				<ol className="flex flex-1 flex-col justify-between lg:hidden">
 					{players.slice(0, 8).map((player, i) => (
 						<li key={player.username}>
 							<Link
 								href={`/users/${encodeURIComponent(player.username)}`}
-								className={`${ROW} grid grid-cols-[2rem_1fr_auto_5.5rem] items-center gap-3 px-3 py-1`}
+								className={`${ROW} grid grid-cols-[2rem_1fr_auto_5.5rem] items-center gap-3`}
 							>
 								<span className={`font-mono text-lg font-semibold tabular-nums ${i === 0 ? 'text-star-400' : 'text-fog-500'}`}>
 									{i + 1}
@@ -290,89 +410,92 @@ export function RankedBoard({ recent, tagsets }: BoardData) {
 	);
 }
 
-/* ---------- Players ---------- */
+/* ---------- Characters ---------- */
 
-let usersCache: string[] | null = null;
+interface CharBoard {
+	aggs: CharAgg[];
+	games: number;
+}
 
-export function PlayersBoard({ recent }: BoardData) {
-	const router = useRouter();
-	const [users, setUsers] = useState<string[] | null>(usersCache);
-	const [query, setQuery] = useState('');
+const charCache = new Map<string, CharBoard>();
+const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
+
+export function CharactersBoard({ recent, tagsets }: BoardData) {
+	// The busiest ranked season being played now.
+	const mode = useSeasonModes(recent, tagsets)[0]?.name ?? null;
+	const [board, setBoard] = useState<CharBoard | null>(null);
+	const [failed, setFailed] = useState(false);
 
 	useEffect(() => {
-		if (usersCache) return;
+		if (!mode) return;
 		let cancelled = false;
-		getAllUsers()
-			.then((result) => {
-				usersCache = result;
-				if (!cancelled) setUsers(result);
+		setFailed(false);
+		const cached = charCache.get(mode);
+		setBoard(cached ?? null);
+		if (cached) return;
+		fetchModeGames(mode)
+			.then((games) => {
+				const rows = buildTeamRows(games);
+				// A character needs a real sample before its win rate means anything.
+				const floor = Math.max(20, Math.round(rows.length * 0.05));
+				const aggs = charStats(rows, characterGroups(true), true)
+					.filter((agg) => agg.games >= floor)
+					.sort((a, b) => b.waeRate - a.waeRate);
+				const result = { aggs, games: games.length };
+				charCache.set(mode, result);
+				if (!cancelled) setBoard(result);
 			})
-			.catch(() => {});
+			.catch(() => {
+				if (!cancelled) setFailed(true);
+			});
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [mode]);
 
-	const q = query.trim().toLowerCase();
-	const matches = useMemo(() => {
-		if (!q || !users) return [];
-		// Names that start with the query first, then names that contain it.
-		const starts: string[] = [];
-		const contains: string[] = [];
-		for (const user of users) {
-			const at = user.toLowerCase().indexOf(q);
-			if (at === 0) starts.push(user);
-			else if (at > 0) contains.push(user);
-		}
-		const byName = (a: string, b: string) => a.localeCompare(b);
-		return [...starts.sort(byName), ...contains.sort(byName)].slice(0, 12);
-	}, [q, users]);
+	if (tagsets.length === 0) return <Waiting />;
+	if (!mode) return <Quiet>No ranked season is being played right now.</Quiet>;
+	if (failed) return <Quiet>The character numbers would not load.</Quiet>;
+	if (!board) return <Waiting />;
+	if (board.aggs.length === 0) return <Quiet>Not enough games this season yet.</Quiet>;
 
-	const justPlayed = useMemo(() => {
-		const seen = new Set<string>();
-		for (const game of recent ?? []) {
-			seen.add(game.away_user);
-			seen.add(game.home_user);
-		}
-		return [...seen].slice(0, 21);
-	}, [recent]);
-
-	const shown = q ? matches : justPlayed;
+	const columns = 'grid grid-cols-[1.5rem_2.5rem_minmax(0,1fr)_4rem_4.5rem_5.5rem] items-center gap-3';
 
 	return (
-		<div className="flex min-h-0 flex-1 flex-col gap-4">
-			<form
-				onSubmit={(event) => {
-					event.preventDefault();
-					const target = matches[0] ?? query.trim();
-					if (target) router.push(`/users/${encodeURIComponent(target)}`);
-				}}
-			>
-				<input
-					type="search"
-					className="input !py-3 !text-lg"
-					aria-label="Find a player"
-					placeholder={users ? `Search ${users.length.toLocaleString()} players` : 'Search players'}
-					value={query}
-					onChange={(event) => setQuery(event.target.value)}
-				/>
-			</form>
-			<div className="min-h-0 flex-1">
-				{!q && shown.length > 0 && <p className={`${LABEL} mb-1.5 px-3`}>Just played</p>}
-				{q && users && matches.length === 0 && <Quiet>No player by that name.</Quiet>}
-				<ul className="grid grid-cols-2 gap-x-3 sm:grid-cols-3">
-					{shown.map((user) => (
-						<li key={user}>
-							<Link
-								href={`/users/${encodeURIComponent(user)}`}
-								className={`${ROW} block truncate px-3 py-2 font-display text-xl font-semibold`}
+		<div className="flex min-h-0 flex-1 flex-col gap-3">
+			<Link href="/characters/analytics" className={`${BLOCK} flex min-h-0 flex-1 flex-col`}>
+				<div className={`${columns} ${LABEL} pb-1`}>
+					<span className="col-span-3 truncate">
+						{mode} · {board.games.toLocaleString()} games
+					</span>
+					<span className="text-right">Picked</span>
+					<span className="text-right">Win rate</span>
+					<span className="text-right">Vs expected</span>
+				</div>
+				<ol className="flex flex-1 flex-col justify-between [@media(max-height:820px)]:[&>*:nth-child(n+6)]:hidden">
+					{board.aggs.slice(0, 6).map((agg, i) => (
+						<li key={agg.group.key} className={`${columns} py-0.5`}>
+							<span className={`font-mono text-lg font-semibold tabular-nums ${i === 0 ? 'text-star-400' : 'text-fog-500'}`}>
+								{i + 1}
+							</span>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img src={characterImage(agg.group.portraitName)} alt="" className="h-10 w-10 object-contain" />
+							<span className="truncate font-title text-2xl leading-none">{agg.group.name}</span>
+							<span className="text-right font-mono text-sm tabular-nums text-fog-500">{pct(agg.pickPct)}</span>
+							<span className="text-right font-mono text-lg tabular-nums">{pct(agg.winPct)}</span>
+							<span
+								className={`text-right font-mono text-xl font-semibold tabular-nums ${agg.waeRate > 0 ? 'text-star-400' : 'text-fog-500'}`}
 							>
-								{user}
-							</Link>
+								{agg.waeRate > 0 ? '+' : '−'}
+								{Math.abs(agg.waeRate * 100).toFixed(1)}
+							</span>
 						</li>
 					))}
-				</ul>
-			</div>
+				</ol>
+			</Link>
+			<Related
+				links={[{ href: '/characters/swing-lab', label: 'Swing Lab' }]}
+			/>
 		</div>
 	);
 }
@@ -394,13 +517,12 @@ export function CommunitiesBoard({ tagsets }: BoardData) {
 
 	return (
 		<div className="flex flex-1 flex-col">
-			<p className={`${LABEL} mb-1.5 px-3`}>Running now</p>
 			<ul className="flex flex-1 flex-col justify-between">
 				{running.map((t) => (
 					<li key={t.id}>
 						<Link
 							href={`/modes/${encodeURIComponent(t.name)}`}
-							className={`${ROW} grid grid-cols-[1fr_auto_auto] items-baseline gap-4 px-3 py-1.5`}
+							className={`${ROW} grid grid-cols-[1fr_auto_auto] items-baseline gap-4`}
 						>
 							<span className="truncate font-display text-xl font-semibold">{t.name}</span>
 							<span className={LABEL}>{t.type}</span>
@@ -417,19 +539,58 @@ export function CommunitiesBoard({ tagsets }: BoardData) {
 	);
 }
 
-/* ---------- Tools ---------- */
+/* ---------- Getting started ---------- */
 
-export function ToolsBoard() {
+const STEPS = [
+	{
+		href: 'https://github.com/ProjectRio/ProjectRio/releases/latest',
+		title: 'Download Project Rio',
+		body: 'A Dolphin build tuned for Mario Superstar Baseball netplay. You bring your own copy of the game.'
+	},
+	{
+		href: '/signup',
+		title: 'Make an account',
+		body: 'Your Rio Key links the client to your account, so every game you play lands on your stat page.'
+	},
+	{
+		href: 'https://discord.gg/c3r9PabfRU',
+		title: 'Find a game',
+		body: 'Find an opponent in the Discord, then host or join from Online Play. Mark the game Ranked to put it on the ladder.'
+	}
+];
+
+export function PlayBoard() {
 	return (
-		<ul className="grid flex-1 content-between gap-x-3 gap-y-1 sm:grid-cols-2">
-			{TOOLS.map((tool) => (
-				<li key={tool.href}>
-					<Link href={tool.href} className={`${ROW} block px-3 py-2`}>
-						<span className="block font-title text-xl leading-tight">{tool.title}</span>
-						<span className="mt-1 line-clamp-2 block text-sm leading-snug text-fog-500">{tool.description}</span>
-					</Link>
-				</li>
-			))}
-		</ul>
+		<div className="flex min-h-0 flex-1 flex-col gap-3">
+			<ol className="flex flex-1 flex-col justify-between gap-1">
+				{STEPS.map((step, i) => {
+					const external = step.href.startsWith('http');
+					return (
+						<li key={step.href}>
+							<a
+								href={step.href}
+								{...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
+								className={`${ROW} grid grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-x-4 py-2.5`}
+							>
+								<span className="font-mono text-5xl font-semibold leading-none text-star-400 [text-shadow:0_3px_0_rgb(0_0_0/0.5)]">
+									{i + 1}
+								</span>
+								<span className="min-w-0">
+									<span className="block font-title text-2xl leading-tight">{step.title}</span>
+									<span className="mt-1 block text-[0.95rem] leading-snug text-fog-300">{step.body}</span>
+								</span>
+							</a>
+						</li>
+					);
+				})}
+			</ol>
+			<Related
+				links={[
+					{ href: '/rio-online/tutorial', label: 'Setup tutorial' },
+					{ href: '/rio-online/optimize', label: 'Optimize' },
+					{ href: '/codes', label: 'Gecko codes' }
+				]}
+			/>
+		</div>
 	);
 }

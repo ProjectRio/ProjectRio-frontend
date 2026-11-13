@@ -19,6 +19,7 @@ export interface LandingRow {
 	result: number; // result_of_ab (0 = the at-bat continued, i.e. a foul)
 	category: ResultCategory;
 	batterCharId: number;
+	batterUser: string; // who was at the controls
 	typeOfSwing: number; // 0 none, 1 slap, 2 charge, 3 star, 4 bunt
 	typeOfContact: number; // 255 = miss
 	frame: number; // frame_of_swing_upon_contact
@@ -83,6 +84,49 @@ function signedAngle(value: number): number {
 	return value > 2048 ? value - 4096 : value;
 }
 
+// One /landing_data/ record -> a row, or null when the swing made no real
+// contact or the landing spot was not recorded.
+function toRow(r: any, mode: string): LandingRow | null {
+	if (r.type_of_contact == null || r.type_of_contact === 255) return null;
+	if (r.ball_x_landing_pos == null) return null;
+	return {
+		gameId: r.game_id,
+		eventNum: r.event_num,
+		result: r.final_result ?? 0,
+		category: resultCategory(r.final_result ?? 0),
+		batterCharId: r.batter_char_id,
+		batterUser: r.batter_username ?? '',
+		typeOfSwing: r.type_of_swing ?? 0,
+		typeOfContact: r.type_of_contact,
+		frame: r.frame_of_swing ?? 0,
+		stick: decodeStick(r.stick_input ?? 0),
+		vertAngle: signedAngle(r.ball_horiz_angle ?? 0), // un-swap (see header)
+		horizAngle: signedAngle(r.ball_vert_angle ?? 0),
+		landingX: r.ball_x_landing_pos,
+		landingY: r.ball_y_landing_pos ?? 0,
+		landingZ: r.ball_z_landing_pos,
+		contactX: r.ball_x_contact_pos ?? 0,
+		contactZ: r.ball_z_contact_pos ?? 0,
+		contactAbsolute: r.contact_absolute ?? 0,
+		contactQuality: r.contact_quality ?? 0,
+		power: r.ball_power ?? 0,
+		hangTime: r.ball_hang_time ?? 0,
+		maxHeight: r.ball_max_height ?? 0,
+		battingHand: !!r.batting_hand,
+		chemLinks: r.chem_links_ob ?? 0,
+		mode
+	};
+}
+
+function toRows(res: any, mode: string): LandingRow[] {
+	const rows: LandingRow[] = [];
+	for (const r of res?.Data ?? []) {
+		const row = toRow(r, mode);
+		if (row) rows.push(row);
+	}
+	return rows;
+}
+
 const cache = new Map<string, Promise<LandingRow[]>>();
 
 export function fetchLandingData(modeName: string, charIds: number[]): Promise<LandingRow[]> {
@@ -92,45 +136,16 @@ export function fetchLandingData(modeName: string, charIds: number[]): Promise<L
 		const params =
 			`?limit_games=False&tag=${encodeURIComponent(modeName)}` +
 			charIds.map((id) => `&batter_char=${id}`).join('');
-		promise = apiGet(STAT_ENDPOINTS.LANDING_DATA, params).then((res) => {
-			const rows: LandingRow[] = [];
-			for (const r of res?.Data ?? []) {
-				// Keep only real contact with a recorded landing spot.
-				if (r.type_of_contact == null || r.type_of_contact === 255) continue;
-				if (r.ball_x_landing_pos == null) continue;
-				rows.push({
-					gameId: r.game_id,
-					eventNum: r.event_num,
-					result: r.final_result ?? 0,
-					category: resultCategory(r.final_result ?? 0),
-					batterCharId: r.batter_char_id,
-					typeOfSwing: r.type_of_swing ?? 0,
-					typeOfContact: r.type_of_contact,
-					frame: r.frame_of_swing ?? 0,
-					stick: decodeStick(r.stick_input ?? 0),
-					vertAngle: signedAngle(r.ball_horiz_angle ?? 0), // un-swap (see header)
-					horizAngle: signedAngle(r.ball_vert_angle ?? 0),
-					landingX: r.ball_x_landing_pos,
-					landingY: r.ball_y_landing_pos ?? 0,
-					landingZ: r.ball_z_landing_pos,
-					contactX: r.ball_x_contact_pos ?? 0,
-					contactZ: r.ball_z_contact_pos ?? 0,
-					contactAbsolute: r.contact_absolute ?? 0,
-					contactQuality: r.contact_quality ?? 0,
-					power: r.ball_power ?? 0,
-					hangTime: r.ball_hang_time ?? 0,
-					maxHeight: r.ball_max_height ?? 0,
-					battingHand: !!r.batting_hand,
-					chemLinks: r.chem_links_ob ?? 0,
-					mode: modeName
-				});
-			}
-			return rows;
-		});
+		promise = apiGet(STAT_ENDPOINTS.LANDING_DATA, params).then((res) => toRows(res, modeName));
 		cache.set(key, promise);
 		promise.catch(() => cache.delete(key));
 	}
 	return promise;
+}
+
+/** Every contact of one game: a single small request (about 75 KB for nine innings). */
+export function fetchGameLandings(gameId: number): Promise<LandingRow[]> {
+	return apiGet(STAT_ENDPOINTS.LANDING_DATA, `?games=${gameId}`).then((res) => toRows(res, ''));
 }
 
 export function useLandingData(modeName: string, charIds: number[]): {
