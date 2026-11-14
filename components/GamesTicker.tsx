@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getLiveGames, getRecentGames, type GameSummary } from '@/lib/api';
@@ -90,12 +90,48 @@ function TickerBox({ item }: { item: TickerItem }) {
 	);
 }
 
+// Site-wide "hide the ticker" preference, kept in localStorage. A thin
+// "Scores" tab stays at the top so it can be brought back.
+const HIDDEN_KEY = 'rio:ticker-hidden';
+const HIDDEN_EVENT = 'rio:ticker-hidden';
+
+function subscribeHidden(callback: () => void) {
+	window.addEventListener(HIDDEN_EVENT, callback);
+	window.addEventListener('storage', callback);
+	return () => {
+		window.removeEventListener(HIDDEN_EVENT, callback);
+		window.removeEventListener('storage', callback);
+	};
+}
+
+function readHidden(): boolean {
+	try {
+		return localStorage.getItem(HIDDEN_KEY) === '1';
+	} catch {
+		return false;
+	}
+}
+
+export function setTickerHidden(hidden: boolean) {
+	try {
+		localStorage.setItem(HIDDEN_KEY, hidden ? '1' : '0');
+	} catch {
+		/* private mode */
+	}
+	window.dispatchEvent(new Event(HIDDEN_EVENT));
+}
+
+export function useTickerHidden(): boolean {
+	return useSyncExternalStore(subscribeHidden, readHidden, () => false);
+}
+
 /** The landing page shows these games on its own board, so the strip stays off it. */
 export default function GamesTicker() {
 	return usePathname() === '/' ? null : <Ticker />;
 }
 
 function Ticker() {
+	const hidden = useTickerHidden();
 	const [items, setItems] = useState<TickerItem[]>([]);
 	const tagsets = useTagsets();
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -155,9 +191,36 @@ function Ticker() {
 
 	if (items.length === 0) return null;
 
+	if (hidden) {
+		return (
+			<div className="sticky top-[67px] z-40 bg-[var(--wall)] [box-shadow:0_3px_0_var(--track-a),0_6px_0_var(--track-b)]">
+				<div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
+					<button
+						type="button"
+						onClick={() => setTickerHidden(false)}
+						className="py-1 font-display text-xs font-semibold uppercase tracking-wider text-fog-500 hover:text-fog-100"
+					>
+						Show scores
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="sticky top-[67px] z-40 bg-[var(--wall)] [box-shadow:0_3px_0_var(--track-a),0_6px_0_var(--track-b)]">
 			<div className="relative mx-auto max-w-7xl">
+				<button
+					type="button"
+					aria-label="Hide the scores ticker"
+					title="Hide the scores ticker"
+					onClick={() => setTickerHidden(true)}
+					className="absolute right-0 top-0 bottom-0 z-20 hidden w-9 items-center justify-center bg-[var(--wall)] text-fog-500 hover:text-fog-100 sm:flex"
+				>
+					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+						<path d="M3 3l8 8M11 3l-8 8" />
+					</svg>
+				</button>
 				{edges.left && (
 					<button
 						aria-label="Scroll left"
@@ -170,7 +233,7 @@ function Ticker() {
 				<div
 					ref={scrollRef}
 					onScroll={updateEdges}
-					className="flex gap-2 overflow-x-auto px-9 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+					className="flex gap-2 overflow-x-auto px-9 py-2 sm:pr-[4.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 				>
 					{items.map((item) => (
 						<TickerBox key={item.key} item={item} />
@@ -180,7 +243,7 @@ function Ticker() {
 					<button
 						aria-label="Scroll right"
 						onClick={() => scrollBy(1)}
-						className="absolute right-0 top-0 bottom-0 z-10 flex w-9 items-center justify-center bg-[var(--wall)] text-fog-300 hover:text-fog-100"
+						className="absolute right-0 top-0 sm:right-9 bottom-0 z-10 flex w-9 items-center justify-center bg-[var(--wall)] text-fog-300 hover:text-fog-100"
 					>
 						›
 					</button>

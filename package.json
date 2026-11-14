@@ -7,13 +7,16 @@
 	},
 	"scripts": {
 		"dev": "next dev",
+		"dev:plain": "CF_DEV_BINDINGS=0 next dev",
 		"build": "next build",
 		"start": "next start",
 		"check": "tsc --noEmit",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
 		"sync-mods": "tsx scripts/sync-mods.ts",
-		"check-mods": "tsx scripts/check-mods.ts"
+		"check-mods": "tsx scripts/check-mods.ts",
+		"render:stadiums": "node scripts/render-stadiums.mjs",
+		"sync:stadiums": "node scripts/sync-stadium-renders.mjs"
 	},
 	"dependencies": {
 		"@types/three": "^0.185.1",
