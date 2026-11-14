@@ -14,19 +14,20 @@ import type { Collection, CollectionKind, Competition, CompetitionKind, Competit
 export const KIND_LABELS: Record<CompetitionKind, string> = { league: 'League', tournament: 'Bracket', season: 'Ranked season', night: 'Night' };
 export const COLLECTION_KIND_LABELS: Record<CollectionKind, string> = { series: 'Series', game_mode: 'Game mode', event: 'Event', organization: 'Organization' };
 
+// Plates in the state's own colour. Red only where the competition is live.
 const STATE_STYLE: Record<CompetitionState, { label: string; className: string; live?: boolean }> = {
-	upcoming: { label: 'Upcoming', className: 'border-night-600 bg-night-800 text-fog-300' },
-	signups: { label: 'Signups open', className: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' },
-	drafting: { label: 'Drafting', className: 'border-star-500/40 bg-star-500/15 text-star-400' },
-	live: { label: 'Live', className: 'border-rio-500/50 bg-rio-500/15 text-rio-300', live: true },
-	playoffs: { label: 'Playoffs', className: 'border-rio-500/50 bg-rio-500/15 text-rio-300', live: true },
-	completed: { label: 'Completed', className: 'border-night-600 bg-night-850 text-fog-500' }
+	upcoming: { label: 'Upcoming', className: 'text-fog-300' },
+	signups: { label: 'Signups open', className: 'text-emerald-300 [--plate:#0d4534]' },
+	drafting: { label: 'Drafting', className: 'text-star-400 [--plate:#473908]' },
+	live: { label: 'Live', className: 'text-rio-300 [--plate:#56161b]', live: true },
+	playoffs: { label: 'Playoffs', className: 'text-rio-300 [--plate:#56161b]', live: true },
+	completed: { label: 'Completed', className: 'text-fog-500 [--plate:#24302a]' }
 };
 
 export function StateChip({ state }: { state: CompetitionState }) {
 	const style = STATE_STYLE[state];
 	return (
-		<span className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-widest ${style.className}`}>
+		<span className={`plate shrink-0 ${style.className}`}>
 			{style.live && (
 				<span className="relative flex h-1.5 w-1.5">
 					<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rio-400 opacity-75" />
@@ -35,6 +36,16 @@ export function StateChip({ state }: { state: CompetitionState }) {
 			)}
 			{style.label}
 		</span>
+	);
+}
+
+/** The preview notice: none of this is real data until the Competition rework lands in Rio Web. */
+export function PreviewNotice() {
+	return (
+		<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-fog-300">
+			<span className="plate text-star-300 [--plate:#5a4a12]">Preview</span>
+			<span>Seeded example data, not real results.</span>
+		</p>
 	);
 }
 
@@ -82,13 +93,13 @@ export function Mark({ participant, size = 28, className = '' }: { participant: 
 	);
 }
 
-/** Name with a link to the player page when the participant is a single user. */
-export function ParticipantName({ participant, name, className = '' }: { participant?: Participant; name?: string; className?: string }) {
+/** Name with a link to the player page when the participant is a single user. `plain` drops the link (for names inside a linked row). */
+export function ParticipantName({ participant, name, className = '', plain = false }: { participant?: Participant; name?: string; className?: string; plain?: boolean }) {
 	const label = participant?.name ?? name ?? '';
 	const single = participant && participant.members.length === 1 && participant.members[0] === participant.name;
-	if (single) {
+	if (single && !plain) {
 		return (
-			<Link href={`/users/${encodeURIComponent(label)}`} className={`font-medium text-fog-100 transition-colors hover:text-rio-300 ${className}`}>
+			<Link href={`/users/${encodeURIComponent(label)}`} className={`font-medium text-fog-100 underline decoration-transparent underline-offset-4 transition-colors hover:decoration-fog-300 ${className}`}>
 				{label}
 			</Link>
 		);
@@ -96,12 +107,11 @@ export function ParticipantName({ participant, name, className = '' }: { partici
 	return <span className={`font-medium text-fog-100 ${className}`}>{label}</span>;
 }
 
-
-export const FILE_LABELS: Record<FileStatus, { label: string; className: string; dot: string }> = {
-	processed: { label: 'Processed', className: 'text-emerald-300', dot: 'bg-emerald-400' },
-	submitted: { label: 'Submitted', className: 'text-star-400', dot: 'bg-star-400' },
-	not_submitted: { label: 'Not submitted', className: 'text-fog-500', dot: 'bg-night-600' },
-	problem: { label: 'Problem', className: 'text-rio-300', dot: 'bg-rio-500' }
+export const FILE_LABELS: Record<FileStatus, { label: string; className: string; dot: string; badge: 'green' | 'gold' | 'gray' | 'red' }> = {
+	processed: { label: 'Processed', className: 'text-emerald-300', dot: 'bg-emerald-400', badge: 'green' },
+	submitted: { label: 'Submitted', className: 'text-star-400', dot: 'bg-star-400', badge: 'gold' },
+	not_submitted: { label: 'Not submitted', className: 'text-fog-500', dot: 'bg-night-600', badge: 'gray' },
+	problem: { label: 'Problem', className: 'text-rio-300', dot: 'bg-rio-500', badge: 'red' }
 };
 
 export function FileDot({ status, withLabel = false }: { status: FileStatus; withLabel?: boolean }) {
@@ -126,8 +136,8 @@ export function shortDate(ms: number | undefined): string {
 export function Section({ title, action, children, className = '' }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
 	return (
 		<section className={className}>
-			<div className="mb-3 flex items-end justify-between gap-3">
-				<h2 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">{title}</h2>
+			<div className="mb-4 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
+				<h2 className="text-2xl text-fog-100">{title}</h2>
 				{action}
 			</div>
 			{children}
@@ -135,15 +145,29 @@ export function Section({ title, action, children, className = '' }: { title: st
 	);
 }
 
+/** One figure in an overview strip: a readout, with an optional line under it. */
 export function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) {
 	return (
 		<div className="min-w-0">
-			<p className="text-[11px] font-semibold uppercase tracking-widest text-fog-500">{label}</p>
-			<div className="mt-1 font-display text-2xl font-bold text-fog-100" style={{ fontVariantNumeric: 'tabular-nums' }}>
-				{value}
+			<div className="readout">
+				<p>{label}</p>
+				<div>{value}</div>
 			</div>
-			{sub && <p className="mt-0.5 text-xs text-fog-500">{sub}</p>}
+			{sub && <p className="mt-1.5 flex flex-wrap gap-x-2 text-xs text-fog-500">{sub}</p>}
 		</div>
+	);
+}
+
+/** The facts row on a card: separate small items, never joined into one string. */
+function Facts({ items }: { items: ReactNode[] }) {
+	const shown = items.filter((item) => item !== null && item !== undefined && item !== false && item !== '');
+	if (shown.length === 0) return null;
+	return (
+		<ul className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fog-500">
+			{shown.map((item, index) => (
+				<li key={index}>{item}</li>
+			))}
+		</ul>
 	);
 }
 
@@ -153,41 +177,34 @@ export function CompetitionCard({ competition, collectionNames }: { competition:
 	const participants = participantsOf(competition);
 	const played = competition.games.filter((game) => !game.series).length;
 	const total = competition.fixtures.filter((fixture) => !fixture.status.startsWith('un')).length || played;
-	const summary =
+	const summary: string[] =
 		competition.kind === 'season'
-			? 'Open play · live ladder'
+			? ['Open play', 'Live ladder']
 			: competition.kind === 'tournament'
-				? `${participants.length} entrants · ${competition.bracket ? competition.bracket.format.replace('_', ' ') : 'bracket pending'}`
+				? [`${participants.length} entrants`, competition.bracket ? competition.bracket.format.replace('_', ' ') : 'Bracket pending']
 				: competition.kind === 'night'
-					? `${competition.teams?.length ?? 2} sides · ${competition.fixtures.length} games`
-					: `${participants.length} ${competition.teams ? 'teams' : 'managers'} · ${total ? `${played}/${total} games` : 'schedule pending'}`;
+					? [`${competition.teams?.length ?? 2} sides`, `${competition.fixtures.length} games`]
+					: [`${participants.length} ${competition.teams ? 'teams' : 'managers'}`, total ? `${played}/${total} games` : 'Schedule pending'];
 	return (
 		<Link href={`/competitions/${competition.slug}`} className="panel panel-glow flex flex-col p-4">
 			<div className="flex items-start justify-between gap-3">
-				<div className="min-w-0">
-					<p className="kicker !text-[10px]">
-						{collectionNames?.join(' · ') ?? KIND_LABELS[competition.kind]} · {competition.season_label}
-					</p>
-					<h3 className="mt-0.5 truncate font-display text-lg font-bold uppercase leading-tight tracking-wide text-fog-100">{competition.name}</h3>
-				</div>
+				<h3 className="min-w-0 truncate font-title text-xl font-normal leading-tight tracking-normal text-fog-100">{competition.name}</h3>
 				<StateChip state={competition.state} />
 			</div>
-			<p className="mt-2 line-clamp-2 text-sm text-fog-500">{competition.description}</p>
-			<div className="mt-3 flex items-center gap-1">
-				{participants.slice(0, 10).map((participant) => (
-					<span key={participant.name} title={participant.name}>
-						<Mark participant={participant} size={22} />
-					</span>
-				))}
-				{participants.length > 10 && <span className="text-xs text-fog-500">+{participants.length - 10}</span>}
-				<span className="ml-auto text-xs text-fog-500">{summary}</span>
-			</div>
-			{competition.champion && (
-				<p className="mt-2 text-xs text-star-400">
-					<span className="mr-1">★</span>
-					{competition.champion}
-				</p>
-			)}
+			<p className="mt-1 line-clamp-2 text-sm text-fog-300">{competition.description}</p>
+			<Facts
+				items={[
+					competition.season_label,
+					...(collectionNames ?? []),
+					...summary,
+					competition.champion && (
+						<span className="text-star-400">
+							<span className="mr-1" aria-label="Champion">★</span>
+							{competition.champion}
+						</span>
+					)
+				]}
+			/>
 		</Link>
 	);
 }
@@ -195,22 +212,20 @@ export function CompetitionCard({ competition, collectionNames }: { competition:
 export function CollectionCard({ collection, count, sections }: { collection: Collection; count: number; sections?: Collection[] }) {
 	return (
 		<Link href={`/collections/${collection.slug}`} className="panel panel-glow block p-5">
-			<div className="flex items-start justify-between gap-3">
-				<div className="min-w-0">
-					<p className="kicker !text-[10px]">{COLLECTION_KIND_LABELS[collection.kind]}</p>
-					<h2 className="mt-0.5 font-display text-xl font-bold uppercase tracking-wide">{collection.name}</h2>
-				</div>
-				<div className="flex shrink-0 flex-col items-end gap-1">
-					{collection.membership === 'derived' && <Badge color="gray">Derived</Badge>}
-					{collection.sponsor && <Badge color="gold">Sponsored</Badge>}
-				</div>
+			<div className="flex flex-wrap items-center gap-2">
+				<span className="plate text-fog-300">{COLLECTION_KIND_LABELS[collection.kind]}</span>
+				{collection.membership === 'derived' && <Badge color="gray">Derived</Badge>}
+				{collection.sponsor && <Badge color="gold">Sponsored</Badge>}
 			</div>
-			<p className="mt-2 text-sm text-fog-300">{collection.tagline}</p>
-			<p className="mt-3 text-xs text-fog-500">
-				{count} competition{count === 1 ? '' : 's'}
-				{sections && sections.length > 0 && ` · ${sections.length} section${sections.length === 1 ? '' : 's'}`}
-				{collection.ladder && ' · lifetime ladder'}
-			</p>
+			<h3 className="mt-3 font-title text-2xl font-normal leading-tight tracking-normal text-fog-100">{collection.name}</h3>
+			<p className="mt-1 text-sm text-fog-300">{collection.tagline}</p>
+			<Facts
+				items={[
+					`${count} competition${count === 1 ? '' : 's'}`,
+					sections && sections.length > 0 && `${sections.length} section${sections.length === 1 ? '' : 's'}`,
+					collection.ladder && 'Lifetime ladder'
+				]}
+			/>
 		</Link>
 	);
 }

@@ -43,12 +43,12 @@ export default function StatTable({ rows, columns, leadLabel, defaultSort, leagu
 			<table className="stat-table">
 				<thead>
 					<tr>
-						<th className="sticky left-0 z-10 bg-night-850">{leadLabel}</th>
+						<th className="sticky left-0 z-10 !bg-[#08140f]">{leadLabel}</th>
 						{columns.map((key) => {
 							const column = COLUMN_BY_KEY[key];
 							const active = sort.key === key;
 							return (
-								<th key={key} className="text-right">
+								<th key={key} className="text-right" aria-sort={active ? (sort.desc ? 'descending' : 'ascending') : undefined}>
 									<button type="button" className={`inline-flex items-center gap-1 uppercase ${active ? 'text-fog-100' : 'hover:text-fog-300'}`} title={`${column.label} — ${column.description}`} onClick={() => toggle(key)}>
 										{column.abbr}
 										{active && <span className="text-[9px]">{sort.desc ? '▼' : '▲'}</span>}
@@ -60,24 +60,29 @@ export default function StatTable({ rows, columns, leadLabel, defaultSort, leagu
 				</thead>
 				<tbody>
 					{leagueLine && (
-						<tr className="bg-night-850/60">
-							<td className="sticky left-0 z-10 bg-night-900 font-display text-xs font-bold uppercase tracking-widest text-fog-500">League</td>
+						<tr className="group">
+							<td className="sticky left-0 z-10 bg-night-900 font-display font-semibold text-fog-500 group-hover:bg-[#050c09]">League</td>
 							{columns.map((key) => (
-								<td key={key} className="text-right tabular-nums text-fog-500">
+								<td key={key} className="num text-fog-500">
 									{formatStat(leagueLine[key], COLUMN_BY_KEY[key].format)}
 								</td>
 							))}
 						</tr>
 					)}
 					{sorted.map((row) => (
-						<tr key={row.key} className={`${row.muted ? 'opacity-50' : ''} ${row.highlight ? 'bg-rio-500/[0.06]' : ''}`}>
-							<td className="sticky left-0 z-10 bg-night-900">{row.lead}</td>
+						<tr key={row.key} className={`group ${row.muted ? 'opacity-50' : ''}`}>
+							<td className="sticky left-0 z-10 bg-night-900 group-hover:bg-[#050c09]">
+								<span className="inline-flex items-center gap-2">
+									{row.highlight && <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-star-400" />}
+									{row.lead}
+								</span>
+							</td>
 							{columns.map((key) => {
 								const column = COLUMN_BY_KEY[key];
 								const value = row.line[key];
 								const emphasis = key === sort.key ? 'font-bold text-fog-100' : 'text-fog-300';
 								return (
-									<td key={key} className={`text-right tabular-nums ${emphasis}`}>
+									<td key={key} className={`num ${emphasis}`}>
 										{formatStat(value, column.format)}
 									</td>
 								);

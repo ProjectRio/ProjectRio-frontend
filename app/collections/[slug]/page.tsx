@@ -14,7 +14,7 @@ import { characterTotals, derive, leagueContext, sumLines, teamLines, type Deriv
 import { characterImage } from '@/lib/data/characters';
 import { Badge, EmptyState, PageHeader, Panel, PanelHeader } from '@/components/ui';
 import LadderTable from '@/components/LadderTable';
-import { COLLECTION_KIND_LABELS, CollectionCard, CompetitionCard, Mark, ParticipantName, Section, participantByName } from '@/components/compete/shared';
+import { COLLECTION_KIND_LABELS, CollectionCard, CompetitionCard, Mark, ParticipantName, PreviewNotice, Section, participantByName } from '@/components/compete/shared';
 import { collectionNamesFor } from '@/components/compete/cards';
 import { standingsFor } from '@/components/compete/StandingsTable';
 import StatTable from '@/components/compete/StatTable';
@@ -36,21 +36,21 @@ function CompetitionsSection({ collection, competitions }: { collection: Collect
 			{past.length > 0 && (
 				<Panel>
 					<PanelHeader title="Past" />
-					<ul className="divide-y divide-night-800">
+					<ul className="px-4 py-2">
 						{past.map((competition) => (
-							<li key={competition.slug} className="flex items-center gap-3 px-4 py-2.5 text-sm">
-								<Link href={`/competitions/${competition.slug}`} className="min-w-0 flex-1 truncate font-medium text-fog-100 hover:text-rio-300">
-									{competition.name}
+							<li key={competition.slug}>
+								<Link href={`/competitions/${competition.slug}`} className="pick flex items-center gap-3 text-sm">
+									<span className="min-w-0 flex-1 truncate font-medium text-fog-100">{competition.name}</span>
+									<span className="hidden font-mono text-xs text-fog-500 sm:inline">{competition.starts_at ? new Date(competition.starts_at).getFullYear() : ''}</span>
+									{competition.champion ? (
+										<span className="inline-flex items-center gap-2 text-sm text-star-400">
+											<Mark participant={participantByName(competition, competition.champion)} size={20} />
+											{competition.champion}
+										</span>
+									) : (
+										<span className="text-xs text-fog-500">{competition.entrants.length} entrants</span>
+									)}
 								</Link>
-								<span className="hidden text-xs text-fog-500 sm:inline">{competition.starts_at ? new Date(competition.starts_at).getFullYear() : ''}</span>
-								{competition.champion ? (
-									<span className="inline-flex items-center gap-2 text-xs text-star-400">
-										<Mark participant={participantByName(competition, competition.champion)} size={20} />
-										{competition.champion}
-									</span>
-								) : (
-									<span className="text-xs text-fog-500">{competition.entrants.length} entrants</span>
-								)}
 							</li>
 						))}
 					</ul>
@@ -123,18 +123,26 @@ function LifetimeStandingsSection({ competitions }: { competitions: Competition[
 	const teams = competitions.some((competition) => competition.teams?.length);
 	return (
 		<Panel>
-			<div className="flex flex-wrap items-center justify-between gap-2 border-b border-night-700 bg-night-850 px-3 py-2 text-xs text-fog-500">
-				<span>
-					Regular-season record across {withGames.length} {withGames.length === 1 ? 'season' : 'seasons'} · playoff games not included
-				</span>
-				<label className="flex items-center gap-1.5">
-					Sort by
-					<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs text-fog-300" value={sort} onChange={(event) => setSort(event.target.value as LifetimeSort)}>
-						<option value="pct">Win %</option>
-						<option value="wins">Wins</option>
-						<option value="titles">Titles</option>
-					</select>
-				</label>
+			<div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-3 pt-4 text-sm text-fog-500">
+				<p className="flex flex-wrap gap-x-3 gap-y-1">
+					<span>
+						Regular-season record across {withGames.length} {withGames.length === 1 ? 'season' : 'seasons'}
+					</span>
+					<span>playoff games not included</span>
+				</p>
+				<div className="seg" role="group" aria-label="Sort by">
+					{(
+						[
+							['pct', 'Win %'],
+							['wins', 'Wins'],
+							['titles', 'Titles']
+						] as const
+					).map(([value, label]) => (
+						<button key={value} type="button" aria-pressed={sort === value} onClick={() => setSort(value)}>
+							{label}
+						</button>
+					))}
+				</div>
 			</div>
 			<div className="overflow-x-auto">
 				<table className="stat-table">
@@ -166,30 +174,34 @@ function LifetimeStandingsSection({ competitions }: { competitions: Competition[
 							const diff = row.rf - row.ra;
 							return (
 								<tr key={row.name}>
-									<td className="font-display font-bold text-fog-500">{index + 1}</td>
+									<td className="font-mono font-bold text-fog-500">{index + 1}</td>
 									<td>
 										<span className="inline-flex items-center gap-2">
 											<Mark participant={{ name: row.name, logo: row.logo, members: [row.name] }} size={24} />
 											{teams ? <span className="font-medium text-fog-100">{row.name}</span> : <ParticipantName participant={{ name: row.name, members: [row.name] }} name={row.name} />}
 										</span>
 									</td>
-									<td className="text-right tabular-nums text-fog-300">{row.seasons}</td>
-									<td className="text-right font-display font-bold tabular-nums text-fog-100">{row.w}</td>
-									<td className="text-right tabular-nums text-fog-300">{row.l}</td>
-									<td className="text-right tabular-nums">{gp ? (row.w / gp).toFixed(3).replace(/^0/, '') : '—'}</td>
+									<td className="num text-fog-300">{row.seasons}</td>
+									<td className="num font-bold text-fog-100">{row.w}</td>
+									<td className="num text-fog-300">{row.l}</td>
+									<td className="num">{gp ? (row.w / gp).toFixed(3).replace(/^0/, '') : '—'}</td>
 									{hasRuns && (
 										<>
-											<td className="text-right tabular-nums text-fog-300">{row.hasRuns ? row.rf : '—'}</td>
-											<td className="text-right tabular-nums text-fog-300">{row.hasRuns ? row.ra : '—'}</td>
-											<td className={`text-right tabular-nums ${!row.hasRuns ? 'text-fog-500' : diff > 0 ? 'text-emerald-300' : diff < 0 ? 'text-rio-300' : 'text-fog-300'}`}>{row.hasRuns ? (diff > 0 ? `+${diff}` : diff) : '—'}</td>
+											<td className="num text-fog-300">{row.hasRuns ? row.rf : '—'}</td>
+											<td className="num text-fog-300">{row.hasRuns ? row.ra : '—'}</td>
+											<td className={`num ${row.hasRuns ? 'text-fog-300' : 'text-fog-500'}`}>{row.hasRuns ? (diff > 0 ? `+${diff}` : diff) : '—'}</td>
 										</>
 									)}
-									<td className="text-right tabular-nums text-star-400">{row.titles ? `★${row.titles > 1 ? row.titles : ''}` : ''}</td>
-									<td className="text-right tabular-nums text-fog-300">{row.bestFinish ? `#${row.bestFinish}` : '—'}</td>
-									<td className="text-xs text-fog-500">
+									<td className="num text-star-400">{row.titles ? `★${row.titles > 1 ? row.titles : ''}` : ''}</td>
+									<td className="num text-fog-300">{row.bestFinish ? `#${row.bestFinish}` : '—'}</td>
+									<td className="text-sm text-fog-500">
 										{row.last && (
-											<Link href={`/competitions/${row.last.competition.slug}`} className="hover:text-fog-100">
-												{row.last.competition.season_label} · {row.last.w}–{row.last.l} · #{row.last.rank}
+											<Link href={`/competitions/${row.last.competition.slug}`} className="inline-flex gap-2 hover:text-fog-100">
+												<span>{row.last.competition.season_label}</span>
+												<span className="font-mono">
+													{row.last.w}–{row.last.l}
+												</span>
+												<span className="font-mono">#{row.last.rank}</span>
 											</Link>
 										)}
 									</td>
@@ -200,9 +212,11 @@ function LifetimeStandingsSection({ competitions }: { competitions: Competition[
 				</table>
 			</div>
 			{rows.length > 12 && (
-				<button type="button" className="w-full border-t border-night-800 py-2 text-xs text-fog-500 hover:text-fog-100" onClick={() => setShowAll(!showAll)}>
-					{showAll ? 'Show fewer' : `Show all ${rows.length}`}
-				</button>
+				<div className="px-4 pb-4 pt-2">
+					<button type="button" className="key px-3 py-1.5 text-sm" onClick={() => setShowAll(!showAll)}>
+						{showAll ? 'Show fewer' : `Show all ${rows.length}`}
+					</button>
+				</div>
 			)}
 		</Panel>
 	);
@@ -216,14 +230,14 @@ function ChampionsSection({ competitions }: { competitions: Competition[] }) {
 	return (
 		<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
 			<Panel>
-				<ul className="divide-y divide-night-800">
+				<ul className="space-y-1 px-4 py-3">
 					{winners.map((competition) => (
-						<li key={competition.slug} className="flex items-center gap-3 px-4 py-2.5">
+						<li key={competition.slug} className="flex items-center gap-3 py-1">
 							<span className="text-star-400">★</span>
 							<Mark participant={participantByName(competition, competition.champion!)} size={28} />
-							<ParticipantName participant={participantByName(competition, competition.champion!)} name={competition.champion!} className="font-display text-base uppercase" />
-							<Link href={`/competitions/${competition.slug}`} className="ml-auto text-xs text-fog-500 hover:text-fog-100">
-								{competition.name} →
+							<ParticipantName participant={participantByName(competition, competition.champion!)} name={competition.champion!} className="font-display text-base" />
+							<Link href={`/competitions/${competition.slug}`} className="ml-auto truncate text-sm text-fog-500 hover:text-fog-100">
+								{competition.name}
 							</Link>
 						</li>
 					))}
@@ -231,13 +245,13 @@ function ChampionsSection({ competitions }: { competitions: Competition[] }) {
 			</Panel>
 			<Panel>
 				<PanelHeader title="Most titles" />
-				<ul className="divide-y divide-night-800">
+				<ul className="space-y-1 px-4 py-3">
 					{[...counts.entries()]
 						.sort((a, b) => b[1] - a[1])
 						.map(([name, count]) => (
-							<li key={name} className="flex items-center justify-between px-4 py-2 text-sm">
+							<li key={name} className="flex items-center justify-between py-1 text-sm">
 								<span className="text-fog-100">{name}</span>
-								<span className="font-display font-bold tabular-nums text-star-400">{count}</span>
+								<span className="font-mono font-semibold tabular-nums text-star-400">{count}</span>
 							</li>
 						))}
 				</ul>
@@ -284,15 +298,18 @@ function AllTimeSection({ competitions }: { competitions: Competition[] }) {
 	const characterColumns: (keyof DerivedLine)[] = ['gp', 'pa', 'h', 'hr', 'rbi', 'r', 'avg', 'obp', 'slg', 'ops_plus', 'ip', 'k', 'era', 'whip'];
 	return (
 		<Panel>
-			<div className="flex flex-wrap items-center gap-3 border-b border-night-700 bg-night-850 px-3 py-2 text-xs text-fog-500">
-				<div className="flex gap-1">
+			<div className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4 text-sm text-fog-500">
+				<div className="seg">
 					{(['managers', 'characters'] as const).map((option) => (
-						<button key={option} type="button" className={`rounded px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-widest ${view === option ? 'bg-rio-500/15 text-rio-300' : 'text-fog-500 hover:text-fog-300'}`} onClick={() => setView(option)}>
+						<button key={option} type="button" aria-pressed={view === option} onClick={() => setView(option)}>
 							{option}
 						</button>
 					))}
 				</div>
-				<span className="ml-auto">Across {competitions.length} competitions · rates against the all-time line</span>
+				<span className="flex flex-wrap gap-x-3 lg:ml-auto">
+					<span>Across {competitions.length} competitions</span>
+					<span>rates against the all-time line</span>
+				</span>
 			</div>
 			{view === 'managers' ? (
 				<StatTable
@@ -305,10 +322,11 @@ function AllTimeSection({ competitions }: { competitions: Competition[] }) {
 						key: row.name,
 						lead: (
 							<span className="inline-flex items-center gap-2">
-								<Link href={`/users/${encodeURIComponent(row.name)}`} className="font-medium text-fog-100 hover:text-rio-300">
+								<Link href={`/users/${encodeURIComponent(row.name)}`} className="font-medium text-fog-100 underline decoration-transparent underline-offset-4 hover:decoration-fog-300">
 									{row.name}
 								</Link>
-								<span className="text-[11px] text-fog-500">
+								<span className="text-xs text-fog-500">
+
 									{row.seasons} season{row.seasons === 1 ? '' : 's'}
 									{row.titles > 0 && <span className="ml-1 text-star-400">★{row.titles > 1 ? row.titles : ''}</span>}
 								</span>
@@ -320,7 +338,7 @@ function AllTimeSection({ competitions }: { competitions: Competition[] }) {
 			) : (
 				<StatTable key="characters" leadLabel="Character" columns={characterColumns} defaultSort="ops_plus" leagueLine={data.league} rows={data.characterRows.filter(({ derived }) => derived.qualified_batter || derived.qualified_pitcher).map(({ line, derived }) => ({ key: line.character, lead: <CharacterCell line={line} showOwner={false} />, line: derived }))} />
 			)}
-			<div className="px-3 py-3">
+			<div className="px-4 py-3">
 				<Glossary />
 			</div>
 		</Panel>
@@ -343,13 +361,21 @@ function PricesSection({ slug }: { slug: string }) {
 	const max = Math.max(1, ...rows.map((row) => row.prices[latest] ?? 0));
 	return (
 		<Panel>
-			<div className="flex flex-wrap items-center justify-between gap-2 border-b border-night-700 bg-night-850 px-3 py-2 text-xs text-fog-500">
-				<span>Average price paid per copy, by season. Last-slot top-ups and keepers excluded.</span>
-				<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs text-fog-300" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}>
-					<option value="latest">Highest now</option>
-					<option value="trend">Biggest rise</option>
-					<option value="name">Name</option>
-				</select>
+			<div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-3 pt-4 text-sm text-fog-500">
+				<span className="max-w-prose">Average price paid per copy, by season. Last-slot top-ups and keepers excluded.</span>
+				<div className="seg" role="group" aria-label="Sort by">
+					{(
+						[
+							['latest', 'Highest now'],
+							['trend', 'Biggest rise'],
+							['name', 'Name']
+						] as const
+					).map(([value, label]) => (
+						<button key={value} type="button" aria-pressed={sort === value} onClick={() => setSort(value)}>
+							{label}
+						</button>
+					))}
+				</div>
 			</div>
 			<div className="overflow-x-auto">
 				<table className="stat-table">
@@ -373,24 +399,24 @@ function PricesSection({ slug }: { slug: string }) {
 									<td>
 										<span className="inline-flex items-center gap-2">
 											{row.asset.includes('Stadium') || row.asset.includes('Castle') || row.asset.includes('Palace') || row.asset.includes('Park') || row.asset.includes('Garden') || row.asset.includes('Jungle') || row.asset.includes('Field') ? (
-												<span className="inline-flex h-6 w-6 items-center justify-center rounded bg-night-800 text-[10px] font-bold text-fog-300">P</span>
+												<span className="well inline-flex h-6 w-[22px] items-center justify-center font-display text-xs font-bold text-fog-300" title="Park">P</span>
 											) : (
 												<img src={characterImage(row.asset)} alt="" width={22} height={26} className="[image-rendering:pixelated]" style={{ width: 22, height: 26 }} />
 											)}
 											<span className="text-fog-100">
 												{row.asset}
-												{row.slot && row.slot > 1 && <span className="ml-1 text-[10px] text-fog-500">#{row.slot}</span>}
+												{row.slot && row.slot > 1 && <span className="ml-1 text-xs text-fog-500">#{row.slot}</span>}
 											</span>
 										</span>
 									</td>
 									{seasons.map((season) => (
-										<td key={season} className={`text-right tabular-nums ${season === latest ? 'font-display font-bold text-fog-100' : 'text-fog-300'}`}>
+										<td key={season} className={`num ${season === latest ? 'font-bold text-fog-100' : 'text-fog-300'}`}>
 											{row.prices[season] !== undefined ? `$${Number(row.prices[season]).toFixed(row.prices[season] % 1 ? 1 : 0)}` : '—'}
 										</td>
 									))}
-									<td className={`text-right tabular-nums ${trend > 0 ? 'text-emerald-300' : trend < 0 ? 'text-rio-300' : 'text-fog-500'}`}>{trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1)}</td>
+									<td className={`num ${trend === 0 ? 'text-fog-500' : 'text-fog-300'}`}>{trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1)}</td>
 									<td>
-										<div className="h-1.5 w-full rounded-full bg-night-800">
+										<div className="well h-1.5 w-full !rounded-full">
 											<div className="h-full rounded-full bg-fog-300" style={{ width: `${((row.prices[latest] ?? 0) / max) * 100}%` }} />
 										</div>
 									</td>
@@ -401,9 +427,11 @@ function PricesSection({ slug }: { slug: string }) {
 				</table>
 			</div>
 			{rows.length > 15 && (
-				<button type="button" className="w-full border-t border-night-800 py-2 text-xs text-fog-500 hover:text-fog-100" onClick={() => setShowAll(!showAll)}>
-					{showAll ? 'Show fewer' : `Show all ${rows.length}`}
-				</button>
+				<div className="px-4 pb-4 pt-2">
+					<button type="button" className="key px-3 py-1.5 text-sm" onClick={() => setShowAll(!showAll)}>
+						{showAll ? 'Show fewer' : `Show all ${rows.length}`}
+					</button>
+				</div>
 			)}
 		</Panel>
 	);
@@ -423,34 +451,37 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 	return (
 		<div className="space-y-10">
 			<div>
-				<p className="mb-2 flex flex-wrap items-center gap-1 text-xs text-fog-500">
+				<nav aria-label="Breadcrumb" className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-fog-500">
 					<Link href="/collections" className="hover:text-fog-100">
 						Collections
 					</Link>
 					{crumbs.map((crumb) => (
-						<span key={crumb.slug} className="flex items-center gap-1">
-							<span>/</span>
+						<span key={crumb.slug} className="flex items-center gap-1.5">
+							<span aria-hidden>/</span>
 							<Link href={`/collections/${crumb.slug}`} className="hover:text-fog-100">
 								{crumb.name}
 							</Link>
 						</span>
 					))}
-				</p>
+				</nav>
 				<PageHeader kicker={COLLECTION_KIND_LABELS[collection.kind]} title={collection.name}>
-					{collection.membership === 'derived' && <Badge color="gray">Derived · {collection.derived_label}</Badge>}
+					{collection.membership === 'derived' && <Badge color="gray">Derived: {collection.derived_label}</Badge>}
 					{collection.sponsor && <Badge color="gold">Sponsored</Badge>}
-					{!collection.approved && <Badge color="red">Awaiting approval</Badge>}
+					{!collection.approved && <Badge color="gold">Awaiting approval</Badge>}
 				</PageHeader>
-				<div className="-mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-					<p className="max-w-3xl text-sm leading-relaxed text-fog-300">{collection.description}</p>
-					<dl className="space-y-1.5 text-xs text-fog-500">
+				<div className="-mt-4 mb-5">
+					<PreviewNotice />
+				</div>
+				<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+					<p className="max-w-prose text-sm leading-relaxed text-fog-300">{collection.description}</p>
+					<dl className="space-y-1.5 text-sm text-fog-500">
 						<div className="flex justify-between gap-3">
 							<dt>Organizers</dt>
 							<dd className="text-right text-fog-300">
 								{collection.organizers.map((name, index) => (
 									<span key={name}>
 										{index > 0 && ', '}
-										<Link href={`/users/${encodeURIComponent(name)}`} className="hover:text-rio-300">
+										<Link href={`/users/${encodeURIComponent(name)}`} className="underline decoration-transparent underline-offset-4 hover:text-fog-100 hover:decoration-fog-300">
 											{name}
 										</Link>
 									</span>
@@ -475,7 +506,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 								<dt>Sponsor</dt>
 								<dd className="text-fog-300">
 									{collection.sponsor.url ? (
-										<a href={collection.sponsor.url} target="_blank" rel="noreferrer" className="hover:text-rio-300">
+										<a href={collection.sponsor.url} target="_blank" rel="noreferrer" className="underline decoration-transparent underline-offset-4 hover:text-fog-100 hover:decoration-fog-300">
 											{collection.sponsor.name}
 										</a>
 									) : (
@@ -514,7 +545,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 						) : null;
 					case 'ladder':
 						return collection.ladder ? (
-							<Section key={section} title={collection.ladder.name} action={collection.ladder.tag_set ? <span className="text-xs text-fog-500">Live from {collection.ladder.tag_set} until collection ladders ship</span> : undefined}>
+							<Section key={section} title={collection.ladder.name} action={collection.ladder.tag_set ? <span className="text-sm text-fog-500">Live from {collection.ladder.tag_set} until collection ladders ship</span> : undefined}>
 								<Panel>{collection.ladder.tag_set ? <LadderTable gameMode={collection.ladder.tag_set} limit={10} /> : <EmptyState title="Ladder not started" />}</Panel>
 							</Section>
 						) : null;

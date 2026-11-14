@@ -4,6 +4,7 @@
 // a processed stat file behind them, and which need chasing.
 
 import type { Competition, FileStatus } from '@/lib/compete/types';
+import { Badge } from '@/components/ui';
 import { FILE_LABELS } from './shared';
 
 const ORDER: FileStatus[] = ['processed', 'submitted', 'not_submitted', 'problem'];
@@ -20,19 +21,16 @@ export default function FileHealth({ competition }: { competition: Competition }
 	if (total === 0) return null;
 	return (
 		<div>
-			<div className="flex h-2 overflow-hidden rounded-full bg-night-800">
+			<div className="well flex h-2.5 overflow-hidden !rounded-full">
 				{ORDER.map((status) => (
 					<div key={status} className={FILE_LABELS[status].dot} style={{ width: `${(counts[status] / total) * 100}%` }} title={`${FILE_LABELS[status].label}: ${counts[status]}`} />
 				))}
 			</div>
-			<ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+			<ul className="mt-3 space-y-1.5 text-sm">
 				{ORDER.map((status) => (
-					<li key={status} className={`flex items-center justify-between gap-2 ${FILE_LABELS[status].className}`}>
-						<span className="flex items-center gap-1.5">
-							<span className={`inline-block h-1.5 w-1.5 rounded-full ${FILE_LABELS[status].dot}`} />
-							{FILE_LABELS[status].label}
-						</span>
-						<span className="tabular-nums">
+					<li key={status} className="flex items-center justify-between gap-2">
+						<Badge color={FILE_LABELS[status].badge}>{FILE_LABELS[status].label}</Badge>
+						<span className="font-mono tabular-nums text-fog-100">
 							{counts[status]} <span className="text-fog-500">({Math.round((counts[status] / total) * 100)}%)</span>
 						</span>
 					</li>

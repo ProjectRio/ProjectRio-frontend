@@ -13,17 +13,17 @@ import { competitionBySlug, collectionBySlug, breadcrumbs } from '@/lib/compete/
 import type { Competition } from '@/lib/compete/types';
 import { getRecentGames, type GameSummary } from '@/lib/api';
 import { useTagsets } from '@/lib/useTagsets';
-import { Tabs } from '@/components/overlay';
+
 import { Badge, EmptyState, PageHeader, Panel, PanelHeader, Spinner } from '@/components/ui';
 import LadderTable from '@/components/LadderTable';
 import GameCard from '@/components/GameCard';
-import { KindBadge, Mark, ParticipantName, Section, Stat, StateChip, participantByName, participantsOf, shortDate, stadiumName } from '@/components/compete/shared';
+import { KindBadge, Mark, ParticipantName, PreviewNotice, Section, Stat, StateChip, participantByName, participantsOf, shortDate, stadiumName } from '@/components/compete/shared';
 import StandingsTable, { playoffTier, standingsFor } from '@/components/compete/StandingsTable';
 import Schedule, { ScoreRow, groupByWeek } from '@/components/compete/Schedule';
 import BracketView from '@/components/compete/BracketView';
 import StatsTab, { Leaders } from '@/components/compete/StatsTab';
 import RosterGrid from '@/components/compete/RosterGrid';
-import FileHealth, { fileCounts } from '@/components/compete/FileHealth';
+import FileHealth from '@/components/compete/FileHealth';
 
 type TabId = 'overview' | 'standings' | 'schedule' | 'playoffs' | 'stats' | 'rosters' | 'entrants';
 
@@ -48,7 +48,7 @@ function RecentResults({ competition, count = 6 }: { competition: Competition; c
 	}, [competition, count]);
 	if (rows.length === 0) return <p className="px-4 py-3 text-sm text-fog-500">No results yet.</p>;
 	return (
-		<ul className="divide-y divide-night-800">
+		<ul className="px-4 py-2">
 			{rows.map((row) => (
 				<ScoreRow key={row.game!.id} competition={competition} row={row} />
 			))}
@@ -66,7 +66,7 @@ function UpNext({ competition, count = 4 }: { competition: Competition; count?: 
 	}, [competition, count]);
 	if (rows.length === 0) return <p className="px-4 py-3 text-sm text-fog-500">Nothing scheduled.</p>;
 	return (
-		<ul className="divide-y divide-night-800">
+		<ul className="px-4 py-2">
 			{rows.map((row) => (
 				<ScoreRow key={row.fixture!.id} competition={competition} row={row} />
 			))}
@@ -89,10 +89,10 @@ function RulesPanel({ competition }: { competition: Competition }) {
 								</Badge>
 							))}
 						</p>
-						{ruleset.codes && <p className="mt-1 text-xs text-fog-500">Codes: {ruleset.codes.join(' · ')}</p>}
+						{ruleset.codes && <p className="mt-1 text-xs text-fog-500">Codes: {ruleset.codes.join(', ')}</p>}
 					</div>
 				))}
-				<dl className="space-y-1.5 border-t border-night-800 pt-3 text-xs text-fog-500">
+				<dl className="space-y-1.5 pt-2 text-sm text-fog-500">
 					<div className="flex justify-between gap-3">
 						<dt>Innings</dt>
 						<dd className="text-fog-300">{competition.innings}</dd>
@@ -119,7 +119,7 @@ function RulesPanel({ competition }: { competition: Competition }) {
 							{competition.organizers.map((name, index) => (
 								<span key={name}>
 									{index > 0 && ', '}
-									<Link href={`/users/${encodeURIComponent(name)}`} className="hover:text-rio-300">
+									<Link href={`/users/${encodeURIComponent(name)}`} className="underline decoration-transparent underline-offset-4 hover:text-fog-100 hover:decoration-fog-300">
 										{name}
 									</Link>
 								</span>
@@ -134,43 +134,28 @@ function RulesPanel({ competition }: { competition: Competition }) {
 
 function LeagueOverview({ competition }: { competition: Competition }) {
 	const rows = standingsFor(competition);
-	const leader = rows[0];
 	const played = competition.games.filter((game) => !game.series).length;
 	const scheduled = competition.fixtures.length || played;
-	const counts = fileCounts(competition);
-	const processedPct = competition.games.length ? Math.round((counts.processed / competition.games.length) * 100) : null;
+	const playoffGames = competition.games.filter((game) => game.series).length;
 	const byOffense = [...rows].filter((row) => Number.isFinite(row.rfpg)).sort((a, b) => b.rfpg - a.rfpg)[0];
 	const byDefense = [...rows].filter((row) => Number.isFinite(row.rapg)).sort((a, b) => a.rapg - b.rapg)[0];
 	return (
 		<div className="space-y-6">
-			<div className="panel flex flex-wrap items-center gap-x-10 gap-y-5 p-5">
-				{competition.champion ? (
+			<div className="panel flex flex-wrap items-start gap-x-10 gap-y-5 p-5">
+				{competition.champion && (
 					<Stat
 						label="Champion"
 						value={
-							<span className="inline-flex items-center gap-2 text-star-400">
+							<span className="inline-flex items-center gap-2 font-display text-3xl font-bold">
 								<Mark participant={participantByName(competition, competition.champion)} size={30} />
 								{competition.champion}
 							</span>
 						}
-						sub={competition.season_label}
 					/>
-				) : leader ? (
-					<Stat
-						label={competition.state === 'completed' ? 'First seed' : 'Leader'}
-						value={
-							<span className="inline-flex items-center gap-2">
-								<Mark participant={participantByName(competition, leader.name)} size={30} />
-								{leader.name}
-							</span>
-						}
-						sub={`${leader.total.w}–${leader.total.l}${Number.isFinite(leader.diff) ? ` · ${leader.diff > 0 ? '+' : ''}${leader.diff} run diff` : ''}`}
-					/>
-				) : null}
-				<Stat label="Games" value={`${played}${scheduled ? ` / ${scheduled}` : ''}`} sub={competition.games.some((game) => game.series) ? `+${competition.games.filter((game) => game.series).length} playoff games` : 'regular season'} />
-				{byOffense && <Stat label="Best offense" value={byOffense.rfpg.toFixed(1)} sub={`${byOffense.name} · runs per game`} />}
-				{byDefense && <Stat label="Best defense" value={byDefense.rapg.toFixed(1)} sub={`${byDefense.name} · runs allowed per game`} />}
-				{processedPct !== null && <Stat label="Stat files" value={`${processedPct}%`} sub={counts.problem ? `${counts.problem} with problems` : 'processed by Rio Web'} />}
+				)}
+				<Stat label="Games" value={`${played}${scheduled ? ` / ${scheduled}` : ''}`} sub={playoffGames ? `+${playoffGames} playoff games` : 'regular season'} />
+				{byOffense && <Stat label="Best offense" value={byOffense.rfpg.toFixed(1)} sub={<><span className="text-fog-300">{byOffense.name}</span><span>runs per game</span></>} />}
+				{byDefense && <Stat label="Best defense" value={byDefense.rapg.toFixed(1)} sub={<><span className="text-fog-300">{byDefense.name}</span><span>runs allowed per game</span></>} />}
 			</div>
 			<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
 				<div className="space-y-6">
@@ -205,7 +190,7 @@ function LeagueOverview({ competition }: { competition: Competition }) {
 							<PanelHeader title="Stat file tracking" />
 							<div className="p-4">
 								<FileHealth competition={competition} />
-								<p className="mt-3 text-xs text-fog-500">Every played game should have a stat file processed by Rio Web. Submitted files are queued; problems need the commissioner.</p>
+								<p className="mt-3 text-sm text-fog-500">Every played game should have a stat file processed by Rio Web. Submitted files are queued; problems need the commissioner.</p>
 							</div>
 						</Panel>
 					)}
@@ -235,27 +220,28 @@ function TournamentOverview({ competition }: { competition: Competition }) {
 					{competition.stations && competition.stations.length > 0 && (
 						<Panel>
 							<PanelHeader title="Stations" />
-							<ul className="grid gap-px bg-night-800 sm:grid-cols-2">
+							<ul className="grid gap-x-6 gap-y-4 p-4 sm:grid-cols-2">
 								{competition.stations.map((station) => {
 									const fixture = ready.find((candidate) => candidate.station === station);
 									const live = competition.bracket?.rounds.flatMap((round) => round.matches).find((match) => match.station === station && match.status === 'live');
 									return (
-										<li key={station} className="bg-night-900 px-4 py-3">
-											<div className="flex items-center justify-between">
-												<span className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">{station}</span>
-												<span className={`text-[10px] font-bold uppercase tracking-widest ${live ? 'text-rio-300' : fixture ? 'text-star-400' : 'text-fog-500'}`}>{live ? 'Playing' : fixture ? 'Assigned' : 'Free'}</span>
+										<li key={station}>
+											<div className="flex items-center justify-between gap-2">
+												<h3 className="text-base text-fog-100">{station}</h3>
+												{live ? <Badge color="red">Playing</Badge> : fixture ? <Badge color="gold">Assigned</Badge> : <Badge color="gray">Free</Badge>}
 											</div>
 											{live ? (
 												<p className="mt-1 text-sm text-fog-100">
 													{live.a?.name} vs {live.b?.name}
 												</p>
 											) : fixture ? (
-												<p className="mt-1 text-sm text-fog-100">
-													{fixture.home} vs {fixture.away} <span className="text-xs text-fog-500">· up next</span>
+												<p className="mt-1 flex flex-wrap gap-x-2 text-sm text-fog-100">
+													<span>
+														{fixture.home} vs {fixture.away}
+													</span>
+													<span className="text-fog-500">up next</span>
 												</p>
-											) : (
-												<p className="mt-1 text-sm text-fog-500">Open</p>
-											)}
+											) : null}
 										</li>
 									);
 								})}
@@ -270,12 +256,12 @@ function TournamentOverview({ competition }: { competition: Competition }) {
 				<div className="space-y-6">
 					<Panel>
 						<PanelHeader title="Entrants" />
-						<ul className="divide-y divide-night-800">
+						<ul className="space-y-1 px-4 py-3">
 							{[...entrants]
 								.sort((a, b) => (a.seed ?? 99) - (b.seed ?? 99))
 								.map((entrant) => (
-									<li key={entrant.username} className="flex items-center gap-2 px-4 py-2 text-sm">
-										<span className="w-5 text-xs text-fog-500">{entrant.seed ?? ''}</span>
+									<li key={entrant.username} className="flex items-center gap-2 py-1 text-sm">
+										<span className="w-5 font-mono text-xs text-fog-500">{entrant.seed ?? ''}</span>
 										<Mark participant={participantByName(competition, entrant.username)} size={22} />
 										<ParticipantName participant={participantByName(competition, entrant.username)} name={entrant.username} />
 										{entrant.status === 'pending' && (
@@ -317,8 +303,8 @@ function SeasonOverview({ competition }: { competition: Competition }) {
 				<PanelHeader
 					title="Ladder"
 					action={
-						<Link href={`/modes/${encodeURIComponent(mode)}/ladder`} className="font-display text-xs font-semibold uppercase tracking-wider text-rio-400 hover:text-rio-300">
-							Full ladder →
+						<Link href={`/modes/${encodeURIComponent(mode)}/ladder`} className="key px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider">
+							Full ladder
 						</Link>
 					}
 				/>
@@ -360,8 +346,8 @@ function NightOverview({ competition }: { competition: Competition }) {
 					const count = wins.get(team.name) ?? 0;
 					return (
 						<div key={team.id} className={`${index === 1 ? 'order-3 text-right' : ''} min-w-0`}>
-							<p className="kicker !text-[10px]">{team.name}</p>
-							<p className={`mt-1 font-display text-5xl font-bold tabular-nums ${count >= needed ? 'text-star-400' : 'text-fog-100'}`}>{count}</p>
+							<h3 className="text-lg text-fog-100">{team.name}</h3>
+							<p className={`mt-1 font-mono text-5xl font-semibold tabular-nums ${count >= needed ? 'text-star-400' : 'text-fog-100'}`}>{count}</p>
 							<ul className={`mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm ${index === 1 ? 'justify-end' : ''}`}>
 								{team.members.map((member) => (
 									<li key={member}>
@@ -372,10 +358,11 @@ function NightOverview({ competition }: { competition: Competition }) {
 						</div>
 					);
 				})}
-				<div className="order-2 text-center text-xs uppercase tracking-widest text-fog-500">
-					first to {needed}
-					<br />
-					{competition.games.length}/{competition.fixtures.length} played
+				<div className="order-2 text-center text-sm text-fog-500">
+					<p>first to {needed}</p>
+					<p className="font-mono">
+						{competition.games.length}/{competition.fixtures.length} played
+					</p>
 				</div>
 			</div>
 			<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -386,7 +373,7 @@ function NightOverview({ competition }: { competition: Competition }) {
 				<div className="space-y-6">
 					<Panel>
 						<PanelHeader title="Draft" />
-						<p className="p-4 text-sm text-fog-300">All 54 characters were drafted between the six players — nine each — before the first pitch. Rosters load from the fixture when the client supports it.</p>
+						<p className="max-w-prose p-4 text-sm text-fog-300">All 54 characters were drafted between the six players — nine each — before the first pitch. Rosters load from the fixture when the client supports it.</p>
 					</Panel>
 					<RulesPanel competition={competition} />
 				</div>
@@ -403,17 +390,22 @@ function EntrantsTab({ competition }: { competition: Competition }) {
 	return (
 		<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
 			<Panel>
-				<PanelHeader title={competition.teams ? 'Teams' : 'Entrants'} action={<span className="text-xs text-fog-500">{competition.entrants.length} entered · {competition.signup_policy === 'open' ? 'open signups' : 'invite only'}</span>} />
+				<PanelHeader title={competition.teams ? 'Teams' : 'Entrants'} action={
+						<span className="flex gap-3 text-sm text-fog-500">
+							<span>{competition.entrants.length} entered</span>
+							<span>{competition.signup_policy === 'open' ? 'open signups' : 'invite only'}</span>
+						</span>
+					} />
 				{competition.kind === 'season' ? (
 					<EmptyState title="Open entry" detail="Anyone can play this season from the Rio client. The ladder is the entrant list." />
 				) : (
-					<ul className="divide-y divide-night-800">
+					<ul className="space-y-1 px-4 py-3">
 						{participants.map((participant) => {
 							const row = rows.find((candidate) => candidate.name === participant.name);
 							const tier = row ? playoffTier(competition, row.rank) : 'none';
 							const entrant = competition.entrants.find((candidate) => candidate.username === participant.name);
 							return (
-								<li key={participant.name} className="flex items-center gap-3 px-4 py-2.5 text-sm">
+								<li key={participant.name} className="flex items-center gap-3 py-1.5 text-sm">
 									<Mark participant={participant} size={30} />
 									<div className="min-w-0 flex-1">
 										<ParticipantName participant={participant} name={participant.name} />
@@ -421,7 +413,7 @@ function EntrantsTab({ competition }: { competition: Competition }) {
 											<p className="text-xs text-fog-500">
 												{participant.members.map((member, index) => (
 													<span key={member}>
-														{index > 0 && ' · '}
+														{index > 0 && ', '}
 														<Link href={`/users/${encodeURIComponent(member)}`} className="hover:text-fog-100">
 															{member}
 														</Link>
@@ -429,16 +421,16 @@ function EntrantsTab({ competition }: { competition: Competition }) {
 												))}
 											</p>
 										) : (
-											<p className="text-xs text-fog-500">
-												{entrant?.source === 'draft' ? 'Drafted a roster' : entrant?.source === 'bracket' ? 'Seeded into the bracket' : entrant?.source === 'signup' ? 'Signed up' : 'Entered'}
-												{participant.home_park !== undefined && ` · home park ${stadiumName(participant.home_park)}`}
+											<p className="flex flex-wrap gap-x-3 text-xs text-fog-500">
+												<span>{entrant?.source === 'draft' ? 'Drafted a roster' : entrant?.source === 'bracket' ? 'Seeded into the bracket' : entrant?.source === 'signup' ? 'Signed up' : 'Entered'}</span>
+												{participant.home_park !== undefined && <span>home park {stadiumName(participant.home_park)}</span>}
 											</p>
 										)}
 									</div>
 									{row && (
-										<span className="text-right text-xs tabular-nums text-fog-300">
+										<span className="text-right font-mono text-sm tabular-nums text-fog-300">
 											{row.total.w}–{row.total.l}
-											{tier !== 'none' && <span className="ml-2 text-[10px] uppercase tracking-widest text-fog-500">#{row.rank}</span>}
+											{tier !== 'none' && <span className="ml-2 text-fog-500">#{row.rank}</span>}
 										</span>
 									)}
 									{entrant?.status === 'pending' && <Badge color="gold">Pending</Badge>}
@@ -474,28 +466,28 @@ function CompetitionPageInner({ slug }: { slug: string }) {
 
 	return (
 		<div>
-			<p className="mb-2 flex flex-wrap items-center gap-1 text-xs text-fog-500">
+			<nav aria-label="Breadcrumb" className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-fog-500">
 				<Link href="/collections" className="hover:text-fog-100">
 					Collections
 				</Link>
 				{crumbs.map((crumb) => (
-					<span key={crumb.slug} className="flex items-center gap-1">
-						<span>/</span>
+					<span key={crumb.slug} className="flex items-center gap-1.5">
+						<span aria-hidden>/</span>
 						<Link href={`/collections/${crumb.slug}`} className="hover:text-fog-100">
 							{crumb.name}
 						</Link>
 					</span>
 				))}
 				{others.map((collection) => (
-					<span key={collection!.slug} className="ml-2 rounded border border-night-700 px-1.5 py-0.5 text-[10px] uppercase tracking-widest">
+					<span key={collection!.slug} className="ml-3">
 						also in{' '}
 						<Link href={`/collections/${collection!.slug}`} className="text-fog-300 hover:text-fog-100">
 							{collection!.name}
 						</Link>
 					</span>
 				))}
-			</p>
-			<PageHeader kicker={`${crumbs[crumbs.length - 1]?.name ?? ''} · ${competition.season_label}`} title={competition.name}>
+			</nav>
+			<PageHeader kicker={competition.season_label} title={competition.name}>
 				<KindBadge kind={competition.kind} />
 				<StateChip state={competition.state} />
 				{competition.draft_league_id && (
@@ -504,16 +496,25 @@ function CompetitionPageInner({ slug }: { slug: string }) {
 					</Link>
 				)}
 			</PageHeader>
-			<p className="-mt-4 mb-6 max-w-3xl text-sm text-fog-500">
-				{competition.description}
-				{competition.starts_at && (
-					<span className="ml-2 text-fog-500">
-						{shortDate(competition.starts_at)}
-						{competition.ends_at ? ` – ${shortDate(competition.ends_at)}` : ''} {new Date(competition.starts_at).getFullYear()}
-					</span>
-				)}
-			</p>
-			<Tabs tabs={tabs} active={tab} onChange={setTab} />
+			<div className="-mt-4 mb-6 space-y-3">
+				<PreviewNotice />
+				<p className="flex max-w-prose flex-wrap gap-x-3 text-sm text-fog-300">
+					<span>{competition.description}</span>
+					{competition.starts_at && (
+						<span className="text-fog-500">
+							{shortDate(competition.starts_at)}
+							{competition.ends_at ? ` – ${shortDate(competition.ends_at)}` : ''} {new Date(competition.starts_at).getFullYear()}
+						</span>
+					)}
+				</p>
+			</div>
+			<div className="tab-strip mb-6" role="tablist">
+				{tabs.map((option) => (
+					<button key={option.id} type="button" role="tab" aria-selected={tab === option.id} onClick={() => setTab(option.id)}>
+						{option.label}
+					</button>
+				))}
+			</div>
 			{tab === 'overview' && (competition.kind === 'league' ? <LeagueOverview competition={competition} /> : competition.kind === 'tournament' ? <TournamentOverview competition={competition} /> : competition.kind === 'season' ? <SeasonOverview competition={competition} /> : <NightOverview competition={competition} />)}
 			{tab === 'standings' && (
 				<Panel>
@@ -529,7 +530,7 @@ function CompetitionPageInner({ slug }: { slug: string }) {
 				(competition.bracket ? (
 					<div className="space-y-4">
 						<BracketView competition={competition} bracket={competition.bracket} />
-						{competition.playoffs && <p className="text-xs text-fog-500">{competition.playoffs.description}</p>}
+						{competition.playoffs && <p className="max-w-prose text-sm text-fog-500">{competition.playoffs.description}</p>}
 					</div>
 				) : (
 					<Panel>

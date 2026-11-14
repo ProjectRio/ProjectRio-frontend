@@ -31,13 +31,13 @@ export function CharacterCell({ line, showOwner = true, competition }: { line: C
 			<img src={characterImage(line.character)} alt="" width={22} height={26} className="shrink-0 [image-rendering:pixelated]" style={{ width: 22, height: 26 }} />
 			<span className="min-w-0">
 				<span className="block truncate text-sm font-medium text-fog-100">
-					<Link href={`/characters/${encodeURIComponent(line.character)}/batting`} className="hover:text-rio-300">
+					<Link href={`/characters/${encodeURIComponent(line.character)}/batting`} className="underline decoration-transparent underline-offset-4 transition-colors hover:decoration-fog-300">
 						{line.character}
 					</Link>
-					{line.slot > 1 && <span className="ml-1 text-[10px] text-fog-500">#{line.slot}</span>}
+					{line.slot > 1 && <span className="ml-1 text-xs text-fog-500">#{line.slot}</span>}
 				</span>
 				{showOwner && (
-					<span className="block truncate text-[11px] text-fog-500">
+					<span className="block truncate text-xs text-fog-500">
 						{line.owners && line.owners.length > 1 ? `${line.owners.length} managers` : competition ? <ParticipantName participant={participantByName(competition, line.owner)} name={line.owner} className="!font-normal !text-fog-500" /> : line.owner}
 					</span>
 				)}
@@ -65,15 +65,15 @@ export function useCompetitionStats(competition: Competition) {
 export function Glossary() {
 	const [open, setOpen] = useState(false);
 	return (
-		<div className="text-xs text-fog-500">
-			<button type="button" className="underline decoration-dotted underline-offset-2 hover:text-fog-100" onClick={() => setOpen(!open)}>
+		<div className="text-sm text-fog-500">
+			<button type="button" aria-expanded={open} className="underline decoration-dotted underline-offset-2 hover:text-fog-100" onClick={() => setOpen(!open)}>
 				{open ? 'Hide glossary' : 'Glossary'}
 			</button>
 			{open && (
-				<dl className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-3">
+				<dl className="mt-3 grid gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2 lg:grid-cols-3">
 					{STAT_COLUMNS.map((column) => (
 						<div key={column.key} className="flex gap-2">
-							<dt className="w-12 shrink-0 font-display font-bold uppercase text-fog-300">{column.abbr}</dt>
+							<dt className="w-12 shrink-0 font-display font-bold text-fog-300">{column.abbr}</dt>
 							<dd>
 								<span className="text-fog-300">{column.label}.</span> {column.description}
 							</dd>
@@ -132,24 +132,25 @@ export default function StatsTab({ competition, highlightOwner }: { competition:
 	}
 
 	return (
-		<div className="space-y-3">
-			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-night-700 bg-night-850 px-3 py-2 text-xs text-fog-500">
-				<div className="flex gap-1">
+		<div>
+			<div className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4 text-sm text-fog-500">
+				<div className="seg">
 					{VIEWS.map((option) => (
-						<button key={option.id} type="button" className={`rounded px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-widest ${view === option.id ? 'bg-rio-500/15 text-rio-300' : 'text-fog-500 hover:text-fog-300'}`} onClick={() => setView(option.id)}>
+						<button key={option.id} type="button" aria-pressed={view === option.id} onClick={() => setView(option.id)}>
 							{option.label}
 						</button>
 					))}
 				</div>
 				{view !== 'team' && (
 					<>
-						<label className="flex items-center gap-1.5">
-							<input type="checkbox" className="accent-rio-500" checked={qualifiedOnly} onChange={(event) => setQualifiedOnly(event.target.checked)} />
-							Qualified only <span className="text-fog-500">({stats.bar}+ {view === 'pitching' ? 'IP' : 'games'})</span>
-						</label>
-						<label className="flex items-center gap-1.5">
-							Manager
-							<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs text-fog-100" value={owner} onChange={(event) => setOwner(event.target.value)}>
+						<button type="button" aria-pressed={qualifiedOnly} className={`${qualifiedOnly ? 'key-on' : 'key-off'} rounded-md border px-3 py-1 font-display text-sm font-semibold uppercase tracking-wider`} onClick={() => setQualifiedOnly(!qualifiedOnly)}>
+							Qualified only <span className="normal-case tracking-normal text-fog-500">({stats.bar}+ {view === 'pitching' ? 'IP' : 'games'})</span>
+						</button>
+						<span className="flex items-center gap-2">
+							<label htmlFor="stats-manager" className="label !mb-0">
+								Manager
+							</label>
+							<select id="stats-manager" className="input !w-auto !py-1.5 text-sm" value={owner} onChange={(event) => setOwner(event.target.value)}>
 								<option value="">All</option>
 								{owners.map((name) => (
 									<option key={name} value={name}>
@@ -157,15 +158,16 @@ export default function StatsTab({ competition, highlightOwner }: { competition:
 									</option>
 								))}
 							</select>
-						</label>
+						</span>
 					</>
 				)}
-				<span className="ml-auto">
-					{rows.length} rows · {competition.innings}-inning ERA · OPS+ and ERA− against this competition
+				<span className="flex flex-wrap gap-x-3 lg:ml-auto">
+					<span>{competition.innings}-inning ERA</span>
+					<span>OPS+ and ERA− against this competition</span>
 				</span>
 			</div>
 			<StatTable key={view} rows={rows} columns={columns} leadLabel={leadLabel} defaultSort={defaultSort} leagueLine={stats.league} />
-			<div className="px-3 pb-3">
+			<div className="px-4 py-3">
 				<Glossary />
 			</div>
 		</div>
@@ -196,13 +198,16 @@ export function Leaders({ competition }: { competition: Competition }) {
 					<li key={entry.label} className="panel flex items-center gap-3 px-3 py-2">
 						<img src={characterImage(entry.item!.line.character)} alt="" width={30} height={35} className="[image-rendering:pixelated]" style={{ width: 30, height: 35 }} />
 						<div className="min-w-0 flex-1">
-							<p className="text-[10px] font-semibold uppercase tracking-widest text-fog-500">{entry.label}</p>
-							<p className="truncate text-sm text-fog-100">
-								{entry.item!.line.character}
-								{entry.item!.line.slot > 1 ? ` #${entry.item!.line.slot}` : ''} <span className="text-xs text-fog-500">· {entry.item!.line.owner}</span>
+							<p className="text-sm text-fog-500">{entry.label}</p>
+							<p className="flex min-w-0 items-baseline gap-2 text-sm">
+								<span className="truncate text-fog-100">
+									{entry.item!.line.character}
+									{entry.item!.line.slot > 1 ? ` #${entry.item!.line.slot}` : ''}
+								</span>
+								<span className="truncate text-xs text-fog-500">{entry.item!.line.owner}</span>
 							</p>
 						</div>
-						<span className="font-display text-xl font-bold tabular-nums text-fog-100">{entry.value(entry.item!.derived)}</span>
+						<span className="font-mono text-xl font-semibold tabular-nums text-fog-100">{entry.value(entry.item!.derived)}</span>
 					</li>
 				))}
 		</ul>
