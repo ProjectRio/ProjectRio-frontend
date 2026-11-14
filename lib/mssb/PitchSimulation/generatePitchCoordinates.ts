@@ -20,6 +20,7 @@ export function generatePitchCoordinates(
             pitchType = 0, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
             pitcher_id = 0,
             pitcherStarsOn = false,
+            cpuPitcher = false,
             pitcherHandedness = 0,
             pitcherXOnMound = 0,
             pitchStartingX = -0.358750939,
@@ -38,6 +39,7 @@ export function generatePitchCoordinates(
             'pitchType': pitchType, //0 curve, 1 charge, 2 perfect charge, 3 changeup, 4 star
             'pitcher_id': pitcher_id,
             'pitcherStarsOn': pitcherStarsOn,
+            'cpuPitcher': cpuPitcher,
             'pitcherHandedness': pitcherHandedness,
             'pitcherXOnMound': pitcherXOnMound,
             'pitchStartingX': pitchStartingX,

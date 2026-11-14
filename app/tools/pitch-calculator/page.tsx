@@ -5,6 +5,28 @@ import PitchPlot from '@/components/PitchPlot';
 import * as c from '@/lib/mssb/PitchSimulation/pitchingConstants';
 import { PageHeader, Panel, PanelHeader } from '@/components/ui';
 
+function OnOff({ id, value, onChange }: { id: string; value: boolean; onChange: (next: boolean) => void }) {
+	return (
+		<div className="seg" role="group" aria-labelledby={id}>
+			<button type="button" aria-pressed={!value} onClick={() => onChange(false)}>
+				Off
+			</button>
+			<button type="button" aria-pressed={value} onClick={() => onChange(true)}>
+				On
+			</button>
+		</div>
+	);
+}
+
+/*
+ * The CPU pitcher is ported from the pitchSimulator branch as its author left
+ * it: it runs, but the pitch-type constants are still zero and the curve
+ * target is never updated, so it does not yet pitch the way the game does.
+ * The switch is shown in development only until that is finished; set this
+ * to true to publish it.
+ */
+const SHOW_CPU_PITCHER = process.env.NODE_ENV !== 'production';
+
 export default function PitchCalculatorPage() {
 	const [pitcherXOnMound, setPitcherXOnMound] = useState(0);
 	const [pitcherId, setPitcherId] = useState(0);
@@ -13,6 +35,8 @@ export default function PitchCalculatorPage() {
 	const [pitchCharge, setPitchCharge] = useState(0);
 	const [pitchCurve, setPitchCurve] = useState('2'); // 1=left, 2=straight, 3=right per frame
 	const [stamina, setStamina] = useState(10);
+	const [superstar, setSuperstar] = useState(false);
+	const [cpuPitcher, setCpuPitcher] = useState(false);
 
 	const pitchInputs = useMemo(() => {
 		const constants: any = c;
@@ -31,7 +55,8 @@ export default function PitchCalculatorPage() {
 			curveInput: curveArray,
 			pitchType,
 			pitcher_id: pitcherId,
-			pitcherStarsOn: false,
+			pitcherStarsOn: superstar,
+			cpuPitcher,
 			pitcherHandedness: handedness,
 			pitcherXOnMound,
 			pitchStartingX: startX,
@@ -41,7 +66,7 @@ export default function PitchCalculatorPage() {
 			batter_id: 21,
 			batZ: 1.7
 		};
-	}, [pitcherXOnMound, pitcherId, handedness, pitchType, pitchCharge, pitchCurve, stamina]);
+	}, [pitcherXOnMound, pitcherId, handedness, pitchType, pitchCharge, pitchCurve, stamina, superstar, cpuPitcher]);
 
 	const charIDMapping: { [key: string]: string } = (c as any).charIDMapping;
 
@@ -74,6 +99,12 @@ export default function PitchCalculatorPage() {
 							</select>
 						</div>
 						<div>
+							<span className="label" id="superstar">
+								Pitcher superstar
+							</span>
+							<OnOff id="superstar" value={superstar} onChange={setSuperstar} />
+						</div>
+						<div>
 							<label className="label" htmlFor="handedness">
 								Handedness
 							</label>
@@ -87,13 +118,27 @@ export default function PitchCalculatorPage() {
 								<option value={1}>Lefty</option>
 							</select>
 						</div>
+						{SHOW_CPU_PITCHER && (
+							<div>
+								<span className="label" id="cpuPitcher">
+									CPU pitcher
+								</span>
+								<OnOff id="cpuPitcher" value={cpuPitcher} onChange={setCpuPitcher} />
+								{cpuPitcher && (
+									<p className="mt-2 text-xs text-fog-500">
+										Experimental: the CPU picks the pitch type, charge and curve, and rerolls on every input change.
+									</p>
+								)}
+							</div>
+						)}
 						<div>
 							<label className="label" htmlFor="pitchType">
 								Pitch Type
 							</label>
 							<select
 								id="pitchType"
-								className="input"
+								disabled={cpuPitcher}
+								className="input disabled:opacity-50"
 								value={pitchType}
 								onChange={(event) => setPitchType(Number(event.target.value))}
 							>
@@ -125,8 +170,9 @@ export default function PitchCalculatorPage() {
 							</label>
 							<input
 								id="charge"
+								disabled={cpuPitcher}
 								type="number"
-								className="input"
+								className="input disabled:opacity-50"
 								step={0.01}
 								min={0}
 								max={1}
@@ -140,7 +186,8 @@ export default function PitchCalculatorPage() {
 							</label>
 							<input
 								id="curve"
-								className="input"
+								disabled={cpuPitcher}
+								className="input disabled:opacity-50"
 								value={pitchCurve}
 								onChange={(event) => setPitchCurve(event.target.value)}
 							/>

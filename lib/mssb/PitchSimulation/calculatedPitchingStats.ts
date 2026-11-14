@@ -2,14 +2,9 @@ import * as c from "./pitchingConstants";
 
 // @ts-ignore
 export function calcuatedPitchingStats(dt) { // based off of 806b1d3c
-      dt.inMemPitcher.cursedBallStat = c.stats[dt.inMemPitcher.charID]['Cursed Ball'];
       let cursedBall = dt.inMemPitcher.cursedBallStat;
-      dt.inMemPitcher.curveControlStat = c.stats[dt.inMemPitcher.charID]["Curve Control"];
       let curveControl = dt.inMemPitcher.curveControlStat;
-      dt.inMemPitcher.curveStat = c.stats[dt.inMemPitcher.charID]["Curve"];
       let curve = dt.inMemPitcher.curveStat;
-      dt.inMemPitcher.fastBallSpeed = c.stats[dt.inMemPitcher.charID]["Fast Ball Speed"];
-      dt.inMemPitcher.curveBallSpeed = c.stats[dt.inMemPitcher.charID]["Curve Ball Speed"];
       let fastBallSpeed;
       let curveBallSpeed
     
