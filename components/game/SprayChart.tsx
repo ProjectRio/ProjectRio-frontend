@@ -83,7 +83,7 @@ export default function SprayChart({
 						<button
 							key={String(value)}
 							className={`rounded-md border px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
-								side === value ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
+								side === value ? 'key-on' : 'border-transparent text-fog-300 hover:text-fog-100'
 							}`}
 							onClick={() => setSide(value as typeof side)}
 						>
@@ -124,7 +124,7 @@ export default function SprayChart({
 
 					{hoveredPoint && (
 						<div
-							className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-[var(--rim-strong)] bg-night-950 px-2.5 py-1.5 text-xs"
+							className="pointer-events-none absolute z-10 -translate-x-1/2 popover px-2.5 py-1.5 text-xs"
 							style={{
 								left: `${hoveredPoint.x}%`,
 								top: `${Math.max(hoveredPoint.y - 6, 2)}%`

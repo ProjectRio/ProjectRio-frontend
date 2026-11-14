@@ -112,7 +112,7 @@ function StaminaBar({ stamina }: { stamina: number }) {
 	return (
 		<div className="flex items-center gap-3">
 			<span className="font-display text-xs font-semibold uppercase tracking-[0.12em] text-fog-500">Stamina</span>
-			<div className="h-3.5 flex-1 overflow-hidden rounded-full border border-[var(--rim)] bg-black/50">
+			<div className="h-3.5 flex-1 overflow-hidden rounded-full bg-black/50 [box-shadow:var(--well-shade)]">
 				<div
 					className="h-full rounded-full border [box-shadow:inset_0_2px_0_rgb(255_255_255/0.35)]"
 					style={{ width: `${pct}%`, backgroundColor: fill, borderColor: edge }}

@@ -76,7 +76,7 @@ function Segmented<T extends string | number>({
 				<button
 					key={String(opt.value)}
 					className={`flex-1 rounded-md border px-2 py-1.5 font-display font-semibold uppercase tracking-wider transition-colors ${
-						value === opt.value ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
+						value === opt.value ? 'key-on' : 'border-transparent text-fog-300 hover:text-fog-100'
 					}`}
 					onClick={() => onChange(opt.value)}
 				>
@@ -100,8 +100,8 @@ function Chip({
 		<button
 			className={`rounded border px-2 py-1 font-display text-[10px] font-bold uppercase tracking-wider transition-colors ${
 				active
-					? 'sel text-fog-100'
-					: 'border-night-600 bg-night-950/70 text-fog-300 hover:text-fog-100'
+					? 'key-on'
+					: 'key-off'
 			}`}
 			onClick={onClick}
 		>
@@ -324,7 +324,7 @@ export default function HitVisualizer({
 						</span>
 					</h2>
 					{isModified && (
-						<span className="rounded border border-star-500/40 bg-star-500/15 px-2 py-0.5 font-display text-xs font-bold uppercase tracking-wider text-star-400">
+						<span className="plate text-star-400 [--plate:#473908]">
 							What-if
 						</span>
 					)}
@@ -334,7 +334,7 @@ export default function HitVisualizer({
 						{stadiums[String(stadiumId)]} — {getTheme3D(stadiumId).label}
 					</span>
 					<button
-						className="rounded-lg border border-night-600 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wider text-fog-300 transition-colors hover:border-fog-300 hover:text-fog-100"
+						className="key px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wider"
 						onClick={onClose}
 					>
 						✕ Close
@@ -396,7 +396,7 @@ export default function HitVisualizer({
 						<Stat label="Actual" value={`${fmt(actualDistance)} · ${resultName || '—'}`} />
 					</div>
 					{sim.errors.length > 0 && (
-						<div className="absolute left-3 top-3 rounded-lg border border-rio-700 bg-night-950/80 px-3 py-2 text-xs text-rio-300">
+						<div className="absolute left-3 top-3 rounded-lg bg-[#3a1215] px-3 py-2 text-xs text-rio-300">
 							{sim.errors.join(' · ')}
 						</div>
 					)}
@@ -407,7 +407,7 @@ export default function HitVisualizer({
 					<div className="flex items-center justify-between">
 						<p className="kicker">What-if lab</p>
 						<button
-							className="rounded border border-night-600 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-wider text-fog-300 transition-colors hover:border-fog-300 hover:text-fog-100 disabled:opacity-40"
+							className="key px-2 py-1 font-display text-[10px] font-bold uppercase tracking-wider disabled:opacity-40"
 							disabled={!isModified}
 							onClick={() => {
 								setInputs(baseInputs);
@@ -489,8 +489,8 @@ export default function HitVisualizer({
 									key={key}
 									className={`rounded-lg border px-2 py-1.5 font-display text-sm font-bold transition-colors ${
 										inputs![key]
-											? 'sel text-fog-100'
-											: 'border-night-600 text-fog-300 hover:text-fog-100'
+											? 'key-on'
+											: 'key-off'
 									}`}
 									onClick={() => set({ [key]: !inputs![key] } as Partial<HitBallInputs>)}
 								>

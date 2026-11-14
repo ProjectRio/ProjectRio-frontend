@@ -43,7 +43,7 @@ function AccountMenu({ username }: { username: string }) {
 			{open && (
 				<div
 					role="menu"
-					className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-[var(--rim-strong)] bg-night-950"
+					className="popover absolute right-0 top-11 w-48 overflow-hidden"
 				>
 					<p className="border-b border-night-700 px-4 py-2 text-xs font-medium text-fog-500">
 						Signed in as <span className="text-fog-100">{username}</span>

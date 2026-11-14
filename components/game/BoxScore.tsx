@@ -288,7 +288,7 @@ export function TeamPanel({
 				<button
 					key={view}
 					className={`rounded-md border px-3 py-1 font-display font-semibold uppercase tracking-wider transition-colors ${
-						tab === view ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
+						tab === view ? 'key-on' : 'border-transparent text-fog-300 hover:text-fog-100'
 					}`}
 					onClick={() => setTab(view)}
 				>

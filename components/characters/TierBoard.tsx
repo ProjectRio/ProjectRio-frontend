@@ -72,7 +72,7 @@ export function TierBoard() {
 							}}
 							className={`rounded-md border px-5 py-2 font-display text-sm font-bold uppercase tracking-widest transition-colors ${
 								listId === l.id
-									? 'sel text-fog-100'
+									? 'key-on'
 									: 'border-transparent bg-black/40 text-fog-300 hover:text-fog-100'
 							}`}
 						>
@@ -121,13 +121,12 @@ export function TierBoard() {
 											onFocus={(e) => show(entry, row.tier, e.currentTarget)}
 											onMouseLeave={hide}
 											onBlur={hide}
-											className="group flex w-[4.6rem] flex-col items-center rounded-lg border bg-black/60 px-1 py-2 transition-colors sm:w-20"
-											style={{ borderColor: `${hue}40` }}
+											className="well group flex w-[4.6rem] flex-col items-center px-1 pb-2 pt-2.5 transition-colors sm:w-20"
 											onMouseOver={(e) => {
 												e.currentTarget.style.borderColor = hue;
 											}}
 											onMouseOut={(e) => {
-												e.currentTarget.style.borderColor = `${hue}40`;
+												e.currentTarget.style.borderColor = '';
 											}}
 										>
 											<span
@@ -181,7 +180,7 @@ function ScoutCard({ hover }: { hover: HoverCard }) {
 				...(below ? { top: hover.bottom + 8 } : { bottom: window.innerHeight - hover.top + 8 })
 			}}
 		>
-			<div className="rounded-lg border border-[var(--rim-strong)] bg-night-950 p-4">
+			<div className="popover p-4">
 				<div className="flex items-center gap-3">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img src={characterImage(canonical)} alt="" className="h-12 w-12 object-contain" />

@@ -63,8 +63,8 @@ export default async function CharacterPage({ params }: { params: Promise<{ char
 								return (
 									<span
 										key={placement.list.id}
-										className="inline-flex items-center gap-2 rounded border px-3 py-1.5 font-display text-sm font-bold uppercase tracking-wider"
-										style={{ borderColor: `${hue}55`, backgroundColor: `${hue}14`, color: hue }}
+										className="plate !gap-2 !px-3 !py-1.5 !text-sm"
+										style={{ color: hue, '--plate': `color-mix(in srgb, ${hue} 26%, #0a1410)` } as React.CSSProperties}
 									>
 										{placement.list.title}
 										<span className="text-fog-100">

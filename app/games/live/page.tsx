@@ -56,7 +56,7 @@ export default function LiveGamesPage() {
 			{games !== null && games.length > 0 && (
 				<>
 					{games.some((game) => game._devFixture) && (
-						<p className="mb-4 rounded-lg border border-star-500/40 bg-star-500/10 px-4 py-2 text-sm text-star-400">
+						<p className="mb-4 rounded-lg bg-star-500/15 px-4 py-2 text-sm text-star-400">
 							Dev mode: no real games are live, so these are example fixtures from{' '}
 							<code>example_ongoing_game.json</code>.
 						</p>

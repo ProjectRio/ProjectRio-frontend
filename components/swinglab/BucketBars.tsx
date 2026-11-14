@@ -43,8 +43,8 @@ BA ${formatBa(bucket.ba)} · SLG ${formatBa(bucket.slg)}
 ${Math.round((bucket.foulRate ?? 0) * 100)}% fouled${thin ? `\nbelow the ${minAb}-AB minimum` : ''}`}
 						className={`flex w-full items-center gap-2 rounded border px-2 py-1.5 text-left transition-colors ${
 							selected
-								? 'border-star-500/50 bg-star-500/10'
-								: 'border-transparent hover:border-night-600'
+								? 'border-transparent bg-star-500/15'
+								: 'border-transparent hover:border-rim hover:bg-black/55'
 						} ${onSelect ? '' : 'cursor-default'}`}
 					>
 						<span className="w-24 shrink-0 truncate text-xs text-fog-100">{bucket.label}</span>

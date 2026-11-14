@@ -46,7 +46,7 @@ export function FieldHeatmap({ shares }: { shares: Map<string, number> }) {
 	const maxShare = Math.max(0.0001, ...shares.values());
 
 	return (
-		<svg viewBox={`0 0 ${W} ${H}`} className="w-full rounded-lg border border-[var(--rim)] bg-black/40">
+		<svg viewBox={`0 0 ${W} ${H}`} className="well w-full">
 			{/* Foul lines and outfield/infield guides */}
 			<line x1={homeX} y1={homeY} x2={px(-72)} y2={py(72)} stroke="var(--color-night-600)" strokeWidth="1.5" />
 			<line x1={homeX} y1={homeY} x2={px(72)} y2={py(72)} stroke="var(--color-night-600)" strokeWidth="1.5" />
@@ -110,7 +110,7 @@ export function LineupStrip({ shares }: { shares: number[] }) {
 						<div
 							key={slot}
 							title={`Bats ${ordinal(slot + 1)} in ${(share * 100).toFixed(1)}% of games`}
-							className="flex flex-col items-center gap-1 rounded border border-night-700 py-2"
+							className="well flex flex-col items-center gap-1 pb-2 pt-2.5"
 							style={{ backgroundColor: `rgba(230, 0, 18, ${0.04 + 0.5 * t})` }}
 						>
 							<span className="font-display text-sm font-bold text-fog-100">{slot + 1}</span>

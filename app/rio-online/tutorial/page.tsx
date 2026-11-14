@@ -127,7 +127,7 @@ export default function TutorialPage() {
 			<Panel>
 				<PanelHeader title="Troubleshooting" />
 				<div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-fog-300">
-					<details className="rounded-lg border border-night-700 p-3">
+					<details className="well p-3">
 						<summary className="cursor-pointer font-semibold text-fog-100">
 							&quot;Both our connections are good but the game still lags&quot;
 						</summary>
@@ -141,13 +141,13 @@ export default function TutorialPage() {
 							<li>On a laptop, connect to a power source — laptops are a common factor in these problems.</li>
 						</ol>
 					</details>
-					<details className="rounded-lg border border-night-700 p-3">
+					<details className="well p-3">
 						<summary className="cursor-pointer font-semibold text-fog-100">
 							&quot;My inputs don&apos;t feel like they go through correctly&quot;
 						</summary>
 						<p className="mt-2">Overclock your controller — see the link in Getting Started.</p>
 					</details>
-					<details className="rounded-lg border border-night-700 p-3">
+					<details className="well p-3">
 						<summary className="cursor-pointer font-semibold text-fog-100">
 							&quot;Dolphin says someone has the wrong version&quot;
 						</summary>

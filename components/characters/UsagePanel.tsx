@@ -37,7 +37,7 @@ function fetchFielding(mode: string, charIds: number[]): Promise<Record<string, 
 
 function Tile({ label, value, detail }: { label: string; value: string; detail?: string }) {
 	return (
-		<div className="rounded-lg border border-[var(--rim)] bg-black/40 px-4 py-3">
+		<div className="well px-4 pb-3 pt-3.5">
 			<p className="font-display text-[11px] font-semibold uppercase tracking-widest text-fog-500">
 				{label}
 			</p>

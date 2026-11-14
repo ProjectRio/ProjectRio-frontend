@@ -54,7 +54,7 @@ export function EmptyState({ title, detail }: { title: string; detail?: string }
 
 export function ErrorState({ message }: { message: string }) {
 	return (
-		<div className="rounded-lg border border-rio-700 bg-rio-700/10 px-4 py-3 text-sm text-rio-300">{message}</div>
+		<div className="rounded-lg bg-rio-700/25 px-4 py-3 text-sm text-rio-300">{message}</div>
 	);
 }
 
@@ -65,19 +65,14 @@ export function Badge({
 	color?: 'red' | 'gold' | 'gray' | 'green';
 	children: ReactNode;
 }) {
+	// Enamel plates: a dark fill in the badge's own colour, bright lettering.
 	const colors = {
-		red: 'bg-rio-500/15 text-rio-300 border-rio-500/40',
-		gold: 'bg-star-500/15 text-star-400 border-star-500/40',
-		gray: 'bg-black/40 text-fog-300 border-night-600',
-		green: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+		red: 'text-rio-300 [--plate:#56161b]',
+		gold: 'text-star-400 [--plate:#473908]',
+		gray: 'text-fog-300',
+		green: 'text-emerald-300 [--plate:#0d4534]'
 	};
-	return (
-		<span
-			className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 font-display text-xs font-semibold uppercase tracking-wider ${colors[color]}`}
-		>
-			{children}
-		</span>
-	);
+	return <span className={`plate ${colors[color]}`}>{children}</span>;
 }
 
 export function PlayerLink({ username, className = '' }: { username: string; className?: string }) {

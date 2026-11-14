@@ -138,7 +138,7 @@ export function AtBatRow({
 						{batterName}
 						{final.batter.captain && <span className="ml-1 text-star-400">✪</span>}
 						{atBat.starChance && (
-							<span className="ml-2 rounded border border-star-500/40 bg-star-500/10 px-1 py-px font-display text-[9px] font-bold uppercase tracking-wider text-star-400">
+							<span className="plate ml-2 !px-1 !text-[9px] text-star-400 [--plate:#473908]">
 								★ Star chance
 							</span>
 						)}
@@ -169,14 +169,14 @@ export function AtBatRow({
 					</span>
 				)}
 				<span
-					className="inline-flex items-center rounded border px-2 py-0.5 font-display text-xs font-bold uppercase tracking-wide"
-					style={{ color, borderColor: `${color}66`, backgroundColor: `${color}14` }}
+					className="plate"
+					style={{ color, '--plate': `color-mix(in srgb, ${color} 26%, #0a1410)` } as React.CSSProperties}
 				>
 					{atBatResultName(final.result_of_ab) || '—'}
 				</span>
 				{flight && (
 					<button
-						className="rounded border border-night-600 px-2 py-0.5 font-display text-[10px] font-bold uppercase tracking-wider text-fog-300 transition-colors hover:border-star-400 hover:text-star-400"
+						className="key px-2 py-0.5 font-display text-[10px] font-bold uppercase tracking-wider hover:text-star-400"
 						onClick={() => onVisualize(final)}
 						title="Open in the 3D visualizer"
 					>

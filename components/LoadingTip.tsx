@@ -37,7 +37,7 @@ export default function LoadingTip({ label }: { label: string }) {
 		<div className="flex flex-col items-center justify-center gap-3 py-12 text-center" role="status">
 			<div className="swing-sprite" aria-hidden />
 			<span className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-fog-500">{label}</span>
-			<p className="sel min-h-[2.75rem] max-w-md px-4 py-2.5 text-sm text-fog-100" aria-hidden={!tip}>
+			<p className="popover min-h-[2.75rem] max-w-md px-4 py-2.5 text-sm text-fog-100" aria-hidden={!tip}>
 				{tip && (
 					<>
 						<span className="mr-2 font-title text-base text-[var(--park-accent)]">Tip</span>

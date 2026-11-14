@@ -215,7 +215,7 @@ export default function MembersTab({ context }: { context: CommunityContext }) {
 				)}
 			</div>
 
-			{notice && <p className="rounded-lg border border-star-500/40 bg-star-500/10 px-4 py-3 font-mono text-sm text-star-400">{notice}</p>}
+			{notice && <p className="rounded-lg bg-star-500/15 px-4 py-3 font-mono text-sm text-star-400">{notice}</p>}
 			{error && <p className="text-sm text-rio-300">{error}</p>}
 
 			<Panel>

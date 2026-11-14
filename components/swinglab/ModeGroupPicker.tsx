@@ -92,7 +92,7 @@ export default function ModeGroupPicker({
 								onClick={() => toggleGroup(group.modes)}
 								className={`rounded border px-2 py-1 text-xs font-semibold transition-colors ${
 									active
-										? 'sel text-fog-100'
+										? 'key-on'
 										: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
 								}`}
 							>
@@ -119,8 +119,8 @@ export default function ModeGroupPicker({
 									key={group.id}
 									className={`inline-flex items-center rounded border text-xs transition-colors ${
 										active
-											? 'sel text-fog-100'
-											: 'border-night-600 bg-black/40 text-fog-300'
+											? 'key-on'
+											: 'key-off'
 									}`}
 								>
 									<button
@@ -157,7 +157,7 @@ export default function ModeGroupPicker({
 					)}
 					<button
 						type="button"
-						className="rounded border border-dashed border-night-600 px-2 py-0.5 text-xs text-fog-500 transition-colors hover:border-fog-300 hover:text-fog-100"
+						className="well px-2 pb-0.5 pt-1 text-xs text-fog-500 transition-colors hover:text-fog-100"
 						onClick={() => setOpen(!open)}
 					>
 						{value.length > 0 ? 'Edit list' : '+ Add modes'}
@@ -182,7 +182,7 @@ export default function ModeGroupPicker({
 				)}
 
 				{open && (
-					<div className="absolute left-0 top-full z-30 mt-2 w-80 rounded-lg border border-[var(--rim-strong)] bg-night-950 p-2">
+					<div className="absolute left-0 top-full z-30 mt-2 w-80 popover p-2">
 						<input
 							autoFocus
 							className="input mb-2 !py-1.5 text-sm"
@@ -207,7 +207,7 @@ export default function ModeGroupPicker({
 										key={tagset.id}
 										type="button"
 										className={`block w-full rounded border px-2 py-1.5 text-left text-sm transition-colors ${
-											active ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:bg-night-700'
+											active ? 'key-on' : 'border-transparent text-fog-300 hover:border-rim hover:bg-black/55 hover:text-fog-100'
 										}`}
 										onClick={() => toggleMode(tagset.name)}
 									>
@@ -234,7 +234,7 @@ export default function ModeGroupPicker({
 								<button
 									type="button"
 									disabled={groupName.trim() === ''}
-									className="shrink-0 rounded border border-night-600 px-2 text-xs text-fog-300 transition-colors hover:border-fog-300 hover:text-fog-100 disabled:opacity-40"
+									className="key shrink-0 px-2 text-xs disabled:opacity-40"
 									onClick={() => {
 										save(groupName, value);
 										setGroupName('');

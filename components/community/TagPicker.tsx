@@ -20,7 +20,7 @@ function TagCheckboxGrid({
 	onToggle: (id: number) => void;
 }) {
 	return (
-		<div className="grid max-h-64 gap-1 overflow-y-auto rounded-lg border border-night-700 p-3 sm:grid-cols-2">
+		<div className="grid max-h-64 gap-1 well overflow-y-auto p-3 sm:grid-cols-2">
 			{tags.map((tag) => (
 				<label key={tag.id} className="flex items-baseline gap-2 text-sm text-fog-300" title={tag.desc}>
 					<input
@@ -76,7 +76,7 @@ export default function TagPicker({
 			<div>
 				<span className="label">Community Tags</span>
 				{ownTags.length === 0 ? (
-					<p className="rounded-lg border border-night-700 p-3 text-sm text-fog-500">
+					<p className="well p-3 text-sm text-fog-500">
 						This community has no rule tags yet.
 					</p>
 				) : (

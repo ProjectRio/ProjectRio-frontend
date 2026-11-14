@@ -81,7 +81,7 @@ export default function PlayerSearch({ className = '' }: { className?: string })
 				}}
 			/>
 			{open && q && users && (
-				<ul className="absolute inset-x-0 top-full z-50 mt-1.5 overflow-hidden rounded-lg border border-[var(--rim-strong)] bg-night-950 py-1">
+				<ul className="absolute inset-x-0 top-full z-50 mt-1.5 popover overflow-hidden py-1">
 					{matches.length === 0 && <li className="px-3 py-1.5 text-sm text-fog-500">No player by that name.</li>}
 					{matches.map((user) => (
 						<li key={user}>

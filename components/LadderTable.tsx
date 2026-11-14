@@ -48,9 +48,10 @@ export default function LadderTable({ gameMode, limit }: { gameMode: string; lim
 							<tr key={player.username}>
 								<td className="font-mono font-bold tabular-nums text-fog-500">{i + 1}</td>
 								<td>
+									{/* An enamel plate in the tier's colour, darkened for the fill. */}
 									<span
-										className="inline-block rounded px-2 py-0.5 font-display text-xs font-bold uppercase tracking-wider"
-										style={{ backgroundColor: `${color}22`, color, border: `1px solid ${color}55` }}
+										className="plate"
+										style={{ '--plate': `color-mix(in srgb, ${color} 28%, #0a1410)`, color } as React.CSSProperties}
 									>
 										{tier}
 									</span>

@@ -49,7 +49,7 @@ export default function Scoreboard({
 	const showHits = teams.every((team) => team.hits !== undefined);
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-[var(--rim-strong)] bg-[var(--chrome-deep)]">
+		<div className="panel bg-[var(--chrome-deep)]">
 			<div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-[var(--rim)] bg-black/35 px-4 py-2">
 				<div className="font-display text-sm font-bold uppercase tracking-[0.14em]">{status}</div>
 				{header && (

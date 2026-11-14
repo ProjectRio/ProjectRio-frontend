@@ -62,7 +62,7 @@ function SegButtons<T extends string | number>({
 					onClick={() => onChange(opt.value)}
 					className={`rounded border px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider transition-colors ${
 						value === opt.value
-							? 'sel text-fog-100'
+							? 'key-on'
 							: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
 					}`}
 				>
@@ -287,7 +287,7 @@ export function TrajectoryLab({ characterName }: { characterName: string }) {
 						/>
 						<button
 							onClick={() => setCloudSeed((s) => s + 1)}
-							className="rounded border border-night-600 bg-black/40 px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider text-fog-300 transition-colors hover:text-fog-100"
+							className="key px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider"
 						>
 							Reroll cloud
 						</button>

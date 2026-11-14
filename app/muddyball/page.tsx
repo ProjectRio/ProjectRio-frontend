@@ -264,7 +264,7 @@ function MuddyballDraft() {
 								<button
 									key={view}
 									className={`flex-1 rounded-md border py-1.5 font-display font-semibold uppercase tracking-wider transition-colors ${
-										rosterView === view ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:text-fog-100'
+										rosterView === view ? 'key-on' : 'border-transparent text-fog-300 hover:text-fog-100'
 									}`}
 									onClick={() => setRosterView(view)}
 								>
@@ -452,10 +452,10 @@ function MuddyballDraft() {
 						<div
 							className={`flex cursor-pointer items-center justify-between rounded-lg border p-2 transition-colors ${
 								stadiumPicked
-									? 'sel'
+									? 'key-on'
 									: remaining >= STADIUM_PRICE
-										? 'border-night-600 hover:bg-night-800'
-										: 'cursor-not-allowed border-night-600 opacity-40'
+										? 'key-off'
+										: 'key-off cursor-not-allowed opacity-40'
 							}`}
 							role="checkbox"
 							aria-checked={stadiumPicked}

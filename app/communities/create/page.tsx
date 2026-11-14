@@ -68,7 +68,7 @@ export default function CreateCommunityPage() {
 		<div className="mx-auto max-w-lg">
 			<PageHeader kicker="Communities" title="Create a Community" />
 			{!username && (
-				<p className="mb-6 rounded-lg border border-star-500/40 bg-star-500/10 px-4 py-3 text-sm text-star-400">
+				<p className="mb-6 rounded-lg bg-star-500/15 px-4 py-3 text-sm text-star-400">
 					You must be logged in — and a Project Rio patron — to sponsor a new community.
 				</p>
 			)}

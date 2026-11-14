@@ -66,7 +66,7 @@ function TickerBox({ item }: { item: TickerItem }) {
 	return (
 		<Link
 			href={item.href}
-			className="block w-44 shrink-0 rounded-md border border-transparent bg-black/40 px-3 py-1.5 transition-colors duration-[120ms] hover:border-rim hover:bg-black/60 focus-visible:border-rim focus-visible:bg-black/60"
+			className="well block w-44 shrink-0 px-3 pb-1.5 pt-2 transition-colors duration-[120ms] hover:border-rim focus-visible:border-rim"
 		>
 			<div className="mb-0.5 flex items-center justify-between gap-2">
 				<span

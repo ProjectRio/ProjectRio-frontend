@@ -175,7 +175,7 @@ export default function PickWinScatter({
 
 			{hovered && (
 				<div
-					className="pointer-events-none absolute z-20 w-52 rounded-lg border border-[var(--rim-strong)] bg-night-950 p-2.5 text-xs"
+					className="pointer-events-none absolute z-20 w-52 popover p-2.5 text-xs"
 					style={{
 						left: `${Math.min(92, (hovered.cx / width) * 100)}%`,
 						top: `${(hovered.cy / height) * 100}%`,

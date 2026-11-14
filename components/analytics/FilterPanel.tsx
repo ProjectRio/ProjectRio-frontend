@@ -239,8 +239,8 @@ export default function FilterPanel({
 									type="button"
 									className={`rounded border px-2 py-1 text-xs transition-colors ${
 										active
-											? 'sel text-fog-100'
-											: 'border-night-600 text-fog-500 hover:text-fog-100'
+											? 'key-on'
+											: 'key-off'
 									}`}
 									onClick={() =>
 										set({

@@ -182,7 +182,7 @@ function Cell({
 			className={`relative block h-[4.5rem] w-[4.5rem] flex-none rounded-md border transition-colors ${
 				selected
 					? 'border-rim bg-black/60 [box-shadow:inset_0_0_0_1px_rgb(136_119_119/0.86)]'
-					: 'border-transparent hover:border-[var(--rim-strong)]'
+					: 'border-transparent hover:border-rim hover:bg-black/55'
 			}`}
 		>
 			<svg viewBox="0 0 56 62" className="h-full w-full" aria-hidden>

@@ -153,8 +153,8 @@ export function LandingLab({ characterName }: { characterName: string }) {
 											onClick={() => setHand(opt.value)}
 											className={`rounded border px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider transition-colors ${
 												effHand === opt.value
-													? 'border-star-500/60 bg-star-500/15 text-star-400'
-													: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
+													? 'key-on'
+													: 'key-off'
 											}`}
 										>
 											{opt.label}
@@ -168,8 +168,8 @@ export function LandingLab({ characterName }: { characterName: string }) {
 										onClick={() => setSwing(opt.value)}
 										className={`rounded border px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wider transition-colors ${
 											swing === opt.value
-												? 'sel text-fog-100'
-												: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
+												? 'key-on'
+												: 'key-off'
 										}`}
 									>
 										{opt.label}
@@ -261,8 +261,8 @@ export function LandingLab({ characterName }: { characterName: string }) {
 													onClick={() => toggleVert(bucket.key as VertBucketKey)}
 													className={`flex w-full items-center gap-2 rounded border px-2 py-1.5 text-left transition-colors ${
 														selected
-															? 'border-star-500/50 bg-star-500/10'
-															: 'border-transparent hover:border-night-600'
+															? 'border-transparent bg-star-500/15'
+															: 'border-transparent hover:border-rim hover:bg-black/55'
 													}`}
 												>
 													<span className="w-20 shrink-0 text-xs text-fog-100">{bucket.label}</span>
@@ -312,7 +312,7 @@ function SprayChart({ rows }: { rows: LandingRow[] }) {
 
 	return (
 		<div>
-			<svg viewBox={`0 0 ${W} ${H}`} className="w-full rounded-lg border border-[var(--rim)] bg-black/40">
+			<svg viewBox={`0 0 ${W} ${H}`} className="well w-full">
 				{/* Distance arcs */}
 				{[30, 60, 90, 120].map((r) => {
 					const rr = r * scale;

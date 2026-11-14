@@ -187,13 +187,13 @@ export default function SwingLab() {
 								<button
 									type="button"
 									onClick={() => setCharPickerOpen(!charPickerOpen)}
-									className="flex w-full items-center gap-2 rounded border border-night-600 bg-black/40 px-2 py-1.5 text-left text-sm text-fog-100 transition-colors hover:border-fog-300"
+									className="well flex w-full items-center gap-2 px-2 pb-1.5 pt-2 text-left text-sm text-fog-100 transition-colors hover:border-rim"
 								>
 									<CharPortrait name={characterName} size={24} />
 									{characterName}
 								</button>
 								{charPickerOpen && (
-									<div className="absolute left-0 top-full z-30 mt-1 w-full rounded-lg border border-[var(--rim-strong)] bg-night-950 p-2">
+									<div className="absolute left-0 top-full z-30 mt-1 w-full popover p-2">
 										<div className="grid max-h-64 grid-cols-6 gap-1 overflow-y-auto pr-1">
 											{[
 												...new Set(
@@ -216,8 +216,8 @@ export default function SwingLab() {
 														}}
 														className={`rounded p-1 transition-colors ${
 															name === characterName
-																? 'sel'
-																: 'border border-transparent hover:bg-night-700'
+																? 'key-on border'
+																: 'border border-transparent hover:border-rim hover:bg-black/55'
 														}`}
 													>
 														<CharPortrait name={name} size={32} />
@@ -258,8 +258,8 @@ export default function SwingLab() {
 											}}
 											className={`rounded border px-2 py-1 text-xs font-semibold transition-colors ${
 												(lefty ? 'L' : 'R') === opt.value
-													? 'border-star-500/60 bg-star-500/15 text-star-400'
-													: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
+													? 'key-on'
+													: 'key-off'
 											}`}
 										>
 											{opt.label}
@@ -290,8 +290,8 @@ export default function SwingLab() {
 											}}
 											className={`rounded border px-2.5 py-1 text-xs font-semibold transition-colors ${
 												swing === opt.value
-													? 'sel text-fog-100'
-													: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
+													? 'key-on'
+													: 'key-off'
 											}`}
 										>
 											{opt.label}
@@ -317,8 +317,8 @@ export default function SwingLab() {
 											onClick={() => setMetric(opt.value)}
 											className={`rounded border px-2.5 py-1 text-xs font-semibold transition-colors ${
 												metric === opt.value
-													? 'sel text-fog-100'
-													: 'border-night-600 bg-black/40 text-fog-300 hover:text-fog-100'
+													? 'key-on'
+													: 'key-off'
 											}`}
 										>
 											{opt.label}

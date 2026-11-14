@@ -43,12 +43,12 @@ export function FieldLabel({ children, hint }: { children: ReactNode; hint?: str
 
 function Chip({ onRemove, children }: { onRemove: () => void; children: ReactNode }) {
 	return (
-		<span className="inline-flex items-center gap-1.5 rounded border border-night-600 bg-night-800 py-0.5 pl-1.5 pr-1 text-xs text-fog-100">
+		<span className="key inline-flex items-center gap-1.5 py-0.5 pl-1.5 pr-1 text-xs">
 			{children}
 			<button
 				type="button"
 				aria-label="Remove"
-				className="rounded px-1 text-fog-500 transition-colors hover:bg-night-700 hover:text-fog-100"
+				className="rounded px-1 text-fog-300 transition-colors hover:bg-black/40 hover:text-fog-100"
 				onClick={onRemove}
 			>
 				×
@@ -92,14 +92,14 @@ export function CharMultiPicker({
 					))}
 					<button
 						type="button"
-						className="rounded border border-dashed border-night-600 px-2 py-0.5 text-xs text-fog-500 transition-colors hover:border-fog-300 hover:text-fog-100"
+						className="well px-2 pb-0.5 pt-1 text-xs text-fog-500 transition-colors hover:text-fog-100"
 						onClick={() => setOpen(!open)}
 					>
 						+ Add
 					</button>
 				</div>
 				{open && (
-					<div className="absolute left-0 top-full z-30 mt-2 w-72 rounded-lg border border-[var(--rim-strong)] bg-night-950 p-2">
+					<div className="absolute left-0 top-full z-30 mt-2 w-72 popover p-2">
 						<input
 							autoFocus
 							className="input mb-2 !py-1.5 text-sm"
@@ -118,7 +118,7 @@ export function CharMultiPicker({
 										type="button"
 										title={`${name}${charClass ? ` · ${charClass}` : ''}`}
 										className={`relative rounded p-1 transition-colors ${
-											active ? 'sel' : 'border border-transparent hover:bg-night-700'
+											active ? 'key-on border' : 'border border-transparent hover:border-rim hover:bg-black/55'
 										}`}
 										onClick={() =>
 											onChange(
@@ -200,12 +200,12 @@ export function PlayerMultiPicker({
 					}}
 				/>
 				{open && suggestions.length > 0 && (
-					<div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded-lg border border-[var(--rim-strong)] bg-night-950">
+					<div className="absolute left-0 top-full z-30 mt-1 w-full popover overflow-hidden">
 						{suggestions.map((name) => (
 							<button
 								key={name}
 								type="button"
-								className="block w-full px-3 py-1.5 text-left text-sm text-fog-300 transition-colors hover:bg-night-700 hover:text-fog-100"
+								className="block w-full border border-transparent px-3 py-1.5 text-left text-sm text-fog-300 transition-colors hover:border-rim hover:bg-black/55 hover:text-fog-100"
 								onClick={() => add(name)}
 							>
 								{name}
@@ -251,14 +251,14 @@ export function ModeMultiPicker({
 					))}
 					<button
 						type="button"
-						className="rounded border border-dashed border-night-600 px-2 py-0.5 text-xs text-fog-500 transition-colors hover:border-fog-300 hover:text-fog-100"
+						className="well px-2 pb-0.5 pt-1 text-xs text-fog-500 transition-colors hover:text-fog-100"
 						onClick={() => setOpen(!open)}
 					>
 						+ Add mode
 					</button>
 				</div>
 				{open && (
-					<div className="absolute left-0 top-full z-30 mt-2 w-80 rounded-lg border border-[var(--rim-strong)] bg-night-950 p-2">
+					<div className="absolute left-0 top-full z-30 mt-2 w-80 popover p-2">
 						<input
 							autoFocus
 							className="input mb-2 !py-1.5 text-sm"
@@ -274,7 +274,7 @@ export function ModeMultiPicker({
 										key={tagset.id}
 										type="button"
 										className={`block w-full rounded border px-2 py-1.5 text-left text-sm transition-colors ${
-											active ? 'sel text-fog-100' : 'border-transparent text-fog-300 hover:bg-night-700'
+											active ? 'key-on' : 'border-transparent text-fog-300 hover:border-rim hover:bg-black/55 hover:text-fog-100'
 										}`}
 										onClick={() =>
 											onChange(

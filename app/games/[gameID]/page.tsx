@@ -71,7 +71,7 @@ function ContactRow({ user, color, roster }: { user: string; color: string; rost
 					{total} contacts{stars > 0 && <span className="text-star-400"> · {stars} star</span>}
 				</span>
 			</div>
-			<div className="flex h-8 overflow-hidden rounded-full border border-[var(--rim-strong)] bg-black/50">
+			<div className="flex h-8 overflow-hidden rounded-full bg-black/50 [box-shadow:var(--well-shade)]">
 				{parts.map(
 					(part) =>
 						part.value > 0 && (

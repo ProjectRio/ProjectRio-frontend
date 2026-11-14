@@ -89,6 +89,14 @@
 	--card-side: #04140e;
 	--card-cap: rgb(255 255 255 / 0.1);
 	--card-cast: rgb(0 0 0 / 0.26);
+
+	/* Wells: what you type or choose in is let into the surface instead of
+	   standing on it. Dark under the near lip, a line of light on the far one. */
+	--well: rgb(0 0 0 / 0.42);
+	--well-shade: inset 0 3px 0 rgb(0 0 0 / 0.42), 0 1px 0 rgb(255 255 255 / 0.09);
+	/* Keys: neutral things you press, in the wall's grey-green. */
+	--key: #37443e;
+	--key-side: #18201c;
 	--rim: rgb(181 173 165 / 0.3);
 	--rim-strong: rgb(181 173 165 / 0.62);
 }
@@ -346,6 +354,9 @@
 		border-radius: 2px;
 		background: rgb(247 243 232 / 0.82);
 	}
+	/* The line is paint and lies flat. The base is a bag: it has a side and
+	   throws a shadow, straight down the page (the offsets are in the bag's
+	   own turned frame). */
 	.chalk::before {
 		content: '';
 		position: absolute;
@@ -354,14 +365,26 @@
 		width: 11px;
 		height: 11px;
 		background: var(--color-fog-100);
-		transform: translate(-2px, -50%) rotate(45deg);
-		box-shadow: 0 0 0 2px rgb(0 0 0 / 0.35);
+		transform: translate(-2px, -60%) rotate(45deg);
+		box-shadow:
+			1.5px 1.5px 0 #a9a48f,
+			3.5px 3.5px 0 rgb(0 0 0 / 0.4);
 	}
 
-	/* Buttons — capsules, built like the game's gauges: a fill, an outline in
-	   the same hue darkened, a light cap along the top. A press squashes. */
+	/*
+	 * One light, from above. Anything you can press stands up off the page:
+	 * a lit top edge, a side in its own colour darkened, a short hard shadow.
+	 * Under the cursor it rises a little; pressed, the face goes down onto its
+	 * base and the side closes up. Anything you type or choose in is a well,
+	 * let into the surface. Words, numbers and chalk are printed flat.
+	 * Nothing is blurred, blended or outlined at rest.
+	 */
+
+	/* Buttons — capsules with a side. */
 	.btn-primary,
 	.btn-secondary {
+		--edge: 4px;
+		--lift: 0px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -372,19 +395,34 @@
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		line-height: 1.1;
-		padding: 0.6rem 1.4rem;
+		padding: calc(0.6rem + 2px) calc(1.4rem + 2px);
 		border-radius: 999px;
+		transform: translateY(calc(-1 * var(--lift)));
+		box-shadow:
+			inset 0 2px 0 var(--btn-cap),
+			0 calc(var(--edge) + var(--lift)) 0 var(--btn-side),
+			0 calc(var(--edge) + var(--lift) + 3px) 0 var(--card-cast);
 		transition:
 			transform 120ms var(--ease-step),
-			background-color var(--step) var(--ease-step),
-			border-color var(--step) var(--ease-step);
+			box-shadow 120ms var(--ease-step),
+			background-color var(--step) var(--ease-step);
+	}
+	.btn-primary:hover,
+	.btn-secondary:hover,
+	.btn-primary:focus-visible,
+	.btn-secondary:focus-visible {
+		--lift: 1px;
+	}
+	.btn-primary:active,
+	.btn-secondary:active {
+		--lift: calc(-1 * var(--edge));
 	}
 
 	.btn-primary {
+		--btn-cap: rgb(255 255 255 / 0.3);
+		--btn-side: var(--color-rio-700);
 		color: #fff;
 		background-color: var(--color-rio-500);
-		border: 2px solid var(--color-rio-700);
-		box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3);
 		text-shadow: 0 1px 0 var(--color-rio-700);
 	}
 	.btn-primary:hover {
@@ -392,18 +430,13 @@
 	}
 
 	.btn-secondary {
+		--btn-cap: rgb(255 255 255 / 0.14);
+		--btn-side: var(--key-side);
 		color: var(--color-fog-100);
-		background-color: rgb(0 0 0 / 0.573);
-		border: 2px solid var(--rim-strong);
-		box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.08);
+		background-color: var(--key);
 	}
 	.btn-secondary:hover {
-		border-color: var(--color-fog-100);
-	}
-
-	.btn-primary:active,
-	.btn-secondary:active {
-		transform: scale(1.04, 0.9);
+		background-color: #425049;
 	}
 
 	/* Data tables */
@@ -511,19 +544,28 @@
 		text-shadow: 0 2px 0 rgb(0 0 0 / 0.5);
 	}
 
-	/* Segmented control — a row of options with the selection bar on one. */
+	/* Well — a window let into whatever it sits in: the scores in the header
+	   wall, an input, the track of a switch. */
+	.well {
+		background-color: var(--well);
+		border: 1px solid transparent;
+		border-radius: 6px;
+		box-shadow: var(--well-shade);
+	}
+
+	/* Segmented control — a switch: a sunk track, with the chosen option
+	   standing in it as a key. */
 	.seg {
 		display: inline-flex;
 		gap: 2px;
-		padding: 2px;
+		padding: 5px 3px 3px;
 		border-radius: 8px;
-		background: rgb(0 0 0 / 0.45);
-		border: 1px solid var(--rim);
+		background: var(--well);
+		box-shadow: var(--well-shade);
 	}
 	.seg > * {
-		padding: 0.35rem 0.85rem;
-		border: 1px solid transparent;
-		border-radius: 6px;
+		padding: 0.3rem 0.85rem;
+		border-radius: 5px;
 		font-family: var(--font-display);
 		font-size: 0.95rem;
 		font-weight: 600;
@@ -539,12 +581,14 @@
 	.seg > [aria-selected='true'],
 	.seg > [aria-current='true'] {
 		color: var(--color-fog-100);
-		background-color: rgb(0 0 0 / 0.573);
-		border-color: var(--color-rim);
-		box-shadow: inset 0 0 0 1px rgb(136 119 119 / 0.86);
+		background-color: var(--key);
+		box-shadow:
+			inset 0 1.5px 0 rgb(255 255 255 / 0.16),
+			0 2px 0 var(--key-side);
 	}
 
-	/* Tabs — sections of one page, standing on a foul line. */
+	/* Tabs — sections of one page, standing on a foul line. The open one is
+	   a card tab in chalk white, lit along its top. */
 	.tab-strip {
 		display: flex;
 		gap: 0.25rem;
@@ -572,6 +616,80 @@
 	.tab-strip > [aria-current='page'] {
 		color: #14140c;
 		background: rgb(247 243 232 / 0.92);
+		box-shadow: inset 0 2px 0 #fff;
+	}
+
+	/* Key — a small neutral thing you press: an action beside a chart, a chip
+	   you can remove. The same build as a button, a size down. */
+	.key {
+		border-color: transparent;
+		border-radius: 5px;
+		color: var(--color-fog-100);
+		background-color: var(--key);
+		box-shadow:
+			inset 0 1.5px 0 rgb(255 255 255 / 0.16),
+			0 2px 0 var(--key-side);
+		transition:
+			transform 120ms var(--ease-step),
+			box-shadow 120ms var(--ease-step),
+			background-color 120ms linear;
+	}
+	:is(button, a).key:hover {
+		background-color: #425049;
+	}
+	:is(button, a).key:active {
+		transform: translateY(2px);
+		box-shadow: inset 0 1.5px 0 rgb(255 255 255 / 0.16);
+	}
+	/* A choice that is not in a switch's track. Chosen, it stands up as a key;
+	   not chosen, it is an empty socket waiting for one. */
+	.key-on {
+		border-color: transparent;
+		color: var(--color-fog-100);
+		background-color: var(--key);
+		box-shadow:
+			inset 0 1.5px 0 rgb(255 255 255 / 0.16),
+			0 2px 0 var(--key-side);
+	}
+	.key-off {
+		border-color: transparent;
+		color: var(--color-fog-300);
+		background-color: var(--well);
+		box-shadow: var(--well-shade);
+	}
+	.key-off:hover {
+		color: var(--color-fog-100);
+	}
+
+	/* Popover — a menu or a tooltip. It floats above the cards, so it is the
+	   same slab, solid, with a longer shadow under it. */
+	.popover {
+		border-radius: 8px;
+		background-color: #0b2219;
+		box-shadow:
+			inset 0 2px 0 var(--card-cap),
+			0 4px 0 var(--card-side),
+			0 12px 0 rgb(0 0 0 / 0.3);
+	}
+
+	/* Plate — a small enamel label: a status, a tier, a mode. Filled, lit on
+	   top, with a thin dark foot. Set --plate to its colour. */
+	.plate {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		border-radius: 4px;
+		padding: 0.15rem 0.5rem 0.1rem;
+		font-family: var(--font-display);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		line-height: 1.25;
+		text-transform: uppercase;
+		background-color: var(--plate, var(--key));
+		box-shadow:
+			inset 0 1.5px 0 rgb(255 255 255 / 0.16),
+			0 2px 0 rgb(0 0 0 / 0.42);
 	}
 
 	/* Charts — shared furniture for hand-drawn SVG. Series colours come from
@@ -774,7 +892,9 @@
 		outline: none;
 		color: #14140c;
 		background: var(--color-fog-100);
-		/* A swallowtail: felt, cut to two points at the fly. */
+		/* Felt, with the fold of its hem showing along the foot. */
+		box-shadow: inset 0 -0.22em 0 rgb(0 0 0 / 0.13);
+		/* A swallowtail: cut to two points at the fly. */
 		clip-path: polygon(0 0, 100% 0, calc(100% - 0.8em) 50%, 100% 100%, 0 100%);
 		animation: flag-up 300ms cubic-bezier(0.3, 1.3, 0.45, 1) calc(var(--wait) + 150ms) both;
 	}
@@ -823,12 +943,14 @@
 	}
 
 	/* Form inputs */
+	/* A well. Typing in it puts the selection bar's rim on it. */
 	.input {
 		width: 100%;
-		background-color: rgb(0 0 0 / 0.45);
-		border: 1px solid var(--rim-strong);
+		background-color: var(--well);
+		border: 1px solid transparent;
 		border-radius: 6px;
-		padding: 0.6rem 0.85rem;
+		box-shadow: var(--well-shade);
+		padding: calc(0.6rem + 2px) 0.85rem calc(0.6rem - 1px);
 		color: var(--color-fog-100);
 		font-size: 0.95rem;
 		outline: none;
@@ -836,8 +958,10 @@
 	}
 
 	.input:focus {
-		border-color: var(--color-fog-100);
-		box-shadow: inset 0 0 0 1px rgb(136 119 119 / 0.86);
+		border-color: var(--color-rim);
+		box-shadow:
+			inset 0 3px 0 rgb(0 0 0 / 0.42),
+			inset 0 0 0 1px rgb(136 119 119 / 0.86);
 	}
 
 	.input::placeholder {
@@ -981,11 +1105,8 @@
 		background-position: -1104px 0;
 	}
 
-	.btn-primary:active,
-	.btn-secondary:active {
-		transform: none;
-	}
-
+	.btn-primary,
+	.btn-secondary,
 	.panel-glow {
 		transform: none;
 		transition: none;

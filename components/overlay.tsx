@@ -68,7 +68,7 @@ export function Tabs({
 					aria-selected={active === tab.id}
 					className={`rounded-md border px-4 py-2 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
 						active === tab.id
-							? 'sel text-fog-100'
+							? 'key-on'
 							: 'border-transparent text-fog-300 hover:text-fog-100'
 					}`}
 					onClick={() => onChange(tab.id)}
