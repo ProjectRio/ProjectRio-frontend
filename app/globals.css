@@ -1113,6 +1113,13 @@
 	}
 }
 
+/* A control that cannot be pressed right now: faded, and it does not rise or go down. */
+:is(.btn-primary, .btn-secondary, .key):disabled,
+:is(.btn-primary, .btn-secondary, .key)[aria-disabled='true'] {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
 /* Draft room focus mode: chrome-free for streams and OBS scenes. */
 html[data-focus] body > *:not(main) {
 	display: none;

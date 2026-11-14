@@ -60,19 +60,9 @@ export function Tabs({
 	onChange: (id: string) => void;
 }) {
 	return (
-		<div className="mb-6 flex flex-wrap gap-1 border-b border-night-700 pb-2" role="tablist">
+		<div className="tab-strip mb-6" role="tablist">
 			{tabs.map((tab) => (
-				<button
-					key={tab.id}
-					role="tab"
-					aria-selected={active === tab.id}
-					className={`rounded-md border px-4 py-2 font-display text-sm font-semibold uppercase tracking-wider transition-colors ${
-						active === tab.id
-							? 'key-on'
-							: 'border-transparent text-fog-300 hover:text-fog-100'
-					}`}
-					onClick={() => onChange(tab.id)}
-				>
+				<button key={tab.id} role="tab" aria-selected={active === tab.id} onClick={() => onChange(tab.id)}>
 					{tab.label}
 				</button>
 			))}
