@@ -1,4 +1,4 @@
-import TabSection from '@/components/running/TabSection';
+import TabSection, { SectionTable } from '@/components/running/TabSection';
 import TopSpeedChart from '@/components/running/TopSpeedChart';
 import { characters } from '@/lib/data/characters';
 import { batterPosition, simulateHomeToFirst, speedConstants } from '@/lib/mssb/RunningSimulation/runningModel';
@@ -33,14 +33,14 @@ function charactersWithSpeed(speed: number) {
 /** Top speed and acceleration for every speed stat the game accepts, converted from per-frame units at 60 fps. */
 function SpeedTable() {
 	return (
-		<div className="overflow-x-auto rounded-lg border border-night-700">
+		<SectionTable>
 			<table className="stat-table">
 				<thead>
 					<tr>
-						<th>Speed stat</th>
-						<th>Top speed (m/s)</th>
-						<th>Acceleration (m/s²)</th>
-						<th>Time to top speed</th>
+						<th className="num">Speed stat</th>
+						<th className="num">Top speed (m/s)</th>
+						<th className="num">Acceleration (m/s²)</th>
+						<th className="num">Time to top speed</th>
 						<th>Characters</th>
 					</tr>
 				</thead>
@@ -49,13 +49,13 @@ function SpeedTable() {
 						const k = speedConstants(speed);
 						return (
 							<tr key={speed}>
-								<td className="font-mono tabular-nums">{speed}</td>
-								<td className="font-mono tabular-nums">{(k.maxV * FPS).toFixed(2)}</td>
-								<td className="font-mono tabular-nums">{(k.accel * FPS * FPS).toFixed(1)}</td>
-								<td className="font-mono tabular-nums">
+								<td className="num">{speed}</td>
+								<td className="num">{(k.maxV * FPS).toFixed(2)}</td>
+								<td className="num">{(k.accel * FPS * FPS).toFixed(1)}</td>
+								<td className="num">
 									{framesToTopSpeed(speed)} frames <span className="text-fog-500">({(framesToTopSpeed(speed) / FPS).toFixed(2)} s)</span>
 								</td>
-								<td className="whitespace-normal">
+								<td className="min-w-[16rem] whitespace-normal">
 									{charactersWithSpeed(speed)}
 									{charactersWithSpeed(speed) && ROW_NOTES[speed] ? ' · ' : ''}
 									{ROW_NOTES[speed] && <span className="text-fog-500">{ROW_NOTES[speed]}</span>}
@@ -65,7 +65,7 @@ function SpeedTable() {
 					})}
 				</tbody>
 			</table>
-		</div>
+		</SectionTable>
 	);
 }
 

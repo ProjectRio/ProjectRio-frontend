@@ -76,7 +76,7 @@ function Toggle<T extends string>({
 		<div
 			role="group"
 			aria-label={label}
-			className={`flex divide-x divide-night-600 overflow-hidden rounded-lg border border-night-600 ${disabled ? 'opacity-40' : ''}`}
+			className={`seg flex w-full ${disabled ? 'opacity-40' : ''}`}
 		>
 			{options.map((o) => (
 				<button
@@ -85,9 +85,7 @@ function Toggle<T extends string>({
 					disabled={disabled}
 					aria-pressed={value === o.value}
 					onClick={() => onChange(o.value)}
-					className={`flex-1 px-3 py-2 text-sm transition-colors ${
-						value === o.value ? 'bg-night-700 font-semibold text-fog-100' : 'text-fog-500 hover:text-fog-300'
-					}`}
+					className="min-w-0 flex-1 !px-2 py-1.5 !text-[0.8rem] leading-tight disabled:cursor-not-allowed"
 				>
 					{o.label}
 				</button>
@@ -192,7 +190,7 @@ function VelocityChart({ runs, selected, compare }: { runs: Record<MashMode, Run
 			</svg>
 			{hover && (
 				<div
-					className="pointer-events-none absolute z-10 whitespace-nowrap rounded-md border border-night-600 bg-night-850 px-3 py-2 text-xs shadow-xl"
+					className="pointer-events-none absolute z-10 whitespace-nowrap popover px-3 py-2 text-xs"
 					style={{ left: hover.left + 14, top: hover.top, transform: hover.left > 360 ? 'translate(calc(-100% - 28px), -50%)' : 'translateY(-50%)' }}
 				>
 					<div className="mb-1 font-semibold text-fog-100">Frame {hover.f}</div>
@@ -235,7 +233,7 @@ function VelocityChart({ runs, selected, compare }: { runs: Record<MashMode, Run
 const f2 = (n: number) => n.toFixed(2);
 
 function Code({ children }: { children: React.ReactNode }) {
-	return <code className="rounded bg-night-800 px-1 py-0.5 font-mono text-[0.85em] text-fog-100">{children}</code>;
+	return <code className="rounded bg-[var(--well)] px-1 py-0.5 font-mono text-[0.85em] text-fog-100">{children}</code>;
 }
 
 function WorkedExample({
@@ -350,11 +348,11 @@ function WorkedExample({
 			: `With no rounding the runner stops on 1B, and slides into 2B, 3B and home, then waits ${SLIDE_RECOVERY_FRAMES} frames. After each stop they are placed 3% along the next baseline and accelerate again from zero.`;
 
 	return (
-		<details className="rounded-lg border border-night-700 bg-night-850 lg:col-span-2">
-			<summary className="cursor-pointer px-4 py-3 font-display text-sm font-bold uppercase tracking-widest text-fog-300">
+		<details className="border-t border-[var(--rim)] pt-4 lg:col-span-2">
+			<summary className="cursor-pointer font-display text-lg text-fog-100 marker:text-star-400">
 				Worked example: how this result is calculated
 			</summary>
-			<div className="space-y-3 border-t border-night-700 p-4 text-sm leading-relaxed text-fog-300">
+			<div className="mt-3 space-y-3 text-sm leading-relaxed text-fog-300 [&>p]:max-w-[75ch]">
 				<p>
 					<b className="text-fog-100">Start ({route}).</b> {startText}
 				</p>
@@ -377,12 +375,14 @@ function WorkedExample({
 					of the baseline. The runner is on {BASE_NAMES[endBase]} on <b className="text-fog-100">frame {run.frame}</b> (
 					{framesToSeconds(run.frame)} s).
 				</p>
-				<div className="overflow-x-auto rounded-md border border-night-700">
+				<div className="-mx-5 overflow-x-auto">
 					<table className="stat-table">
 						<thead>
 							<tr>
-								{['Frame', 'Stamina', 'Cap (m/frame)', 'mashPercent', 'v (m/frame)', 'Bases run', 'Rounding', 'What happens'].map((h) => (
-									<th key={h}>{h}</th>
+								{['Frame', 'Stamina', 'Cap (m/frame)', 'mashPercent', 'v (m/frame)', 'Bases run', 'Rounding', 'What happens'].map((h, j) => (
+									<th key={h} className={j < 7 ? 'num' : undefined}>
+										{h}
+									</th>
 								))}
 							</tr>
 						</thead>
@@ -390,15 +390,15 @@ function WorkedExample({
 							{rows.map(({ t, i }, k) => {
 								const gap = k > 0 && rows[k - 1].t.f !== t.f - 1;
 								return (
-									<tr key={t.f} className={t.f === run.frame ? 'bg-night-800' : gap ? 'border-t-2 border-night-600' : undefined}>
-										<td className="font-mono tabular-nums">{t.f}</td>
-										<td className="font-mono tabular-nums">{t.stamina}</td>
-										<td className="font-mono tabular-nums">{t.cap ? t.cap.toFixed(4) : '–'}</td>
-										<td className="font-mono tabular-nums">{t.mash.toFixed(2)}</td>
-										<td className="font-mono tabular-nums">{t.v.toFixed(4)}</td>
-										<td className="font-mono tabular-nums">{t.fbr.toFixed(4)}</td>
-										<td className="font-mono tabular-nums">{Math.round(t.strength * 100)}%</td>
-										<td className="whitespace-normal">{note(i)}</td>
+									<tr key={t.f} className={`${t.f === run.frame ? 'font-semibold [&>td]:text-star-400' : ''} ${gap ? '[&>td]:border-t-2 [&>td]:border-t-[var(--rim-strong)]' : ''}`}>
+										<td className="num">{t.f}</td>
+										<td className="num">{t.stamina}</td>
+										<td className="num">{t.cap ? t.cap.toFixed(4) : '–'}</td>
+										<td className="num">{t.mash.toFixed(2)}</td>
+										<td className="num">{t.v.toFixed(4)}</td>
+										<td className="num">{t.fbr.toFixed(4)}</td>
+										<td className="num">{Math.round(t.strength * 100)}%</td>
+										<td className="min-w-[16rem] whitespace-normal">{note(i)}</td>
 									</tr>
 								);
 							})}
@@ -514,13 +514,13 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 						step={1}
 						value={speed}
 						onChange={(e) => setSpeed(Number(e.target.value))}
-						className="w-full accent-rio-500"
+						className="w-full accent-star-400"
 					/>
-					<div className="mt-1 flex flex-wrap gap-2 text-xs">
-						<button type="button" className="text-fog-500 underline-offset-2 hover:text-fog-100 hover:underline" onClick={() => setSpeed(baseSpeed)}>
+					<div className="mt-2 flex flex-wrap gap-2 text-xs">
+						<button type="button" className="key px-2 py-0.5" onClick={() => setSpeed(baseSpeed)}>
 							Base ({baseSpeed})
 						</button>
-						<button type="button" className="text-fog-500 underline-offset-2 hover:text-fog-100 hover:underline" onClick={() => setSpeed(baseSpeed + 50)}>
+						<button type="button" className="key px-2 py-0.5" onClick={() => setSpeed(baseSpeed + 50)}>
 							Starred ({baseSpeed + 50})
 						</button>
 					</div>
@@ -693,14 +693,14 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 			</div>
 
 			<div className="min-w-0 space-y-4">
-				<div className="rounded-lg border border-night-700 bg-night-850 p-4">
-					<p className="text-xs uppercase tracking-widest text-fog-500">
-						Safe at {BASE_NAMES[endBase]} on frame
-					</p>
-					<p className="font-display text-4xl font-bold tabular-nums">
-						{run.frame} <span className="text-lg font-medium text-fog-300">({framesToSeconds(run.frame)} s)</span>
-					</p>
-					<dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+				<div>
+					<div className="readout">
+						<p>Safe at {BASE_NAMES[endBase]} on frame</p>
+						<p className="!text-[2.5rem]">
+							{run.frame} <span className="font-body text-lg font-medium text-fog-300">({framesToSeconds(run.frame)} s)</span>
+						</p>
+					</div>
+					<dl className="mt-4 grid max-w-xl grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 						<dt className="text-fog-500">Start</dt>
 						<dd className="text-right font-mono tabular-nums">
 							({run.start[0].toFixed(2)}, {run.start[1].toFixed(2)}) m
@@ -759,7 +759,7 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 				</div>
 				{firstBaseOnly && (
 					<div className="space-y-2">
-						<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">Race to 1B</h3>
+						<h3 className="text-lg text-fog-100">Race to 1B</h3>
 						<RaceChart
 							racers={[
 								{ run, label: `${characters[String(charId)]} (${speed})${boxSuffix(side)}`, color: selColor },
@@ -775,7 +775,7 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 				)}
 				{firstBaseOnly && (
 					<div className="space-y-2">
-						<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">
+						<h3 className="text-lg text-fog-100">
 							Frames to 1B across {characters[String(charId)]}&apos;s range
 						</h3>
 						<StartHeatMap
@@ -796,11 +796,9 @@ export default function RunningCalculator({ firstBaseOnly = false }: { firstBase
 
 			{!firstBaseOnly && (
 				<div className="space-y-2 lg:col-span-2">
-					<h3 className="font-display text-sm font-bold uppercase tracking-widest text-fog-300">The runner&apos;s path</h3>
-					<div className="rounded-lg border border-night-700 bg-night-850 p-3">
-						<RunPathChart run={run} color={selColor} charId={charId} side={side} startBase={startBase} />
-					</div>
-					<p className="text-xs text-fog-500">
+					<h3 className="text-lg text-fog-100">The runner&apos;s path</h3>
+					<RunPathChart run={run} color={selColor} charId={charId} side={side} startBase={startBase} />
+					<p className="max-w-[75ch] text-xs leading-relaxed text-fog-500">
 						Top-down, from behind home plate. The thick line is the simulated path for the selected mashing mode. Numbered circles mark each
 						second since contact, and the time under each base is when the runner reaches it. Callouts show the lead, where rounding starts,
 						any slide, and the overrun past the final base when the runner stops there: past 1B, or past 2B or 3B after rounding.

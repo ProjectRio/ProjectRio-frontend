@@ -1,14 +1,21 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
-export type TabDef = { id: string; label: string; content: ReactNode };
+/**
+ * A draft tab is only shown in development, marked "Draft", so it can be written locally without
+ * appearing on the live site. To publish a tab, remove its `draft` flag.
+ */
+export type TabDef = { id: string; label: string; content: ReactNode; draft?: boolean };
+
+const SHOW_DRAFTS = process.env.NODE_ENV !== 'production';
 
 /**
  * Simple tab strip. The active tab is mirrored to the URL hash (#basics) so tabs can be linked to.
  * All panels are rendered and inactive ones hidden, so server-rendered content and component state survive switching.
  */
-export default function Tabs({ tabs }: { tabs: TabDef[] }) {
+export default function Tabs({ tabs: allTabs }: { tabs: TabDef[] }) {
+	const tabs = useMemo(() => allTabs.filter((t) => SHOW_DRAFTS || !t.draft), [allTabs]);
 	const [active, setActive] = useState(tabs[0]?.id);
 
 	useEffect(() => {
@@ -28,7 +35,7 @@ export default function Tabs({ tabs }: { tabs: TabDef[] }) {
 
 	return (
 		<div className="space-y-8">
-			<div role="tablist" className="flex flex-wrap gap-x-1 border-b border-night-700">
+			<div role="tablist" className="tab-strip">
 				{tabs.map((t) => (
 					<button
 						key={t.id}
@@ -38,11 +45,10 @@ export default function Tabs({ tabs }: { tabs: TabDef[] }) {
 						aria-selected={active === t.id}
 						aria-controls={`panel-${t.id}`}
 						onClick={() => select(t.id)}
-						className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-2 font-display text-sm font-bold uppercase tracking-widest transition-colors ${
-							active === t.id ? 'border-star-400 text-fog-100' : 'border-transparent text-fog-500 hover:text-fog-300'
-						}`}
+						className="inline-flex items-center gap-2 whitespace-nowrap"
 					>
 						{t.label}
+						{t.draft && <span className="plate text-fog-100">Draft</span>}
 					</button>
 				))}
 			</div>

@@ -144,7 +144,7 @@ export default function BoxPicker({
 		<div className="space-y-1.5">
 			<svg
 				viewBox={`0 0 ${W} ${H}`}
-				className="block h-auto w-full cursor-crosshair touch-none select-none rounded-md border border-night-700 bg-night-850"
+				className="block h-auto w-full cursor-crosshair touch-none select-none well"
 				role="group"
 				aria-label="Drag a point to set where that runner starts in the batter's box"
 				onPointerDown={onPointerDown}

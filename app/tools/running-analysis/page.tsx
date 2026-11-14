@@ -59,46 +59,79 @@ const sideAbbr = (s: BoxSide) => (s === 'R' ? 'RHB' : 'LHB');
 const charName = (id: number) => characters[String(id)];
 
 function C({ children }: { children: ReactNode }) {
-	return <code className="rounded bg-night-800 px-1 py-0.5 font-mono text-[0.85em] text-fog-100">{children}</code>;
+	return <code className="rounded bg-[var(--well)] px-1 py-0.5 font-mono text-[0.85em] text-fog-100">{children}</code>;
 }
 
 function Pre({ children }: { children: string }) {
+	return <pre className="well my-4 max-w-4xl overflow-x-auto p-4 font-mono text-xs leading-relaxed text-fog-300">{children}</pre>;
+}
+
+/** Prose held to a reading measure; code blocks inside it may run wider. */
+const PROSE = 'space-y-3 text-[15px] leading-relaxed text-fog-300 [&>:is(p,ul,ol,h3)]:max-w-[70ch]';
+
+/** A section of the long-form analysis. `num` is "1 · Timeline" (a step in the sequence) or a plain name. */
+const splitNum = (num: string) => {
+	const m = num.match(/^(\d+) · (.+)$/);
+	return m ? { step: m[1], name: m[2] } : { step: null, name: num };
+};
+
+/** A section heading: the step number hangs in the margin in gold, the section's short name sits above its title. */
+function SectionHead({ num, title }: { num?: string; title: string }) {
+	const { step, name } = splitNum(num ?? '');
 	return (
-		<pre className="my-3 overflow-x-auto rounded-lg border border-night-700 bg-night-850 p-4 font-mono text-xs leading-relaxed text-fog-300">
-			{children}
-		</pre>
+		<header className="flex items-start gap-4">
+			<span className="w-8 shrink-0 pt-1 text-right font-mono text-3xl font-semibold leading-none text-star-400 tabular-nums">{step}</span>
+			<div>
+				{name && <p className="font-display text-sm font-semibold text-fog-500">{name}</p>}
+				<h2 className="mt-1 text-2xl sm:text-3xl">{title}</h2>
+			</div>
+		</header>
 	);
 }
 
 function Section({ num, title, refs, children }: { num: string; title: string; refs: string; children: ReactNode }) {
 	return (
-		<section className="space-y-3">
-			<div>
-				<p className="kicker">{num}</p>
-				<h2 className="mt-1 text-2xl uppercase">{title}</h2>
+		<section className="space-y-4">
+			<SectionHead num={num} title={title} />
+			<div className="space-y-4 sm:pl-12">
+				<div className={PROSE}>{children}</div>
+				<p className="max-w-[70ch] break-words font-mono text-xs leading-relaxed text-fog-500">{refs}</p>
 			</div>
-			<div className="max-w-3xl space-y-3 text-sm leading-relaxed text-fog-300">{children}</div>
-			<p className="font-mono text-xs text-fog-500">{refs}</p>
 		</section>
 	);
 }
 
-function Table({ head, rows, highlight }: { head: ReactNode[]; rows: ReactNode[][]; highlight?: (i: number) => boolean }) {
+/** A stat table set straight into its panel. Columns listed in `text` (the first, by default) are words; the rest are numbers. */
+function Table({
+	head,
+	rows,
+	highlight,
+	text = [0]
+}: {
+	head: ReactNode[];
+	rows: ReactNode[][];
+	highlight?: (i: number) => boolean;
+	text?: number[];
+}) {
+	// A negative index counts from the end: -1 is the last column.
+	const cls = (j: number) => (text.includes(j) || text.includes(j - head.length) ? undefined : 'num');
 	return (
 		<div className="overflow-x-auto">
 			<table className="stat-table">
 				<thead>
 					<tr>
-						{head.map((h, i) => (
-							<th key={i}>{h}</th>
+						{head.map((h, j) => (
+							<th key={j} className={cls(j)}>
+								{h}
+							</th>
 						))}
 					</tr>
 				</thead>
 				<tbody>
 					{rows.map((r, i) => (
-						<tr key={i} className={highlight?.(i) ? 'bg-night-800' : undefined}>
+						<tr key={i} className={highlight?.(i) ? 'bg-black/25 [&>td:first-child]:text-star-400' : undefined}>
 							{r.map((cell, j) => (
-								<td key={j} className={j === 0 ? '' : 'font-mono tabular-nums'}>
+								<td key={j} className={cls(j)}>
 									{cell}
 								</td>
 							))}
@@ -234,7 +267,7 @@ export default function RunningAnalysisPage() {
 	const analysis = (
 		<div className="space-y-12">
 			<div>
-				<p className="max-w-3xl text-fog-300">
+				<p className="max-w-[68ch] text-lg leading-relaxed text-fog-300">
 					How many frames a runner needs to reach each base after contact, from the batter&apos;s box or from a base. The figures come
 					from a frame-by-frame model that copies the game&apos;s runner update in single-precision floats. Every rule is traced to the
 					mssb-dtk decompilation, and the model runs live in the calculator below. The runner always goes forward and is sent to the next
@@ -244,10 +277,10 @@ export default function RunningAnalysisPage() {
 
 			<Panel>
 				<PanelHeader title="Summary" />
-				<div className="grid gap-8 p-5 lg:grid-cols-2">
+				<div className="grid gap-x-10 gap-y-8 p-5 sm:p-6 lg:grid-cols-2">
 					<div className="space-y-3">
-						<h2 className="text-lg uppercase text-fog-100">Advice for players</h2>
-						<ul className="space-y-2.5 text-sm leading-relaxed text-fog-300">
+						<h2 className="text-2xl text-fog-100">Advice for players</h2>
+						<ul className="max-w-[68ch] space-y-3 text-[15px] leading-relaxed text-fog-300">
 							<li>
 								<b className="text-fog-100">Left-handed batters get to 1B sooner.</b> The left-handed box is about 3 m closer, worth{' '}
 								{leftyGain} frames from the middle of each character&apos;s range at their own speed.
@@ -288,8 +321,8 @@ export default function RunningAnalysisPage() {
 						</ul>
 					</div>
 					<div className="space-y-3">
-						<h2 className="text-lg uppercase text-fog-100">How running works</h2>
-						<ul className="space-y-2.5 text-sm leading-relaxed text-fog-300">
+						<h2 className="text-2xl text-fog-100">How running works</h2>
+						<ul className="max-w-[68ch] space-y-3 text-[15px] leading-relaxed text-fog-300">
 							<li>
 								<b className="text-fog-100">Every batter waits 30 frames before moving.</b> It takes half a second after contact before moving,
 								no matter their speed or the type of hit.
@@ -335,12 +368,15 @@ export default function RunningAnalysisPage() {
 
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{tiles.map((t) => (
-					<Panel key={t.label} className="p-5">
-						<p className="text-xs text-fog-500">{t.label}</p>
-						<p className="mt-1 font-display text-3xl font-bold tabular-nums">
-							{t.value} <span className="text-base font-medium text-fog-300">{t.unit}</span>
-						</p>
-						<p className="mt-1 text-xs text-fog-300">{t.sub}</p>
+					<Panel key={t.label} className="flex flex-col p-5">
+						<div className="readout">
+							{/* These labels are whole phrases, so they are set as text, not as the readout's small caps. */}
+							<p className="!font-body !text-sm !font-medium !normal-case !tracking-normal leading-snug">{t.label}</p>
+							<p className="mt-1">
+								{t.value} <span className="font-body text-base font-medium text-fog-300">{t.unit}</span>
+							</p>
+						</div>
+						<p className="mt-3 text-xs leading-relaxed text-fog-300">{t.sub}</p>
 					</Panel>
 				))}
 			</div>
@@ -353,7 +389,7 @@ export default function RunningAnalysisPage() {
 			<Panel>
 				<PanelHeader title="Frames to 1st by speed stat" />
 				<div className="space-y-3 p-5">
-					<p className="text-sm text-fog-300">
+					<p className="max-w-[70ch] text-sm leading-relaxed text-fog-300">
 						Four starting spots. Solid lines are TAS mashing, dashed lines are no mashing. The extremes are the closest and farthest spots
 						any character&apos;s hitbox allows. The middle-of-range lines use Mario&apos;s range.
 					</p>
@@ -461,9 +497,10 @@ start of each at-bat: boxPosition = initialBoxPosition = (0, ·, 0.4), clamped`}
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Panel>
 					<PanelHeader title="Mario's box, worked" />
-					<p className="px-4 pt-3 font-mono text-xs text-fog-500">Near −0.65 · Far 0.55 · Front −0.2 · Back 1.5 · offX −2.1 · offZ −1.0</p>
+					<p className="px-4 pb-2 pt-3 font-mono text-xs text-fog-500">Near −0.65 · Far 0.55 · Front −0.2 · Back 1.5 · offX −2.1 · offZ −1.0</p>
 					<Table
 						head={['Spot', 'Handedness', 'batterPos (x, z) m', 'Distance to 1B (m)']}
+						text={[0, 1]}
 						rows={SPOT_ORDER.flatMap((sp) =>
 							SIDES.map((sd) => {
 								const p = batterPosition(0, sd, sp);
@@ -476,6 +513,7 @@ start of each at-bat: boxPosition = initialBoxPosition = (0, ·, 0.4), clamped`}
 					<PanelHeader title="Across all 54 characters" />
 					<Table
 						head={['Spot', 'Handedness', 'Shortest distance (m)', 'Longest distance (m)']}
+						text={[0, 1]}
 						rows={SPOT_ORDER.flatMap((sp) =>
 							SIDES.map((sd) => {
 								const r = range(sd, sp);
@@ -483,16 +521,16 @@ start of each at-bat: boxPosition = initialBoxPosition = (0, ·, 0.4), clamped`}
 									SPOT_NAMES[sp],
 									sideName(sd),
 									<>
-										{r.lo.L.toFixed(2)} <span className="font-sans text-fog-500">{charName(r.lo.id)}</span>
+										{r.lo.L.toFixed(2)} <span className="font-body text-fog-500">{charName(r.lo.id)}</span>
 									</>,
 									<>
-										{r.hi.L.toFixed(2)} <span className="font-sans text-fog-500">{charName(r.hi.id)}</span>
+										{r.hi.L.toFixed(2)} <span className="font-body text-fog-500">{charName(r.hi.id)}</span>
 									</>
 								];
 							})
 						)}
 					/>
-					<p className="border-t border-night-700 px-4 py-3 text-xs text-fog-300">
+					<p className="border-t border-[var(--rim)] px-4 py-3 text-xs leading-relaxed text-fog-300">
 						A left-handed batter stands about 3 m closer to 1st than a right-handed one, which is roughly 11% of the distance. That&apos;s
 						the biggest single factor in the starting position.
 					</p>
@@ -553,7 +591,7 @@ mashHoldFrames        = runnerTimingConsts.mashHoldFrames                     //
 			<Panel>
 				<PanelHeader title="Acceleration from a standing start" />
 				<div className="space-y-3 p-5">
-					<p className="max-w-3xl text-sm leading-relaxed text-fog-300">
+					<p className="max-w-[70ch] text-sm leading-relaxed text-fog-300">
 						Lower speed stats accelerate harder, so slow runners get away quicker. Here a speed-{fastestBase} runner falls up to{' '}
 						{accelBehind[2].toFixed(2)} m behind a speed-{slowest} runner and only draws level on frame {accelLevel[2]}, about{' '}
 						{(accelLevel[2] / 60).toFixed(1)} s after starting to move; starred Yoshi (speed {yoshiSpeed}) draws level on frame{' '}
@@ -615,7 +653,7 @@ if (maxedOut) {
 						the first frame at top speed.
 					</li>
 				</ol>
-				<h3 className="pt-2 text-lg uppercase text-fog-100">Stamina</h3>
+				<h3 className="pt-3 text-xl text-fog-100">Stamina</h3>
 				<p>
 					At the start of every frame, <C>running_updateStamina</C> drains 1 point from 4000 if the previous frame&apos;s velocity was
 					at least 0.1. Then <C>staminaMult = 1 − 0.3·(1 − stamina/4000)</C> and <C>accelerationStaminaEffect = 1 − 0.5·(…)</C>. The
@@ -713,12 +751,11 @@ L         = |position − currentBase| + |nextBase − position|                
 				</p>
 			</Section>
 
-			<section className="space-y-3">
-				<div>
-					<p className="kicker">8 · Full results</p>
-					<h2 className="mt-1 text-2xl uppercase">Batter to 1B by speed stat</h2>
-					<p className="mt-2 max-w-3xl text-sm text-fog-300">Each cell is TAS / human viable / no mashing, with the TAS time in seconds.</p>
-				</div>
+			<section className="space-y-4">
+				<SectionHead num="8 · Full results" title="Batter to 1B by speed stat" />
+				<p className="max-w-[70ch] text-[15px] leading-relaxed text-fog-300 sm:pl-12">
+					Each cell is TAS / human viable / no mashing, with the TAS time in seconds.
+				</p>
 				<Panel>
 					<Table
 						head={[
@@ -727,11 +764,12 @@ L         = |position − currentBase| + |nextBase − position|                
 								<span key={s.key}>
 									{s.label.replace(' (Mario)', '')}
 									<br />
-									<span className="font-sans normal-case tracking-normal text-fog-500">{s.L.toFixed(2)} m to 1B</span>
+									<span className="font-body normal-case tracking-normal text-fog-500">{s.L.toFixed(2)} m to 1B</span>
 								</span>
 							)),
 							'Notes'
 						]}
+						text={[0, -1]}
 						highlight={(i) => speedNotes[SPEEDS[i]] !== undefined}
 						rows={SPEEDS.map((sp, i) => [
 							sp,
@@ -740,7 +778,7 @@ L         = |position − currentBase| + |nextBase − position|                
 									{s.tas[i]} / {s.human[i]} / {s.none[i]} <span className="text-fog-500">({framesToSeconds(s.tas[i])} s)</span>
 								</span>
 							)),
-							<span key="note" className="whitespace-normal font-sans text-fog-300">
+							<span key="note" className="whitespace-normal font-body text-fog-300">
 								{speedNotes[sp] ?? ''}
 							</span>
 						])}
@@ -748,10 +786,10 @@ L         = |position − currentBase| + |nextBase − position|                
 				</Panel>
 			</section>
 
-			<section className="space-y-3">
-				<div>
-					<h2 className="text-2xl uppercase">Every base run by speed stat</h2>
-					<p className="mt-2 max-w-3xl text-sm text-fog-300">
+			<section className="space-y-4">
+				<SectionHead title="Every base run by speed stat" />
+				<div className="sm:pl-12">
+					<p className="max-w-[70ch] text-[15px] leading-relaxed text-fog-300">
 						Each cell is the frame the runner reaches the base, rounding / straight, with TAS mashing. Batter runs start from the middle of
 						Mario&apos;s range in the right-handed box; runners on base start from a full lead. Batter to 1B has one number because it always runs
 						straight, and 3B to home is the same both ways because a runner starting on 3rd never starts rounding.{' '}
@@ -763,6 +801,7 @@ L         = |position − currentBase| + |nextBase − position|                
 				<Panel>
 					<Table
 						head={['Speed', ...routeResults.map((r) => routeLabel(r)), 'Notes']}
+						text={[0, -1]}
 						highlight={(i) => speedNotes[SPEEDS[i]] !== undefined}
 						rows={SPEEDS.map((sp, i) => [
 							sp,
@@ -776,7 +815,7 @@ L         = |position − currentBase| + |nextBase − position|                
 									</span>
 								)
 							),
-							<span key="note" className="whitespace-normal font-sans text-fog-300">
+							<span key="note" className="whitespace-normal font-body text-fog-300">
 								{speedNotes[sp] ?? ''}
 							</span>
 						])}
@@ -785,14 +824,14 @@ L         = |position − currentBase| + |nextBase − position|                
 			</section>
 
 			<details className="panel">
-				<summary className="cursor-pointer px-4 py-3 font-display text-sm font-bold uppercase tracking-widest text-fog-300">
+				<summary className="cursor-pointer px-5 py-4 font-display text-lg font-bold text-fog-100 marker:text-star-400">
 					Character reference: speed stat and distance to 1B
 				</summary>
-				<p className="border-t border-night-700 px-4 py-3 text-xs text-fog-300">
+				<p className="max-w-[80ch] border-t border-[var(--rim)] px-5 py-3 text-xs leading-relaxed text-fog-300">
 					Speed is the unstarred stat (starring adds 50). Frames to 1B use that speed from the middle of each character&apos;s range with TAS mashing. Distances
 					are in metres; RHB and LHB are right- and left-handed batters.
 				</p>
-				<div className="max-h-[520px] overflow-auto border-t border-night-700">
+				<div className="max-h-[520px] overflow-auto">
 					<Table
 						head={[
 							'Character',
@@ -847,12 +886,13 @@ L         = |position − currentBase| + |nextBase − position|                
 					{ id: 'analysis', label: 'Full Analysis', content: analysis },
 					{ id: 'basics', label: 'Basics', content: <BasicsTab /> },
 					{ id: 'first-base', label: 'Running to 1B', content: <RunningToFirstTab /> },
-					{ id: 'rounding', label: 'Rounding the Bases', content: <RoundingTab /> },
-					{ id: 'actions', label: 'Actions', content: <ActionsTab /> },
-					{ id: 'rundowns', label: 'Rundowns', content: <RundownsTab /> },
-					{ id: 'stealing', label: 'Stealing', content: <StealingTab /> },
-					{ id: 'cpu', label: 'CPU', content: <CpuTab /> },
-					{ id: 'misc', label: 'Misc', content: <MiscTab /> }
+					// Draft tabs only show in development. To publish one, remove its `draft: true`.
+					{ id: 'rounding', label: 'Rounding the Bases', content: <RoundingTab />, draft: true },
+					{ id: 'actions', label: 'Actions', content: <ActionsTab />, draft: true },
+					{ id: 'rundowns', label: 'Rundowns', content: <RundownsTab />, draft: true },
+					{ id: 'stealing', label: 'Stealing', content: <StealingTab />, draft: true },
+					{ id: 'cpu', label: 'CPU', content: <CpuTab />, draft: true },
+					{ id: 'misc', label: 'Misc', content: <MiscTab />, draft: true }
 				]}
 			/>
 		</div>

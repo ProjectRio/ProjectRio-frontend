@@ -52,16 +52,18 @@ export default function RunningToFirstTab() {
 			<TabSection title="Overrunning 1B">
 				<p>The batter will overrun first base if they are not set to round the base and the runner is in the last 20% of the baseline without being put out yet.</p>
 				<p>If any of the following are true during the whole last-half of the baseline, the runner will overrun first base:</p>
-				<ul className="list-disc pl-5">
+				<ul className="list-disc space-y-1 pl-5 marker:text-fog-500">
 					<li>Fly ball with another runner on or near first.</li>
-					<li>Ground ball or low line drive, including:</li>
-					<ul className="list-disc pl-5">
-						<li>Ball still in the infield.</li>
-						<li>Ball in shallow outfield and moving slowly.</li>
-						<li>Fielder has a ball within 25m of 1B.</li>
-						<li>The right fielder has the ball while the batter is less than 75% towards 1B.</li>
-						<li>Close play: The ball is being thrown to 1B and will arrive less than 0.5s after the batter reaches 1B.</li>
-					</ul>
+					<li>
+						Ground ball or low line drive, including:
+						<ul className="mt-1 list-[circle] space-y-1 pl-5">
+							<li>Ball still in the infield.</li>
+							<li>Ball in shallow outfield and moving slowly.</li>
+							<li>Fielder has a ball within 25m of 1B.</li>
+							<li>The right fielder has the ball while the batter is less than 75% towards 1B.</li>
+							<li>Close play: The ball is being thrown to 1B and will arrive less than 0.5s after the batter reaches 1B.</li>
+						</ul>
+					</li>
 				</ul>
 				<p>The length of the overrun is the same for every character.
 					Going past the base is 6.89m over 60 frames on a curved line, and coming back is a straight line over 120 frames.

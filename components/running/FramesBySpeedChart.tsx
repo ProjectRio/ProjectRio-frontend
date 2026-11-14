@@ -98,7 +98,7 @@ export default function FramesBySpeedChart({ speeds, scenarios }: { speeds: numb
 			</svg>
 			{hover && (
 				<div
-					className="pointer-events-none absolute z-10 whitespace-nowrap rounded-md border border-night-600 bg-night-850 px-3 py-2 text-xs shadow-xl"
+					className="pointer-events-none absolute z-10 whitespace-nowrap popover px-3 py-2 text-xs"
 					style={{ left: hover.left + 14, top: hover.top, transform: hover.left > 420 ? 'translate(calc(-100% - 28px), -50%)' : 'translateY(-50%)' }}
 				>
 					<div className="mb-1 font-semibold text-fog-100">Speed {speeds[hover.i]}</div>

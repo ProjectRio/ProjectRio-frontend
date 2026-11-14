@@ -243,7 +243,7 @@ export default function RaceChart({ racers }: { racers: Racer[] }) {
 			)}
 			{hover && (
 				<div
-					className="pointer-events-none absolute z-10 whitespace-nowrap rounded-md border border-night-600 bg-night-850 px-3 py-2 text-xs shadow-xl"
+					className="pointer-events-none absolute z-10 whitespace-nowrap popover px-3 py-2 text-xs"
 					style={{ left: hover.left + 14, top: hover.top, transform: hover.left > 360 ? 'translate(calc(-100% - 28px), -50%)' : 'translateY(-50%)' }}
 				>
 					<div className="mb-1 font-semibold text-fog-100">Frame {hover.f}</div>
@@ -268,7 +268,7 @@ export default function RaceChart({ racers }: { racers: Racer[] }) {
 							if (!p) return null;
 							const who = p.v >= 0 ? pair[0] : pair[1];
 							return (
-								<div className="mt-1 border-t border-night-600 pt-1 text-fog-300">
+								<div className="mt-1 border-t border-[var(--rim)] pt-1 text-fog-300">
 									{Math.abs(p.v) < 0.005 ? 'Dead even' : `${shortName(who.label)} ahead by ${Math.abs(p.v).toFixed(2)} m`}
 									{p.f !== hover.f ? ` (frame ${p.f})` : ''}
 								</div>

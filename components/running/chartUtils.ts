@@ -12,7 +12,8 @@ export const SERIES = {
 
 export const AXIS_TEXT = 'var(--color-fog-500)';
 export const AXIS_LABEL = 'var(--color-fog-300)';
-export const GRID = 'var(--color-night-700)';
+/** Matches `.chart .grid` in globals.css. */
+export const GRID = 'rgb(181 173 165 / 0.16)';
 
 /** Round tick values covering [a, b] in about n steps. */
 export function niceTicks(a: number, b: number, n: number): number[] {

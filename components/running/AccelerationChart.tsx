@@ -106,7 +106,7 @@ export default function AccelerationChart({ series }: { series: AccelerationSeri
 		<div className="relative space-y-1">
 			{/* distance covered */}
 			<div>
-				<p className="pl-1 text-xs uppercase tracking-widest text-fog-500">Distance covered (m)</p>
+				<p className="pl-1 text-xs text-fog-500">Distance covered (m)</p>
 				<svg viewBox={`0 0 ${W} ${H_TOP}`} className="block h-auto w-full" role="img" aria-label="Distance covered from a standing start by speed stat">
 					{niceTicks(0, dMax * 1.04, 5).map((v) => (
 						<g key={v}>
@@ -151,7 +151,7 @@ export default function AccelerationChart({ series }: { series: AccelerationSeri
 
 			{/* gap to the first runner */}
 			<div>
-				<p className="pl-1 text-xs uppercase tracking-widest text-fog-500">M ahead of (+) or behind (−) the {base.label} runner</p>
+				<p className="pl-1 text-xs text-fog-500">M ahead of (+) or behind (−) the {base.label} runner</p>
 				<svg viewBox={`0 0 ${W} ${H_GAP + 14}`} className="block h-auto w-full" role="img" aria-label="Distance ahead of or behind the slowest runner">
 					{niceTicks(gMin * 1.15, gMax * 1.15, 5).map((v) => (
 						<g key={v}>
@@ -203,7 +203,7 @@ export default function AccelerationChart({ series }: { series: AccelerationSeri
 
 			{hover && (
 				<div
-					className="pointer-events-none absolute z-10 whitespace-nowrap rounded-md border border-night-600 bg-night-850 px-3 py-2 text-xs shadow-xl"
+					className="pointer-events-none absolute z-10 whitespace-nowrap popover px-3 py-2 text-xs"
 					style={{ left: hover.left + 14, top: hover.top, transform: hover.left > 420 ? 'translate(calc(-100% - 28px), -50%)' : 'translateY(-50%)' }}
 				>
 					<div className="mb-1 font-semibold text-fog-100">Frame {hover.f}</div>
