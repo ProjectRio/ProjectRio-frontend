@@ -22,22 +22,21 @@ export default async function ModTablePage({ params }: { params: Promise<{ table
 
 	return (
 		<div className="space-y-6">
-			<nav className="flex flex-wrap items-center gap-2 text-sm" aria-label="Mod tables">
-				<Link href="/tools/mods" className="text-fog-500 hover:text-fog-100">
+			<nav className="space-y-3" aria-label="Mod tables">
+				<Link href="/tools/mods" className="inline-block text-sm text-fog-500 transition-colors hover:text-fog-100">
 					All mods
 				</Link>
-				<span className="text-fog-500">/</span>
-				{siblings.map((other) => (
-					<Link
-						key={other.id}
-						href={`/tools/mods/${other.id}`}
-						className={`rounded px-3 py-1 font-display text-xs font-semibold uppercase tracking-wider ${
-							other.id === table.id ? 'bg-rio-500/15 text-rio-300' : 'text-fog-300 hover:text-fog-100'
-						}`}
-					>
-						{other.title}
-					</Link>
-				))}
+				<div className="tab-strip">
+					{siblings.map((other) => (
+						<Link
+							key={other.id}
+							href={`/tools/mods/${other.id}`}
+							aria-current={other.id === table.id ? 'page' : undefined}
+						>
+							{other.title}
+						</Link>
+					))}
+				</div>
 			</nav>
 			<ModTableEditor table={table} groupTitle={GROUPS[table.group].title} />
 		</div>
