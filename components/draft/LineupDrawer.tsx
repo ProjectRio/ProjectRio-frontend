@@ -44,7 +44,7 @@ const DRAG_TYPE = 'text/x-rio-asset';
 
 function SourceBadge({ source }: { source: Source }) {
 	if (source === 'drafted') return null;
-	return <span className={`rounded-sm px-1 font-display text-[8px] font-bold uppercase tracking-widest ${source === 'target' ? 'bg-star-500/20 text-star-400' : 'bg-rio-500/20 text-rio-300'}`}>{source === 'target' ? 'target' : 'gone'}</span>;
+	return <span className={`plate !px-1 !py-0 text-[8px] ${source === 'target' ? 'text-star-300 [--plate:#5a4a12]' : 'text-rio-300 [--plate:#56161b]'}`}>{source === 'target' ? 'target' : 'gone'}</span>;
 }
 
 export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: DraftSnapshot; open: boolean; onClose: () => void }) {
@@ -119,18 +119,18 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 			}}
 			disabled={candidate.source !== 'lost' && rosterFull && selected === null}
 			title={candidate.source === 'lost' ? `${candidate.asset.name} — taken by another team` : selected !== null ? `Put ${candidate.asset.name} at ${FIELD_POSITIONS[selected].label}` : rosterFull ? 'Field is full — select a slot first' : `Add ${candidate.asset.name} · drag onto a position`}
-			className={`flex items-center gap-1 rounded border px-1 py-0.5 text-[11px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-				candidate.source === 'drafted' ? 'border-night-600 bg-night-850 hover:border-rio-400' : candidate.source === 'target' ? 'border-dashed border-star-500/50 hover:border-star-400' : 'cursor-not-allowed border-rio-700/40 opacity-60'
+			className={`flex items-center gap-1 rounded-[5px] px-1 py-0.5 text-[11px] disabled:cursor-not-allowed disabled:opacity-40 ${
+				candidate.source === 'drafted' ? 'key' : candidate.source === 'target' ? 'key-off' : 'cursor-not-allowed opacity-60'
 			}`}
 		>
 			<AssetSprite asset={candidate.asset} size={24} dim={candidate.source === 'lost'} className={candidate.source === 'target' ? 'opacity-70' : ''} />
 			<span className={candidate.source === 'lost' ? 'text-fog-500 line-through' : 'text-fog-100'}>{candidate.asset.name}</span>
-			{candidate.price !== null && <Money amount={candidate.price} className="font-display text-[10px] font-bold text-rio-300" />}
+			{candidate.price !== null && <Money amount={candidate.price} className="font-mono text-[10px] font-semibold text-fog-100" />}
 			<SourceBadge source={candidate.source} />
 			{candidate.source === 'lost' && (
 				<span
 					role="button"
-					className="ml-0.5 text-fog-500 hover:text-rio-300"
+					className="ml-0.5 text-fog-500 hover:text-fog-100"
 					title="Drop this target"
 					onClick={(event) => {
 						event.stopPropagation();
@@ -145,20 +145,25 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 	);
 
 	return (
-		<Drawer open={open} onClose={onClose} title="Lineup" kicker={you ? `${you.name} · private to you` : 'Private to you'} width="w-[min(100vw,26rem)]">
+		<Drawer open={open} onClose={onClose} title="Lineup" kicker={
+				<>
+					{you && <span>{you.name}</span>}
+					<span>Private to you</span>
+				</>
+			} width="w-[min(100vw,26rem)]">
 			<div className="space-y-3 p-3">
-				<div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">
+				<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fog-500">
 					<span>
-						<span className="text-fog-100">{drafted}</span>/9 drafted
+						<span className="font-mono tabular-nums text-fog-100">{drafted}/9</span> drafted
 					</span>
 					{filled - drafted > 0 && <span className="text-star-400">{filled - drafted} target{filled - drafted === 1 ? '' : 's'} pencilled in</span>}
 					{lost > 0 && <span className="text-rio-300">{lost} gone — re-plan</span>}
-					{filled === 9 && lost === 0 && <span className="text-emerald-300">field covered</span>}
+					{filled === 9 && lost === 0 && <span className="text-fog-100">field covered</span>}
 				</div>
 
-				<div className="flex overflow-hidden rounded-lg border border-night-600 text-sm">
+				<div className="seg flex w-full">
 					{(['field', 'lineup'] as const).map((option) => (
-						<button key={option} type="button" className={`flex-1 py-1 font-display text-xs font-semibold uppercase tracking-wider transition-colors ${view === option ? 'bg-rio-500 text-white' : 'hover:bg-night-700'}`} onClick={() => setView(option)}>
+						<button key={option} type="button" aria-pressed={view === option} className="flex-1 !py-1 !text-sm" onClick={() => setView(option)}>
 							{option}
 						</button>
 					))}
@@ -210,28 +215,26 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 									}}
 								>
 									{entry ? (
-										<div className={`group flex flex-col items-center gap-0.5 transition-transform ${isDragTarget || isSelected ? 'scale-110' : 'hover:scale-105'}`}>
+										<div className="group flex flex-col items-center gap-0.5">
 											<div className="relative">
-												{/* grounding shadow */}
-												<span className="pointer-events-none absolute left-1/2 top-[88%] h-2 w-9 -translate-x-1/2 rounded-full bg-black/50 blur-[2px]" />
 												<button
 													type="button"
 													onClick={() => tapSlot(slot)}
 													title={`${entry.asset.name} · ${position.name}${entry.source === 'target' ? ' · target' : entry.source === 'lost' ? ' · taken by another team' : ''} — ${isSelected ? 'tap another slot to swap' : 'tap to select · drag to move'}`}
-													className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-night-950/85 shadow-[0_6px_14px_rgb(0_0_0_/_0.55)] backdrop-blur transition-shadow ${
-														entry.source === 'target' ? 'border-dashed' : ''
-													} ${isSelected ? 'ring-2 ring-white shadow-[0_0_18px_rgb(255_255_255_/_0.45)]' : isDragTarget ? 'ring-2 ring-white' : ''}`}
+													className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-night-950 ${
+														isSelected || isDragTarget ? 'shadow-[0_0_0_2px_#000,0_0_0_3px_var(--color-rim)]' : 'shadow-[0_2px_0_rgb(0_0_0_/_0.7)]'
+													}`}
 													style={{ borderColor: entry.source === 'lost' ? 'var(--color-rio-500)' : entry.source === 'target' ? 'var(--color-star-400)' : hue }}
 												>
 													<img src={assetImage(entry.asset) ?? ''} alt={entry.asset.name} draggable={false} className={`h-8 w-8 object-contain [image-rendering:pixelated] ${entry.source === 'target' ? 'opacity-65' : entry.source === 'lost' ? 'opacity-40 grayscale' : ''}`} />
 												</button>
-												<span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rio-500 px-1 font-display text-[9px] font-bold tabular-nums leading-none text-white ring-2 ring-night-950" title={`Bats ${battingNumber}`}>
+												<span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-[4px] bg-star-400 px-1 font-mono text-[9px] font-bold tabular-nums leading-none text-night-950 shadow-[0_2px_0_rgb(0_0_0_/_0.7)]" title={`Bats ${battingNumber}`}>
 													{battingNumber}
 												</span>
 												{isSelected && (
 													<button
 														type="button"
-														className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-night-950 text-[9px] leading-none text-rio-300 ring-2 ring-rio-500 hover:bg-rio-500 hover:text-white"
+														className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-[4px] bg-[var(--key)] text-[9px] leading-none text-fog-100 shadow-[0_2px_0_rgb(0_0_0_/_0.7)] hover:bg-[#425049]"
 														onClick={(event) => {
 															event.stopPropagation();
 															clearRosterSlot(leagueId, slot);
@@ -243,21 +246,26 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 													</button>
 												)}
 											</div>
-											<span className={`rounded-sm px-1 font-display text-[8px] font-bold uppercase tracking-widest backdrop-blur ${entry.source === 'lost' ? 'bg-rio-600/85 text-white' : entry.source === 'target' ? 'bg-star-500/85 text-night-950' : 'bg-night-950/75 text-fog-200'}`}>{position.label}</span>
+											<span className={`rounded-[3px] px-1 font-display text-[9px] font-bold leading-tight shadow-[0_2px_0_rgb(0_0_0_/_0.7)] ${entry.source === 'lost' ? 'bg-rio-700 text-fog-100' : entry.source === 'target' ? 'bg-[#5a4a12] text-star-300' : 'bg-night-950 text-fog-100'}`}>{position.label}</span>
 										</div>
 									) : (
-										<button type="button" className={`flex flex-col items-center gap-0.5 transition-all ${isDragTarget || isSwapTarget ? 'scale-110 opacity-100' : 'opacity-75 hover:opacity-100'}`} onClick={() => tapSlot(slot)} title={selected !== null ? `Move here (${position.name})` : `${position.name} — drag a character here`}>
-											<div className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-dashed transition-all ${isDragTarget || isSwapTarget ? 'border-white bg-white/25' : 'border-white/45 bg-black/25'}`}>
-												<span className="font-display text-sm font-bold text-white/80">{isDragTarget || isSwapTarget ? '↓' : '+'}</span>
+										<button type="button" className="flex flex-col items-center gap-0.5" onClick={() => tapSlot(slot)} title={selected !== null ? `Move here (${position.name})` : `${position.name} — drag a character here`}>
+											<div className={`flex h-11 w-11 items-center justify-center rounded-full ${isDragTarget || isSwapTarget ? 'bg-black/60 shadow-[0_0_0_1px_var(--color-rim)]' : 'bg-black/45 shadow-[inset_0_3px_0_rgb(0_0_0_/_0.5),0_1px_0_rgb(255_255_255_/_0.12)]'}`}>
+												<span className="font-display text-sm font-bold text-fog-100">{isDragTarget || isSwapTarget ? '↓' : '+'}</span>
 											</div>
-											<span className="rounded-sm bg-night-950/60 px-1 font-display text-[8px] font-bold uppercase tracking-widest text-white/80">{position.label}</span>
+											<span className="rounded-[3px] bg-night-950 px-1 font-display text-[9px] font-bold leading-tight text-fog-300 shadow-[0_2px_0_rgb(0_0_0_/_0.7)]">{position.label}</span>
 										</button>
 									)}
 								</div>
 							);
 						})}
 					</StadiumField>
-						<p className="text-center text-[11px] text-fog-500">Tap to select &amp; swap · drag to rearrange · ✕ to remove · numbers are the batting order</p>
+						<ul className="flex flex-wrap justify-center gap-x-3 text-[11px] text-fog-500">
+	<li>Tap to select &amp; swap</li>
+	<li>Drag to rearrange</li>
+	<li>✕ to remove</li>
+	<li>Numbers are the batting order</li>
+</ul>
 					</>
 				) : (
 					<div className="space-y-1">
@@ -271,7 +279,7 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 									key={place}
 									draggable
 									role="listitem"
-									className={`flex cursor-grab select-none items-center gap-2 rounded-lg p-1.5 transition-all active:cursor-grabbing ${entry ? 'bg-night-800' : 'border border-dashed border-night-600 opacity-50'} ${isSource ? 'scale-95 opacity-40' : ''} ${isTarget ? 'scale-[1.02] ring-2 ring-rio-500' : ''}`}
+									className={`flex cursor-grab select-none items-center gap-2 border p-1.5 active:cursor-grabbing ${isTarget ? 'sel' : entry ? 'key-on rounded-md' : 'well opacity-60'} ${isSource ? 'opacity-40' : ''}`}
 									onDragStart={(event) => {
 										setOrderDragFrom(place);
 										event.dataTransfer.effectAllowed = 'move';
@@ -295,47 +303,50 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 									}}
 								>
 									<span className="shrink-0 text-sm leading-none text-fog-500">⠿</span>
-									<span className="w-4 shrink-0 text-xs tabular-nums text-fog-500">{place + 1}</span>
-									<span className="w-6 shrink-0 font-display text-[10px] font-bold uppercase text-fog-400">{position.label}</span>
+									<span className="w-4 shrink-0 font-mono text-xs tabular-nums text-fog-500">{place + 1}</span>
+									<span className="w-6 shrink-0 font-display text-[11px] font-bold text-fog-300">{position.label}</span>
 									{entry ? (
 										<>
 											<AssetSprite asset={entry.asset} size={26} dim={entry.source === 'lost'} className={entry.source === 'target' ? 'opacity-70' : ''} />
 											<span className={`flex-1 truncate text-xs ${entry.source === 'lost' ? 'text-fog-500 line-through' : 'text-fog-100'}`}>{entry.asset.name}</span>
 											<ClassDot asset={entry.asset} />
-											{entry.price !== null && <Money amount={entry.price} className="font-display text-xs font-bold text-rio-300" />}
+											{entry.price !== null && <Money amount={entry.price} className="font-mono text-xs font-semibold text-fog-100" />}
 											<SourceBadge source={entry.source} />
-											<button type="button" className="h-5 w-5 rounded text-xs leading-none text-rio-400 hover:bg-rio-500/20" onClick={() => clearRosterSlot(leagueId, slot)} aria-label={`Remove ${entry.asset.name}`}>
+											<button type="button" className="h-5 w-5 rounded text-xs leading-none text-fog-500 hover:text-fog-100" onClick={() => clearRosterSlot(leagueId, slot)} aria-label={`Remove ${entry.asset.name}`}>
 												✕
 											</button>
 										</>
 									) : (
 										<>
-											<div className="h-7 w-6 rounded bg-night-700" />
+											<div className="h-7 w-6 rounded bg-black/30" />
 											<span className="text-xs text-fog-500">empty</span>
 										</>
 									)}
 								</div>
 							);
 						})}
-						<p className="text-center text-[11px] text-fog-500">Drag rows to set the batting order · positions come from the field</p>
+						<ul className="flex flex-wrap justify-center gap-x-3 text-[11px] text-fog-500">
+	<li>Drag rows to set the batting order</li>
+	<li>Positions come from the field</li>
+</ul>
 					</div>
 				)}
 
-				<div className="flex items-center justify-between gap-2 rounded-lg border border-night-600 p-2">
+				<div className="well flex items-center justify-between gap-2 p-2">
 					<div>
-						<div className="text-sm font-medium">Stadium</div>
+						<h3 className="font-display text-sm font-semibold text-fog-300">Stadium</h3>
 						<div className="text-[11px] text-fog-500">{stadium ? stadium.asset.name : 'none planned yet'}</div>
 					</div>
 					{stadium ? (
 						<span className="flex items-center gap-1.5">
 							<AssetSprite asset={stadium.asset} size={22} dim={stadium.source === 'lost'} />
 							<SourceBadge source={stadium.source} />
-							<button type="button" className="text-xs text-rio-400 hover:text-rio-300" onClick={() => setPlan(leagueId, { stadium_id: null })} aria-label="Clear stadium">
+							<button type="button" className="text-xs text-fog-500 hover:text-fog-100" onClick={() => setPlan(leagueId, { stadium_id: null })} aria-label="Clear stadium">
 								✕
 							</button>
 						</span>
 					) : (
-						<select className="rounded border border-night-600 bg-night-900 px-1 py-0.5 text-[11px] text-fog-300" value="" onChange={(event) => event.target.value && setPlan(leagueId, { stadium_id: Number(event.target.value) })} aria-label="Stadium">
+						<select className="input !w-auto !py-0.5 !text-[11px]" value="" onChange={(event) => event.target.value && setPlan(leagueId, { stadium_id: Number(event.target.value) })} aria-label="Stadium">
 							<option value="">Choose…</option>
 							{stadiums.map((candidate) => (
 								<option key={candidate.asset.id} value={candidate.asset.id}>
@@ -348,7 +359,11 @@ export default function LineupDrawer({ snapshot, open, onClose }: { snapshot: Dr
 				</div>
 
 				<div>
-					<div className="mb-1 font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Bench · drafted and targets · click or drag onto the field</div>
+					<div className="mb-1 flex flex-wrap items-baseline gap-x-3">
+	<h3 className="font-display text-sm font-semibold text-fog-300">Bench</h3>
+	<span className="text-[11px] text-fog-500">Drafted and targets</span>
+	<span className="text-[11px] text-fog-500">Click or drag onto the field</span>
+</div>
 					{bench.length === 0 ? <p className="text-[11px] text-fog-500">Everyone is on the field. Star more targets in the pool or the pricing sheet.</p> : <div className="flex flex-wrap gap-1">{bench.map(benchChip)}</div>}
 				</div>
 			</div>

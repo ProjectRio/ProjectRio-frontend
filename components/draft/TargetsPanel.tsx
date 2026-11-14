@@ -32,16 +32,17 @@ export default function TargetsPanel({ snapshot, canQueue, onQueue, onPlan }: { 
 	const targets = plan.targets.map(assetById);
 	return (
 		<>
-			<div className="flex items-center gap-1 border-b border-night-800 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">
-				Targets · {targets.length}
-				<button type="button" className="ml-auto text-rio-300 hover:text-rio-200" onClick={onPlan}>
-					Lineup ↗
+			<div className="flex items-center gap-2 px-3 pb-1 pt-2.5">
+				<h3 className="font-display text-sm font-semibold text-fog-300">Targets</h3>
+				<span className="font-mono text-xs tabular-nums text-fog-500">{targets.length}</span>
+				<button type="button" className="key ml-auto px-2 pb-0.5 pt-1 font-display text-xs font-semibold" onClick={onPlan}>
+					Lineup
 				</button>
 			</div>
 			{targets.length === 0 ? (
-				<p className="px-2 py-2 text-[11px] text-fog-500">Star sprites in the pool (or rows in Pricing) to build a watchlist. It is private to you.</p>
+				<p className="px-3 pb-3 pt-1 text-[11px] text-fog-500">Star sprites in the pool (or rows in Pricing) to build a watchlist. It is private to you.</p>
 			) : (
-				<ul className="divide-y divide-night-800">
+				<ul className="px-3 pb-2">
 					{targets.map((asset) => {
 						const status = statusFor(snapshot, asset);
 						const avg = snapshot.price_history[asset.id]?.avg;
@@ -53,26 +54,26 @@ export default function TargetsPanel({ snapshot, canQueue, onQueue, onPlan }: { 
 						const inner = (
 							<>
 								<AssetSprite asset={asset} size={22} dim={dim} />
-								<span className={`min-w-0 flex-1 truncate ${dim ? 'text-fog-500 line-through' : status.kind === 'yours' ? 'text-emerald-300' : 'text-fog-100'}`}>{asset.name}</span>
-								{status.kind === 'block' && <span className="rounded-sm bg-rio-500/20 px-1 font-display text-[9px] font-bold uppercase tracking-widest text-rio-300">Now</span>}
-								{status.kind === 'yours' && <span className="font-display font-bold tabular-nums text-emerald-300">${status.price}</span>}
+								<span className={`min-w-0 flex-1 truncate ${dim ? 'text-fog-500 line-through' : status.kind === 'yours' ? 'text-star-400' : 'text-fog-100'}`}>{asset.name}</span>
+{status.kind === 'block' && <span className="plate !px-1 !py-0 text-[9px] text-rio-300 [--plate:#56161b]">Now</span>}
+{status.kind === 'yours' && <span className="font-mono font-semibold tabular-nums text-star-400">${status.price}</span>}
 								{(status.kind === 'gone' || status.kind === 'queued') && status.team_id !== null && <TeamLogo logo={findTeam(snapshot, status.team_id)?.logo ?? null} name={findTeam(snapshot, status.team_id)?.name ?? ''} size={14} className={dim ? 'opacity-50 grayscale' : ''} />}
-								{status.kind === 'open' && status.copies !== null && status.copies > 1 && <span className="text-[9px] text-fog-500">×{status.copies}</span>}
+								{status.kind === 'open' && status.copies !== null && status.copies > 1 && <span className="font-mono text-[9px] tabular-nums text-fog-500">×{status.copies}</span>}
 								{avg !== undefined && status.kind !== 'yours' && (
-									<span className="w-7 text-right font-display tabular-nums text-fog-500">
+									<span className="w-7 text-right font-mono tabular-nums text-fog-500">
 										<Money amount={Math.round(avg)} />
 									</span>
 								)}
 							</>
 						);
 						return (
-							<li key={asset.id} className={`flex items-center gap-1 pr-1 text-[11px] ${status.kind === 'block' ? 'bg-rio-500/[0.08]' : ''}`} title={label}>
+							<li key={asset.id} className={`flex items-center gap-1 text-[11px] ${status.kind === 'block' ? 'sel -mx-2 px-2' : ''}`} title={label}>
 								{queueable ? (
-									<button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1 text-left hover:bg-night-800/60" onClick={() => onQueue(asset)}>
+									<button type="button" className="pick flex min-w-0 flex-1 items-center gap-1.5 !py-1 text-left" onClick={() => onQueue(asset)}>
 										{inner}
 									</button>
 								) : (
-									<span className="flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1">{inner}</span>
+									<span className="flex min-w-0 flex-1 items-center gap-1.5 py-1">{inner}</span>
 								)}
 								<button
 									type="button"

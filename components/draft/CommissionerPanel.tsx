@@ -14,12 +14,12 @@ function Row({ children }: { children: React.ReactNode }) {
 
 function Small({ children, onClick, disabled, tone = 'default', title }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; tone?: 'default' | 'primary' | 'danger'; title?: string }) {
 	const styles = {
-		default: 'border-night-600 text-fog-300 hover:border-fog-500 hover:text-fog-100',
-		primary: 'border-rio-500 bg-rio-500 text-white hover:bg-rio-400',
-		danger: 'border-rio-700/60 text-rio-300 hover:border-rio-400'
+		default: 'key px-2.5 pb-0.5 pt-1 font-display text-xs font-semibold',
+		primary: 'btn-primary !px-3 !py-1 !text-xs',
+		danger: 'key px-2.5 pb-0.5 pt-1 font-display text-xs font-semibold !text-rio-300'
 	};
 	return (
-		<button type="button" title={title} disabled={disabled} onClick={onClick} className={`rounded border px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-widest transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${styles[tone]}`}>
+		<button type="button" title={title} disabled={disabled} onClick={onClick} className={`disabled:cursor-not-allowed disabled:opacity-40 ${styles[tone]}`}>
 			{children}
 		</button>
 	);
@@ -43,7 +43,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 	const rules = draft.config.restrictions.map((restriction) => (restriction.type === 'group_max' ? `group:${restriction.name}` : restriction.type === 'handedness' ? `handedness:${restriction.char_id}` : restriction.type));
 
 	return (
-		<div className="space-y-3 p-3 text-sm">
+		<div className="space-y-3 px-3 pb-3 pt-1 text-sm">
 			{draft.state === 'lobby' || draft.state === 'setup' ? (
 				<Row>
 					<Small tone="primary" onClick={() => handle.act({ type: 'start' })} disabled={busy('start')}>
@@ -83,7 +83,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 					{((openLot && !awaitingOpening) || (current.kind === 'round_pool' && current.phase === 'bidding')) && (
 						<Small onClick={() => handle.act({ type: 'close_current' })} disabled={busy('close_current') || draft.paused || !!rescind} tone={everyoneOut ? 'primary' : 'default'} title="Close bidding now">
 							Close {current.kind === 'round_pool' ? 'bids' : 'lot'}
-							{everyoneOut ? ' · all out' : ''}
+							{everyoneOut && <span className="ml-1.5 opacity-80">all out</span>}
 						</Small>
 					)}
 					{hasLots && (
@@ -103,9 +103,10 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 			)}
 
 			{rescind && (
-				<div className="rounded border border-star-500/50 bg-star-500/10 p-2">
+				<div className="well space-y-1.5 p-2">
+					<p className="font-display text-sm font-semibold text-star-400">Rescind request</p>
 					<p className="text-xs text-fog-100">
-						<span className="font-display font-bold uppercase tracking-widest text-star-400">Rescind request</span> — {findTeam(snapshot, rescind.team_id)?.name} wants to withdraw <Money amount={rescind.amount} />.
+						{findTeam(snapshot, rescind.team_id)?.name} wants to withdraw <Money amount={rescind.amount} className="font-mono" />.
 					</p>
 					<Row>
 						<Small tone="primary" onClick={() => handle.act({ type: 'resolve_rescind', payload: { bid_id: rescind.id, approve: true } })} disabled={busy('resolve_rescind')}>
@@ -119,8 +120,8 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 			)}
 
 			{stuck.length > 0 && (
-				<div className="rounded border border-star-500/50 bg-star-500/10 p-2 text-xs text-fog-100">
-					<span className="font-display font-bold uppercase tracking-widest text-star-400">No legal option</span> for {stuck.map((id) => findTeam(snapshot, id)?.name).join(', ')}. Waive a restriction below.
+				<div className="well p-2 text-xs text-fog-100">
+					<span className="font-display text-sm font-semibold text-star-400">No legal option</span> for {stuck.map((id) => findTeam(snapshot, id)?.name).join(', ')}. Waive a restriction below.
 				</div>
 			)}
 
@@ -128,7 +129,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 				<div>
 					<label className="label !mb-1">Waive a restriction</label>
 					<Row>
-						<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs" value={waiveTeam} onChange={(event) => setWaiveTeam(event.target.value ? Number(event.target.value) : '')}>
+						<select className="input !w-auto !py-1 !text-xs" value={waiveTeam} onChange={(event) => setWaiveTeam(event.target.value ? Number(event.target.value) : '')}>
 							<option value="">Team…</option>
 							{teams.map((team) => (
 								<option key={team.id} value={team.id}>
@@ -136,7 +137,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 								</option>
 							))}
 						</select>
-						<select className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs" value={waiveRule} onChange={(event) => setWaiveRule(event.target.value)}>
+						<select className="input !w-auto !py-1 !text-xs" value={waiveRule} onChange={(event) => setWaiveRule(event.target.value)}>
 							{[...new Set(rules)].map((rule) => (
 								<option key={rule} value={rule}>
 									{rule}
@@ -155,7 +156,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 					<label className="label !mb-1">Edit a draft budget</label>
 					<Row>
 						<select
-							className="rounded border border-night-600 bg-night-900 px-2 py-1 text-xs"
+							className="input !w-auto !py-1 !text-xs"
 							value={budgetTeam}
 							onChange={(event) => {
 								const id = event.target.value ? Number(event.target.value) : '';
@@ -170,7 +171,7 @@ export default function CommissionerPanel({ snapshot, handle }: { snapshot: Draf
 								</option>
 							))}
 						</select>
-						<input type="number" className="input !w-20 !py-1 text-xs tabular-nums" value={budget} onChange={(event) => setBudget(Number(event.target.value) || 0)} aria-label="New budget" />
+						<input type="number" className="input !w-20 !py-1 font-mono !text-xs tabular-nums" value={budget} onChange={(event) => setBudget(Number(event.target.value) || 0)} aria-label="New budget" />
 						<Small onClick={() => budgetTeam !== '' && handle.act({ type: 'set_team_budget', payload: { team_id: budgetTeam, budget } })} disabled={budgetTeam === '' || busy('set_team_budget')}>
 							Set
 						</Small>

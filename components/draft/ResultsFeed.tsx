@@ -13,20 +13,22 @@ function BidHistory({ snapshot, result, now }: { snapshot: DraftSnapshot; result
 	const nominator = findTeam(snapshot, result.nominated_by_team_id);
 	const roundPool = draft.format === 'round_pool';
 	return (
-		<div className="border-t border-night-800 bg-night-900/60 px-2 py-1.5 text-[11px]">
+		<div className="well mx-2 mb-1.5 px-2 py-1.5 text-[11px]">
 			<div className="mb-1 flex flex-wrap items-center gap-x-2 text-fog-500">
-				<span>
-					{draft.format === 'snake' ? `Pick ${result.pick_number}` : `Lot ${result.round}`}
-					{nominator && (
-						<>
-							{' '}
-							· nom. <span className="text-fog-300">{nominator.name}</span>
-						</>
-					)}
-					{result.opening_bid !== null && <> · opened ${result.opening_bid}</>}
-				</span>
-				{result.took_remaining_budget && <span className="text-star-400">last slot · remaining budget</span>}
-				{result.note && <span className="text-fog-400">{result.note}</span>}
+				<span className="font-mono tabular-nums">{draft.format === 'snake' ? `Pick ${result.pick_number}` : `Lot ${result.round}`}</span>
+				{nominator && (
+					<span>
+						nom. <span className="text-fog-300">{nominator.name}</span>
+					</span>
+				)}
+				{result.opening_bid !== null && (
+					<span>
+						opened <span className="font-mono tabular-nums">${result.opening_bid}</span>
+					</span>
+				)}
+				{result.took_remaining_budget && <span className="text-star-400">last slot</span>}
+				{result.took_remaining_budget && <span className="text-star-400">remaining budget</span>}
+				{result.note && <span className="text-fog-300">{result.note}</span>}
 			</div>
 			{result.bids.length > 0 ? (
 				<ol className="space-y-0.5">
@@ -35,10 +37,10 @@ function BidHistory({ snapshot, result, now }: { snapshot: DraftSnapshot; result
 						const winner = bid.team_id === result.team_id && (roundPool || bid.id === result.bids.find((candidate) => candidate.team_id === result.team_id)?.id);
 						return (
 							<li key={bid.id} className={`flex items-center gap-1.5 ${bid.rescind === 'approved' ? 'line-through opacity-50' : ''}`}>
-								<span className={`w-8 text-right font-display font-bold tabular-nums ${winner ? 'text-star-400' : 'text-fog-300'}`}>${bid.amount}</span>
+								<span className={`w-8 text-right font-mono font-semibold tabular-nums ${winner ? 'text-star-400' : 'text-fog-300'}`}>${bid.amount}</span>
 								{team && <TeamLogo logo={team.logo} name={team.name} size={14} />}
-								<span className={`min-w-0 flex-1 truncate ${winner ? 'text-fog-100' : 'text-fog-400'}`}>{team?.name}</span>
-								<span className="tabular-nums text-fog-500">{timeAgo(bid.placed_at, now)}</span>
+								<span className={`min-w-0 flex-1 truncate ${winner ? 'text-fog-100' : 'text-fog-300'}`}>{team?.name}</span>
+								<span className="font-mono tabular-nums text-fog-500">{timeAgo(bid.placed_at, now)}</span>
 							</li>
 						);
 					})}
@@ -61,30 +63,30 @@ export default function ResultsFeed({ snapshot, limit = 30, maxHeight = 'max-h-[
 	const items = snapshot.results.slice(0, limit);
 	if (items.length === 0) return <p className="px-3 py-4 text-center text-xs text-fog-500">Nothing sold yet.</p>;
 	return (
-		<ol className={`divide-y divide-night-800 overflow-y-auto ${maxHeight}`}>
+		<ol className={`overflow-y-auto px-3 pb-2 ${maxHeight}`}>
 			{items.map((result) => {
 				const team = findTeam(snapshot, result.team_id);
 				const open = openId === result.pick_id;
 				const yours = result.team_id === snapshot.you.team_id;
 				return (
-					<li key={result.pick_id} className={yours ? 'bg-rio-500/[0.06]' : ''}>
+					<li key={result.pick_id} className={yours ? '-mx-3 bg-star-400/[0.06] px-3' : ''}>
 						<button
 							type="button"
-							className="flex w-full items-center gap-1.5 px-2 py-1 text-left text-[11px] leading-snug hover:bg-night-800/60"
+							className="pick flex w-full items-center gap-1.5 !py-1 text-left text-[11px] leading-snug"
 							onClick={() => setOpenId(open ? null : result.pick_id)}
 							aria-expanded={open}
 							title={`${result.asset.name} → ${team?.name} · ${result.bids.length} bid${result.bids.length === 1 ? '' : 's'}`}
 						>
-							<span className="w-5 shrink-0 text-right font-display text-[10px] tabular-nums text-fog-500">{result.pick_number}</span>
+							<span className="w-5 shrink-0 text-right font-mono text-[10px] tabular-nums text-fog-500">{result.pick_number}</span>
 							<AssetSprite asset={result.asset} size={22} />
 							<span className="min-w-0 flex-1 truncate text-fog-100">{result.asset.name}</span>
 							{team && <TeamLogo logo={team.logo} name={team.name} size={16} />}
 							{money && (
-								<span className={`w-8 shrink-0 text-right font-display font-bold tabular-nums ${result.took_remaining_budget ? 'text-star-400' : 'text-fog-100'}`}>
+								<span className={`w-8 shrink-0 text-right font-mono font-semibold tabular-nums ${result.took_remaining_budget ? 'text-star-400' : 'text-fog-100'}`}>
 									<Money amount={result.price} />
 								</span>
 							)}
-							<span className="w-7 shrink-0 text-right tabular-nums text-fog-500">{timeAgo(result.made_at, now)}</span>
+							<span className="w-7 shrink-0 text-right font-mono tabular-nums text-fog-500">{timeAgo(result.made_at, now)}</span>
 						</button>
 						{open && <BidHistory snapshot={snapshot} result={result} now={now} />}
 					</li>
@@ -99,15 +101,17 @@ export function RailFeed({ snapshot, maxHeight = 'max-h-[70vh]' }: { snapshot: D
 	const [view, setView] = useState<'results' | 'log'>('results');
 	const [open, setOpen] = useState(true);
 	const tab = (key: 'results' | 'log', label: string) => (
-		<button type="button" className={`px-1 ${view === key ? 'text-fog-100' : 'text-fog-500 hover:text-fog-300'}`} onClick={() => setView(key)} aria-pressed={view === key}>
+		<button type="button" className="!px-2 !py-0.5 !text-xs" onClick={() => setView(key)} aria-pressed={view === key}>
 			{label}
 		</button>
 	);
 	return (
 		<>
-			<div className="flex items-center gap-1 border-b border-night-800 px-1 py-1 font-display text-[10px] font-bold uppercase tracking-widest">
-				{tab('results', 'Results')}
-				{tab('log', 'Log')}
+			<div className="flex items-center gap-1 px-2 pb-1.5 pt-2">
+				<div className="seg">
+					{tab('results', 'Results')}
+					{tab('log', 'Log')}
+				</div>
 				<button type="button" className="ml-auto px-1 text-fog-500 hover:text-fog-300" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Collapse' : 'Expand'}>
 					{open ? '▴' : '▾'}
 				</button>

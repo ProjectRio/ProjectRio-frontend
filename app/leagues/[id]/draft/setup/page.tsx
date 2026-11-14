@@ -10,7 +10,7 @@ import { leagueById } from '@/lib/draft/fixtures';
 import { FORMAT_BLURBS, FORMAT_LABELS, type Asset, type DraftConfig, type DraftFormat, type Restriction } from '@/lib/draft/types';
 import { useDraft } from '@/lib/draft/useDraft';
 import PreviewBar from '@/components/draft/PreviewBar';
-import { AssetSprite, findTeam, Reason, SectionLabel, StateChip, TeamLogo } from '@/components/draft/primitives';
+import { AssetSprite, findTeam, Reason, StateChip, TeamLogo } from '@/components/draft/primitives';
 import { EmptyState, PageHeader, Panel, Spinner } from '@/components/ui';
 
 const FORMATS: DraftFormat[] = ['auction', 'vickrey', 'snake', 'fixed_price', 'round_pool'];
@@ -33,7 +33,7 @@ function Number_({ value, onChange, min = 0, max, disabled }: { value: number; o
 function Toggle({ checked, onChange, label, disabled }: { checked: boolean; onChange: (value: boolean) => void; label: string; disabled?: boolean }) {
 	return (
 		<label className={`flex items-center gap-2 text-sm text-fog-300 ${disabled ? 'opacity-50' : ''}`}>
-			<input type="checkbox" className="accent-rio-500" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+			<input type="checkbox" className="accent-star-400" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
 			{label}
 		</label>
 	);
@@ -135,19 +135,19 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 	return (
 		<div>
 			<PreviewBar leagueId={leagueId} compact />
-			<PageHeader kicker={`${league.name} · commissioner`} title="Draft setup">
+			<PageHeader kicker={league.name} title="Draft setup">
 				<StateChip state={draft.state} paused={draft.paused} />
 				<Link href={`/leagues/${leagueId}/draft`} className="btn-secondary !py-2 text-sm">
 					Room
 				</Link>
 			</PageHeader>
-			{locked && <p className="mb-4 rounded border border-star-500/40 bg-star-500/10 px-3 py-2 text-sm text-fog-300">The draft has started. Rules are a snapshot taken at setup and can&apos;t change now; use the commissioner panel in the room.</p>}
+			{locked && <p className="well mb-4 max-w-[75ch] px-3 py-2 text-sm text-fog-100">The draft has started. Rules are a snapshot taken at setup and can&apos;t change now; use the commissioner panel in the room.</p>}
 
 			<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
 				<div className="space-y-4">
 					<Panel>
-						<SectionLabel>Format</SectionLabel>
-						<div className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
+						<h2 className="px-4 pt-4 text-xl">Format</h2>
+						<div className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
 							{FORMATS.map((candidate) => (
 								<button
 									key={candidate}
@@ -157,19 +157,20 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 										setFormat(candidate);
 										setSaved(false);
 									}}
-									className={`rounded-lg border p-3 text-left transition-colors disabled:cursor-not-allowed ${format === candidate ? 'border-rio-500 bg-rio-500/10' : 'border-night-700 bg-night-850 hover:border-night-600'}`}
-								>
-									<div className="font-display text-sm font-bold uppercase tracking-wide">{FORMAT_LABELS[candidate]}</div>
+									aria-pressed={format === candidate}
+										className={`rounded-lg border p-3 text-left disabled:cursor-not-allowed ${format === candidate ? 'key-on' : 'key-off'}`}
+									>
+										<div className={`font-display text-base font-semibold ${format === candidate ? 'text-star-400' : ''}`}>{FORMAT_LABELS[candidate]}</div>
 									<div className="mt-1 text-xs text-fog-500">{FORMAT_BLURBS[candidate]}</div>
 								</button>
 							))}
 						</div>
-						{draft.state !== 'setup' && <p className="px-3 pb-3 text-xs text-fog-500">Format locks once the lobby opens.</p>}
+						{draft.state !== 'setup' && <p className="px-4 pb-4 text-xs text-fog-500">Format locks once the lobby opens.</p>}
 					</Panel>
 
 					<Panel>
-						<SectionLabel>Roster and budget</SectionLabel>
-						<div className="grid gap-4 p-3 sm:grid-cols-2 lg:grid-cols-4">
+						<h2 className="px-4 pt-4 text-xl">Roster and budget</h2>
+						<div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
 							<Field label="Character slots">
 								<Number_ value={config.slots.character} min={1} max={12} disabled={locked} onChange={(value) => update({ slots: { ...config.slots, character: value } })} />
 							</Field>
@@ -201,8 +202,8 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 					</Panel>
 
 					<Panel>
-						<SectionLabel>Timing and flow</SectionLabel>
-						<div className="grid gap-4 p-3 sm:grid-cols-2 lg:grid-cols-4">
+						<h2 className="px-4 pt-4 text-xl">Timing and flow</h2>
+						<div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
 							{format !== 'fixed_price' && format !== 'snake' && (
 								<>
 									<Field label="Lot clock (s)" hint="Blank = untimed; the commissioner closes.">
@@ -259,33 +260,35 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 					</Panel>
 
 					<Panel>
-						<SectionLabel
-							action={
-								<span className="text-xs text-fog-500">
-									{config.pool.asset_ids.length} of {ALL_ASSETS.length} in the pool
-									{totalCopies !== null && (
-										<span className={totalCopies < totalSlots ? ' text-star-400' : ''}>
-											{' '}· {totalCopies} copies for {totalSlots} slots
-										</span>
-									)}
+						<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 pt-4">
+							<h2 className="text-xl">Pool{format === 'fixed_price' ? ' and prices' : config.pool.copies !== null ? ' and copies' : ''}</h2>
+							<span className="flex flex-wrap gap-x-3 text-xs text-fog-500">
+								<span>
+									<span className="font-mono tabular-nums text-fog-100">{config.pool.asset_ids.length}</span> of {ALL_ASSETS.length} in the pool
 								</span>
-							}
-						>
-							Pool{format === 'fixed_price' ? ' and prices' : config.pool.copies !== null ? ' and copies' : ''}
-						</SectionLabel>
-						<div className="flex flex-wrap gap-1 border-b border-night-800 px-3 py-2">
-							{(['All', 'Power', 'Balance', 'Technique', 'Speed', 'Stadiums'] as const).map((option) => (
-								<button key={option} type="button" className={`border-b-2 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-widest ${poolFilter === option ? 'text-fog-100' : 'text-fog-500'}`} style={{ borderColor: poolFilter === option ? (option === 'Stadiums' ? '#f59e0b' : (CLASS_HUES[option] ?? 'var(--color-rio-500)')) : 'transparent' }} onClick={() => setPoolFilter(option)}>
-									{option}
-								</button>
-							))}
-							<button type="button" className="ml-auto text-xs text-fog-500 hover:text-fog-100" disabled={locked} onClick={() => update({ pool: { ...config.pool, asset_ids: ALL_ASSETS.map((asset) => asset.id) } })}>
+								{totalCopies !== null && (
+									<span className={totalCopies < totalSlots ? 'text-star-400' : ''}>
+										<span className="font-mono tabular-nums">{totalCopies}</span> copies for <span className="font-mono tabular-nums">{totalSlots}</span> slots
+									</span>
+								)}
+							</span>
+						</div>
+						<div className="flex flex-wrap items-center gap-2 px-4 py-3">
+							<div className="seg flex-wrap">
+								{(['All', 'Power', 'Balance', 'Technique', 'Speed', 'Stadiums'] as const).map((option) => (
+									<button key={option} type="button" aria-pressed={poolFilter === option} className="flex items-center gap-1.5 !px-2.5 !text-sm" onClick={() => setPoolFilter(option)}>
+										{option !== 'All' && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: option === 'Stadiums' ? '#f59e0b' : CLASS_HUES[option] }} />}
+										{option}
+									</button>
+								))}
+							</div>
+							<button type="button" className="key ml-auto px-2.5 py-1 text-xs" disabled={locked} onClick={() => update({ pool: { ...config.pool, asset_ids: ALL_ASSETS.map((asset) => asset.id) } })}>
 								Include all
 							</button>
 						</div>
-						<ul className="grid grid-cols-4 gap-1.5 p-2 sm:grid-cols-6 lg:grid-cols-9">
+						<ul className="grid grid-cols-4 gap-1.5 px-4 pb-4 sm:grid-cols-6 lg:grid-cols-9">
 							{poolAssets.map((asset) => (
-								<li key={asset.id} className={`flex flex-col items-center rounded border px-1 py-1.5 ${inPool(asset) ? 'border-night-700 bg-night-850' : 'border-night-800 opacity-40'}`}>
+								<li key={asset.id} className={`flex flex-col items-center rounded-md px-1 py-1.5 ${inPool(asset) ? 'key-on' : 'key-off opacity-50'}`}>
 									<button type="button" disabled={locked} onClick={() => togglePool(asset)} className="flex flex-col items-center" title={inPool(asset) ? 'Click to exclude' : 'Click to include'}>
 										<AssetSprite asset={asset} size={32} />
 										<span className="mt-0.5 w-full truncate text-[10px] text-fog-300">{asset.name}</span>
@@ -305,8 +308,8 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 					</Panel>
 
 					<Panel>
-						<SectionLabel>Restrictions</SectionLabel>
-						<div className="space-y-3 p-3">
+						<h2 className="px-4 pt-4 text-xl">Restrictions</h2>
+						<div className="space-y-3 p-4">
 							<Toggle
 								checked={config.restrictions.some((rule) => rule.type === 'captain_required')}
 								disabled={locked}
@@ -318,10 +321,10 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 								const remove = () => setRestrictions(config.restrictions.filter((_, candidate) => candidate !== index));
 								const replace = (next: Restriction) => setRestrictions(config.restrictions.map((candidate, position) => (position === index ? next : candidate)));
 								return (
-									<div key={index} className="flex flex-wrap items-center gap-2 rounded border border-night-700 bg-night-850 p-2 text-sm">
+									<div key={index} className="flex flex-wrap items-center gap-2 text-sm">
 										{rule.type === 'group_max' && (
 											<>
-												<span className="font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">Group max</span>
+												<span className="font-display text-sm font-semibold text-fog-300">Group max</span>
 												<input className="input !w-32 !py-1 !text-sm" value={rule.name} disabled={locked} onChange={(event) => replace({ ...rule, name: event.target.value })} />
 												<CharacterSelect multiple value={rule.char_ids} onChange={(ids) => replace({ ...rule, char_ids: ids })} />
 												<span className="text-fog-500">at most</span>
@@ -330,13 +333,13 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 										)}
 										{rule.type === 'must_be_captain' && (
 											<>
-												<span className="font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">Must be captain</span>
+												<span className="font-display text-sm font-semibold text-fog-300">Must be captain</span>
 												<CharacterSelect value={[rule.char_id]} onChange={(ids) => replace({ ...rule, char_id: ids[0] })} />
 											</>
 										)}
 										{rule.type === 'handedness' && (
 											<>
-												<span className="font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">Handedness</span>
+												<span className="font-display text-sm font-semibold text-fog-300">Handedness</span>
 												<CharacterSelect value={[rule.char_id]} onChange={(ids) => replace({ ...rule, char_id: ids[0] })} />
 												<select className="input !w-auto !py-1 !text-sm" value={rule.bat ?? ''} disabled={locked} onChange={(event) => replace({ ...rule, bat: (event.target.value || null) as 'L' | 'R' | null })}>
 													<option value="">bats either</option>
@@ -351,7 +354,7 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 												<span className="text-xs text-fog-500">icon only — not enforced by the draft</span>
 											</>
 										)}
-										<button type="button" className="ml-auto text-xs text-fog-500 hover:text-rio-300" disabled={locked} onClick={remove}>
+										<button type="button" className="key ml-auto px-2 py-0.5 text-xs" disabled={locked} onClick={remove}>
 											Remove
 										</button>
 									</div>
@@ -372,18 +375,18 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 					</Panel>
 
 					<Panel>
-						<SectionLabel>Keepers</SectionLabel>
-						<div className="p-3">
-							<ul className="mb-3 divide-y divide-night-800">
+						<h2 className="px-4 pt-4 text-xl">Keepers</h2>
+						<div className="p-4">
+							<ul className="mb-3">
 								{keepers.map((keeper) => (
 									<li key={keeper.id} className="flex items-center gap-2 py-1.5 text-sm">
 										<TeamLogo logo={findTeam(snapshot, keeper.team_id)?.logo ?? null} name={findTeam(snapshot, keeper.team_id)?.name ?? ''} size={20} />
 										<span className="text-fog-300">{findTeam(snapshot, keeper.team_id)?.name}</span>
 										<AssetSprite asset={keeper.asset} size={22} />
 										<span>{keeper.asset.name}</span>
-										{money && <span className="font-display font-bold tabular-nums text-star-400">${keeper.price}</span>}
-										{format === 'snake' && <span className="text-xs text-fog-500">pick #{keeper.pick_number}</span>}
-										<button type="button" className="ml-auto text-xs text-fog-500 hover:text-rio-300" disabled={locked} onClick={() => handle.act({ type: 'remove_keeper', payload: { pick_id: keeper.id } })}>
+										{money && <span className="font-mono tabular-nums text-fog-100">${keeper.price}</span>}
+										{format === 'snake' && <span className="font-mono text-xs tabular-nums text-fog-500">pick #{keeper.pick_number}</span>}
+										<button type="button" className="key ml-auto px-2 py-0.5 text-xs" disabled={locked} onClick={() => handle.act({ type: 'remove_keeper', payload: { pick_id: keeper.id } })}>
 											Remove
 										</button>
 									</li>
@@ -424,7 +427,7 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 									)}
 									<button
 										type="button"
-										className="btn-primary !py-2 text-sm"
+										className="btn-secondary !py-2 text-sm"
 										disabled={keeperTeam === '' || keeperAsset === '' || handle.pending.has('add_keeper')}
 										onClick={() =>
 											keeperTeam !== '' &&
@@ -443,29 +446,29 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 
 				<aside className="space-y-4">
 					<Panel>
-						<SectionLabel>Draft order</SectionLabel>
-						<ol className="divide-y divide-night-800">
+						<h2 className="px-4 pt-4 text-xl">Draft order</h2>
+						<ol className="px-1 pb-1 pt-2">
 							{order.map((teamId, index) => {
 								const team = findTeam(snapshot, teamId)!;
 								return (
-									<li key={teamId} className="flex items-center gap-2 px-3 py-1.5 text-sm">
-										<span className="w-4 font-display font-bold tabular-nums text-fog-500">{index + 1}</span>
+									<li key={teamId} className="flex items-center gap-2 px-3 py-1 text-sm">
+										<span className="w-4 font-mono tabular-nums text-fog-500">{index + 1}</span>
 										<TeamLogo logo={team.logo} name={team.name} size={20} />
 										<span className="min-w-0 flex-1 truncate">{team.name}</span>
-										<button type="button" className="px-1 text-fog-500 hover:text-fog-100 disabled:opacity-30" disabled={locked || index === 0} onClick={() => move(order, setOrder, index, -1)} aria-label="Move up">
+										<button type="button" className="key px-1.5 py-0.5 text-[10px] disabled:opacity-30" disabled={locked || index === 0} onClick={() => move(order, setOrder, index, -1)} aria-label="Move up">
 											▲
 										</button>
-										<button type="button" className="px-1 text-fog-500 hover:text-fog-100 disabled:opacity-30" disabled={locked || index === order.length - 1} onClick={() => move(order, setOrder, index, 1)} aria-label="Move down">
+										<button type="button" className="key px-1.5 py-0.5 text-[10px] disabled:opacity-30" disabled={locked || index === order.length - 1} onClick={() => move(order, setOrder, index, 1)} aria-label="Move down">
 											▼
 										</button>
 									</li>
 								);
 							})}
 						</ol>
-						<div className="p-2">
+						<div className="px-4 pb-4 pt-1">
 							<button
 								type="button"
-								className="text-xs text-fog-500 underline decoration-dotted underline-offset-2 hover:text-fog-100"
+								className="key px-2.5 py-1 text-xs"
 								disabled={locked}
 								onClick={() => {
 									setOrder([...order].sort(() => Math.random() - 0.5));
@@ -478,25 +481,25 @@ export default function SetupPage({ params }: { params: Promise<{ id: string }> 
 					</Panel>
 					{(format === 'vickrey' || format === 'round_pool') && (
 						<Panel>
-							<SectionLabel>Tie priority</SectionLabel>
-							<ol className="divide-y divide-night-800">
+							<h2 className="px-4 pt-4 text-xl">Tie priority</h2>
+							<ol className="px-1 pb-1 pt-2">
 								{priority.map((teamId, index) => {
 									const team = findTeam(snapshot, teamId)!;
 									return (
-										<li key={teamId} className="flex items-center gap-2 px-3 py-1.5 text-sm">
-											<span className="w-4 font-display font-bold tabular-nums text-fog-500">{index + 1}</span>
+										<li key={teamId} className="flex items-center gap-2 px-3 py-1 text-sm">
+											<span className="w-4 font-mono tabular-nums text-fog-500">{index + 1}</span>
 											<span className="min-w-0 flex-1 truncate">{team.name}</span>
-											<button type="button" className="px-1 text-fog-500 hover:text-fog-100 disabled:opacity-30" disabled={locked || index === 0} onClick={() => move(priority, setPriority, index, -1)} aria-label="Move up">
+											<button type="button" className="key px-1.5 py-0.5 text-[10px] disabled:opacity-30" disabled={locked || index === 0} onClick={() => move(priority, setPriority, index, -1)} aria-label="Move up">
 												▲
 											</button>
-											<button type="button" className="px-1 text-fog-500 hover:text-fog-100 disabled:opacity-30" disabled={locked || index === priority.length - 1} onClick={() => move(priority, setPriority, index, 1)} aria-label="Move down">
+											<button type="button" className="key px-1.5 py-0.5 text-[10px] disabled:opacity-30" disabled={locked || index === priority.length - 1} onClick={() => move(priority, setPriority, index, 1)} aria-label="Move down">
 												▼
 											</button>
 										</li>
 									);
 								})}
 							</ol>
-							<p className="p-2 text-xs text-fog-500">Only used when ties resolve by priority order: the winner drops to the back.</p>
+							<p className="px-4 pb-4 pt-1 text-xs text-fog-500">Only used when ties resolve by priority order: the winner drops to the back.</p>
 						</Panel>
 					)}
 					<Panel className="space-y-3 p-4">

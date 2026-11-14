@@ -36,8 +36,8 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 		<div className="space-y-2">
 			<div className="flex flex-wrap items-center gap-x-5 gap-y-3">
 				<div>
-					<p className="kicker">{current.round_kind === 'stadium' ? 'Stadium round' : `Round ${draft.round}`}</p>
-					<h2 className="text-2xl uppercase leading-none">{PHASE_LABEL[current.phase]}</h2>
+					<p className="font-display text-sm font-semibold text-fog-500">{current.round_kind === 'stadium' ? 'Stadium round' : `Round ${draft.round}`}</p>
+					<h2 className="text-2xl leading-none">{PHASE_LABEL[current.phase]}</h2>
 					<p className="mt-0.5 max-w-xs text-[11px] text-fog-500">
 						{current.phase === 'nominating' && `${current.participating_team_ids.length} teams nominate one each; the round opens when all are in.`}
 						{current.phase === 'bidding' && 'One sealed bid each — bids buy pick order, not a character.'}
@@ -61,7 +61,7 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 									disabled={!clickable}
 									onClick={() => handle.act({ type: 'pick', payload: { asset_id: asset.id } })}
 									title={`${asset.name} · by ${team?.name}${taken ? ' · taken' : reason ? ` · ${reason}` : clickable ? ' · click to pick' : ''}`}
-									className={`relative flex h-[58px] w-[46px] flex-col items-center justify-center rounded border ${chosen ? 'border-rio-500 bg-rio-500/20' : taken ? 'border-night-800 opacity-40' : 'border-night-700 bg-night-850'} ${clickable ? 'cursor-pointer hover:border-rio-400 hover:bg-rio-500/15' : ''}`}
+									className={`relative flex h-[58px] w-[46px] flex-col items-center justify-center rounded-[5px] border ${chosen ? 'sel' : taken ? 'border-transparent bg-black/20 opacity-40' : 'key-on'} ${clickable ? 'cursor-pointer hover:!border-rim' : ''}`}
 								>
 									<AssetSprite asset={asset} size={34} dim={taken || !!reason} />
 									{team && <TeamLogo logo={team.logo} name={team.name} size={12} className="absolute bottom-0.5 right-0.5" />}
@@ -74,8 +74,8 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 				{current.phase === 'bidding' && (
 					<>
 						<div>
-							<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Sealed</div>
-							<div className="font-display text-3xl font-bold leading-none tabular-nums">
+							<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Sealed</div>
+							<div className="font-mono text-3xl font-semibold leading-none tabular-nums text-fog-100">
 								{current.submitted_team_ids.length}
 								<span className="text-base text-fog-500">/{current.participating_team_ids.length}</span>
 							</div>
@@ -85,7 +85,7 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 							{teams
 								.filter((team) => current.participating_team_ids.includes(team.id))
 								.map((team) => (
-									<li key={team.id} title={`${team.name} — ${current.submitted_team_ids.includes(team.id) ? 'sealed' : 'deciding'}`} className={`rounded-full border p-0.5 ${current.submitted_team_ids.includes(team.id) ? 'border-emerald-500/70 bg-emerald-500/15' : 'border-night-600'}`}>
+									<li key={team.id} title={`${team.name} — ${current.submitted_team_ids.includes(team.id) ? 'sealed' : 'deciding'}`} className={`rounded-full p-0.5 ${current.submitted_team_ids.includes(team.id) ? 'bg-fog-100' : 'bg-black/30'}`}>
 										<TeamLogo logo={team.logo} name={team.name} size={22} />
 									</li>
 								))}
@@ -100,9 +100,9 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 							const now = current.picking_team_ids.includes(entry.team_id);
 							const tied = current.order.filter((other) => other.group === entry.group).length > 1;
 							return (
-								<li key={entry.team_id} title={`${index + 1}. ${team?.name} — $${entry.bid}${tied ? ' (tied)' : ''}${entry.picked ? ' · picked' : now ? ' · picking' : ''}`} className={`flex items-center gap-1 rounded-full border py-0.5 pl-0.5 pr-1.5 text-[10px] ${now ? 'border-rio-500 bg-rio-500/15 text-fog-100' : entry.picked ? 'border-night-800 text-fog-500 opacity-60' : 'border-night-600 text-fog-300'}`}>
+								<li key={entry.team_id} title={`${index + 1}. ${team?.name} — $${entry.bid}${tied ? ' (tied)' : ''}${entry.picked ? ' · picked' : now ? ' · picking' : ''}`} className={`flex items-center gap-1 border py-0.5 pl-0.5 pr-1.5 text-[10px] ${now ? 'sel !rounded-full text-fog-100' : entry.picked ? 'rounded-full border-transparent bg-black/20 text-fog-500 opacity-60' : 'rounded-full border-transparent bg-black/30 text-fog-300'}`}>
 									{team && <TeamLogo logo={team.logo} name={team.name} size={18} />}
-									<span className="font-display font-bold tabular-nums text-star-400">${entry.bid}</span>
+									<span className={`font-mono font-semibold tabular-nums ${now ? 'text-star-400' : 'text-fog-100'}`}>${entry.bid}</span>
 									{tied && <span className="text-fog-500">=</span>}
 								</li>
 							);
@@ -115,43 +115,45 @@ export default function RoundPoolStage({ snapshot, handle }: StageProps) {
 			</div>
 
 			{needsNomination && (
-				<div className="rounded border border-rio-500/50 bg-rio-500/5 px-3 py-1.5">
+				<div className="sel px-3 py-1.5">
 					<NominationInline snapshot={snapshot} handle={handle} label="Your nomination this round" kind={current.round_kind} />
 				</div>
 			)}
 
 			{current.phase === 'bidding' && participating && you.can_act && (
 				<StickyBidBar>
-				<div className="flex flex-wrap items-center gap-2 rounded border border-night-700 bg-night-850 px-3 py-1.5">
-					<span className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Your sealed bid</span>
-					<input type="number" min={draft.config.min_bid} max={maxBid} value={amount} onChange={(event) => setAmount(Number(event.target.value) || 0)} className="input !w-20 !py-1 font-display text-base font-bold tabular-nums" disabled={draft.paused} aria-label="Sealed bid" />
+				<div className="well flex flex-wrap items-center gap-2 px-3 py-1.5">
+					<span className="font-display text-xs font-semibold text-fog-300">Your sealed bid</span>
+					<input type="number" min={draft.config.min_bid} max={maxBid} value={amount} onChange={(event) => setAmount(Number(event.target.value) || 0)} className="input !w-20 !py-1 font-mono text-base font-semibold tabular-nums !text-star-400" disabled={draft.paused} aria-label="Sealed bid" />
 					<button type="button" className="btn-primary !px-4 !py-1.5 text-sm" disabled={draft.paused || handle.pending.has('sealed_bid') || amount < draft.config.min_bid || amount > maxBid} onClick={() => handle.act({ type: 'sealed_bid', payload: { amount } })}>
 						{you.sealed_bid !== null ? 'Update' : 'Seal'} ${amount}
 					</button>
 					<span className="text-[11px] text-fog-500">
-						max <Money amount={maxBid} className="text-fog-300" /> · you pay your own bid whatever you pick
-						{you.sealed_bid !== null && (
-							<span className="text-emerald-300">
-								{' '}
-								· sealed at <Money amount={you.sealed_bid} />
-							</span>
-						)}
+						max <Money amount={maxBid} className="font-mono text-fog-100" />
 					</span>
+					<span className="text-[11px] text-fog-500">you pay your own bid whatever you pick</span>
+					{you.sealed_bid !== null && (
+						<span className="text-[11px] text-star-400">
+							sealed at <Money amount={you.sealed_bid} className="font-mono" />
+						</span>
+					)}
 					<Reason error={handle.error} types={['sealed_bid']} className="w-full !text-xs" />
 				</div>
 				</StickyBidBar>
 			)}
 
 			{current.phase === 'picking' && yourPick && !current.runoff && (
-				<div className="rounded border border-rio-500/60 bg-rio-500/10 px-3 py-1.5 text-xs">
-					<span className="font-display font-bold uppercase tracking-widest text-rio-300">
+				<div className="sel flex flex-wrap items-center gap-x-3 px-3 py-1.5 text-xs">
+					<span className="font-display text-sm font-semibold text-star-400">
 						{current.tie && current.tie.team_ids.length > 1 ? `Tied with ${current.tie.team_ids.filter((id) => id !== you.team_id).map((id) => findTeam(snapshot, id)?.name).join(', ')} — choose privately` : 'Your pick'}
 					</span>
-					<span className="text-fog-300">
-						{' '}
-						· click a sprite above{yourOrder ? ` · you pay $${yourOrder.bid}` : ''}
-						{you.tie_choice !== null && <span className="text-emerald-300"> · choice locked, waiting for the others</span>}
-					</span>
+					<span className="text-fog-300">click a sprite above</span>
+					{yourOrder && (
+						<span className="text-fog-300">
+							you pay <span className="font-mono tabular-nums text-fog-100">${yourOrder.bid}</span>
+						</span>
+					)}
+					{you.tie_choice !== null && <span className="text-star-400">choice locked, waiting for the others</span>}
 					<Reason error={handle.error} types={['pick', 'tie_choice']} className="!text-xs" />
 				</div>
 			)}

@@ -22,29 +22,26 @@ export function AssetHero({ asset, snapshot, size = 84, children }: { asset: Ass
 	const target = usePlan(snapshot.draft.league_id).targets.includes(asset.id) && snapshot.you.team_id !== null;
 	return (
 		<div className="flex min-w-0 items-center gap-3">
-			<div className="relative flex shrink-0 items-center justify-center rounded-full" style={{ width: size + 16, height: size + 16, background: 'radial-gradient(circle, rgb(230 0 18 / 0.28), rgb(230 0 18 / 0.04) 60%, transparent 72%)' }}>
+			<div className="well relative flex shrink-0 items-center justify-center !rounded-full" style={{ width: size + 16, height: size + 16 }}>
 				<AssetSprite asset={asset} size={size} />
 			</div>
 			<div className="min-w-0">
 				<div className="flex items-center gap-2">
 					<ClassTag asset={asset} />
 					{icons.length > 0 && <RestrictionMarks icons={icons} />}
-					{target && <span className="rounded-sm bg-star-500/20 px-1 font-display text-[9px] font-bold uppercase tracking-widest text-star-400">★ your target</span>}
+					{target && <span className="plate !px-1 !py-0 text-[9px] text-star-300 [--plate:#5a4a12]">★ your target</span>}
 				</div>
-				<h2 className="text-2xl uppercase leading-none sm:text-3xl">{asset.name}</h2>
-				<div className="mt-1 text-[11px] text-fog-500">
+				<h2 className="text-2xl leading-none sm:text-3xl">{asset.name}</h2>
+				<div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-fog-500">
 					{history && (
 						<span title={history.samples.map((sample) => `${sample.season} $${sample.price}`).join(' · ')}>
 							avg <span className="text-fog-300">${Math.round(history.avg)}</span> ({history.min}–{history.max})
 						</span>
 					)}
-					{children && (
-						<>
-							{history ? ' · ' : ''}
-							{children}
-						</>
-					)}
-					{icons.length > 0 && <span> · {icons.map((icon) => icon.label).join(' · ')}</span>}
+					{children && <span>{children}</span>}
+					{icons.map((icon) => (
+						<span key={icon.code + icon.label}>{icon.label}</span>
+					))}
 				</div>
 			</div>
 		</div>
@@ -54,8 +51,8 @@ export function AssetHero({ asset, snapshot, size = 84, children }: { asset: Ass
 export function StatBlock({ label, children, accent = false }: { label: string; children: React.ReactNode; accent?: boolean }) {
 	return (
 		<div>
-			<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">{label}</div>
-			<div className={`font-display text-2xl font-bold leading-none tabular-nums ${accent ? 'text-rio-300' : 'text-fog-100'}`}>{children}</div>
+			<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">{label}</div>
+			<div className={`font-mono text-2xl font-semibold leading-none tabular-nums ${accent ? 'text-star-400' : 'text-fog-100'}`}>{children}</div>
 		</div>
 	);
 }
@@ -77,9 +74,10 @@ export function WaitingCard({ snapshot, handle, teamId, reason }: { snapshot: Dr
 			<div className="flex items-center gap-3">
 				{team && <TeamLogo logo={team.logo} name={team.name} size={36} />}
 				<div>
-					<p className="kicker">{yours ? 'Your turn to nominate' : 'The draft waits'}</p>
-					<h2 className="text-xl uppercase leading-none">{yours ? 'Name your nomination' : `Waiting on ${team?.name ?? 'a team'}`}</h2>
-					<p className="mt-0.5 text-[11px] text-fog-500">{reason ?? 'No nomination queued'} · no nomination timer; the commissioner can nominate for the team.</p>
+					<p className="font-display text-sm font-semibold text-star-400">{yours ? 'Your turn to nominate' : 'The draft waits'}</p>
+					<h2 className="text-xl leading-none">{yours ? 'Name your nomination' : `Waiting on ${team?.name ?? 'a team'}`}</h2>
+					<p className="mt-0.5 text-[11px] text-fog-300">{reason ?? 'No nomination queued'}</p>
+					<p className="text-[11px] text-fog-500">No nomination timer; the commissioner can nominate for the team.</p>
 				</div>
 			</div>
 			{yours && snapshot.you.can_act && <NominationInline snapshot={snapshot} handle={handle} label="Nominate" />}
@@ -109,17 +107,17 @@ export function WaitingCard({ snapshot, handle, teamId, reason }: { snapshot: Dr
  * with a thumb while the board scrolls behind it. Desktop: in the strip.
  */
 export function StickyBidBar({ children }: { children: React.ReactNode }) {
-	return <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:border-t max-lg:border-night-700 max-lg:bg-night-950/95 max-lg:px-3 max-lg:py-2 max-lg:shadow-[0_-8px_24px_rgb(0_0_0_/_0.5)] max-lg:backdrop-blur">{children}</div>;
+	return <div className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:bg-[#0b2219] max-lg:px-3 max-lg:py-2 max-lg:shadow-[inset_0_2px_0_var(--card-cap),0_-4px_0_rgb(0_0_0_/_0.3)]">{children}</div>;
 }
 
 export function LastSaleRibbon({ snapshot, asset, teamId, price, label = 'Last' }: { snapshot: DraftSnapshot; asset: Asset; teamId: number; price: number; label?: string }) {
 	const team = findTeam(snapshot, teamId);
 	return (
 		<span className="inline-flex items-center gap-1.5 text-[11px] text-fog-500" title={`${asset.name} to ${team?.name} for $${price}`}>
-			<span className="font-display font-semibold uppercase tracking-widest">{label}</span>
+			<span className="font-display font-semibold">{label}</span>
 			<AssetSprite asset={asset} size={18} />
 			{team && <TeamLogo logo={team.logo} name={team.name} size={14} />}
-			<span className="font-display font-bold tabular-nums text-star-400">${price}</span>
+			<span className="font-mono font-semibold tabular-nums text-fog-100">${price}</span>
 		</span>
 	);
 }

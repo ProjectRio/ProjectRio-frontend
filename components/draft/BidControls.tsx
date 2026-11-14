@@ -24,23 +24,25 @@ function Situation({ snapshot, teamId, bidding }: { snapshot: DraftSnapshot; tea
 	return (
 		<p className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-fog-500">
 			<span>
-				<Money amount={team.remaining} className="font-semibold text-fog-300" /> left · {slots} slot{slots === 1 ? '' : 's'}
-				{team.open_slots.stadium > 0 && team.open_slots.character > 0 ? ` (${team.open_slots.character}+${team.open_slots.stadium})` : ''}
-				{perSlotNow !== null && (
-					<>
-						{' '}
-						· <Money amount={perSlotNow} className="text-fog-300" />/slot
-					</>
-				)}
+				<Money amount={team.remaining} className="font-mono font-semibold text-fog-100" /> left
 			</span>
+			<span>
+				<span className="font-mono tabular-nums text-fog-300">{slots}</span> slot{slots === 1 ? '' : 's'}
+				{team.open_slots.stadium > 0 && team.open_slots.character > 0 ? ` (${team.open_slots.character}+${team.open_slots.stadium})` : ''}
+			</span>
+			{perSlotNow !== null && (
+				<span>
+					<Money amount={perSlotNow} className="font-mono text-fog-300" />/slot
+				</span>
+			)}
 			{after !== null && (
 				<span className={tight ? 'text-star-400' : ''}>
-					win at ${bidding} → <Money amount={after} className={tight ? 'font-semibold text-star-400' : 'font-semibold text-fog-300'} />/slot for the rest
+					win at ${bidding} → <Money amount={after} className={tight ? 'font-mono font-semibold text-star-400' : 'font-mono font-semibold text-fog-300'} />/slot for the rest
 				</span>
 			)}
 			{slots === 1 && config.last_slot_takes_remaining && <span className="text-star-400">last slot pays your whole remaining budget</span>}
 			{rules.map((rule) => (
-				<span key={rule.label} className={rule.ok ? 'text-emerald-300/80' : 'text-star-400'}>
+				<span key={rule.label} className={rule.ok ? 'text-fog-300' : 'text-star-400'}>
 					{rule.ok ? '✓' : '!'} {rule.label}
 				</span>
 			))}
@@ -122,16 +124,17 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 		return (
 			<div className="space-y-1.5">
 				<form
-					className="flex flex-wrap items-center gap-1.5 rounded border border-rio-500/50 bg-rio-500/5 px-2 py-1.5"
+					className="sel flex flex-wrap items-center gap-1.5 px-2 py-1.5"
 					onSubmit={(event) => {
 						event.preventDefault();
 						void bid(amount);
 					}}
 				>
-					<span className="font-display text-[11px] font-bold uppercase tracking-widest text-rio-300">Your nomination · open the bidding at</span>
-					<input ref={inputRef} type="number" min={floor} max={maxBid} step={increment} value={amount} disabled={!canBid || busy} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-20 !py-1 font-display text-base font-bold tabular-nums" aria-label="Opening bid" autoFocus />
+					<span className="font-display text-sm font-semibold text-star-400">Your nomination</span>
+					<span className="text-xs text-fog-300">Open the bidding at</span>
+					<input ref={inputRef} type="number" min={floor} max={maxBid} step={increment} value={amount} disabled={!canBid || busy} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-20 !py-1 font-mono text-base font-semibold tabular-nums !text-star-400" aria-label="Opening bid" autoFocus />
 					{quick.map((value) => (
-						<button key={value} type="button" disabled={!canBid || busy} onClick={() => setAmount(value)} className={`rounded border px-2 py-1 text-xs ${amount === value ? 'border-rio-400 text-fog-100' : 'border-night-600 text-fog-300 hover:border-rio-400'} disabled:opacity-40`}>
+						<button key={value} type="button" disabled={!canBid || busy} onClick={() => setAmount(value)} aria-pressed={amount === value} className={`${amount === value ? 'key-on text-star-400' : 'key'} rounded-[5px] px-2 py-1 font-mono text-xs tabular-nums disabled:opacity-40`}>
 							${value}
 						</button>
 					))}
@@ -139,8 +142,9 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 						Open at ${amount}
 					</button>
 					<span className="text-[11px] text-fog-500">
-						max <Money amount={maxBid} className="font-semibold text-fog-300" /> · you hold it until someone bids
+						max <Money amount={maxBid} className="font-mono font-semibold text-fog-100" />
 					</span>
+					<span className="text-[11px] text-fog-500">You hold it until someone bids</span>
 				</form>
 				{situation}
 				<Reason error={error} types={['bid']} className="!text-xs" />
@@ -152,11 +156,10 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 
 	if (youAreHigh) {
 		return (
-			<div className="flex flex-wrap items-center gap-3 rounded border border-rio-500/50 bg-rio-500/10 px-3 py-1.5 text-xs">
-				<span className="font-display font-bold uppercase tracking-widest text-rio-300">You hold the high bid</span>
-				<span className="text-fog-300">
-					<Money amount={high!.amount} /> · {high!.placed_by}
-				</span>
+			<div className="well flex flex-wrap items-center gap-3 px-3 py-1.5 text-xs">
+				<span className="font-display text-sm font-semibold text-star-400">You hold the high bid</span>
+				<Money amount={high!.amount} className="font-mono text-base font-semibold text-star-400" />
+				<span className="text-fog-300">{high!.placed_by}</span>
 				{high!.rescind === 'requested' ? (
 					<span className="ml-auto text-star-400">Rescind requested — commissioner deciding</span>
 				) : (
@@ -175,8 +178,8 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 					Bid ${floor}
 				</button>
 				{quick.map((step) => (
-					<button key={step} type="button" disabled={!canBid || busy || floor + step - increment > maxBid} onClick={() => bid(floor + step - increment)} className="btn-secondary !px-3 !py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40">
-						+${step}
+					<button key={step} type="button" disabled={!canBid || busy || floor + step - increment > maxBid} onClick={() => bid(floor + step - increment)} className="key px-2.5 py-1.5 font-mono text-xs tabular-nums disabled:cursor-not-allowed disabled:opacity-40">
+	+${step}
 					</button>
 				))}
 				<form
@@ -186,22 +189,25 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 						void bid(amount);
 					}}
 				>
-					<input ref={inputRef} type="number" min={floor} max={maxBid} step={increment} value={amount} disabled={!canBid || busy} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-20 !py-1 font-display text-base font-bold tabular-nums" aria-label="Custom bid" />
+					<input ref={inputRef} type="number" min={floor} max={maxBid} step={increment} value={amount} disabled={!canBid || busy} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-20 !py-1 font-mono text-base font-semibold tabular-nums" aria-label="Custom bid" />
 					<button type="submit" className="btn-secondary !px-3 !py-1.5 text-xs disabled:opacity-40" disabled={!canBid || busy || amount < floor || amount > maxBid}>
 						Bid ${amount}
 					</button>
 				</form>
 				<span className="text-[11px] text-fog-500">
-					max <Money amount={maxBid} className="font-semibold text-fog-300" />
-					{floor > maxBid && !ineligibleReason && <span className="text-star-400"> · can't cover the next increment</span>}
-					{ineligibleReason && <span className="text-star-400"> · {ineligibleReason}</span>}
-				</span>
+					max <Money amount={maxBid} className="font-mono font-semibold text-fog-100" />
+					</span>
+					{floor > maxBid && !ineligibleReason && <span className="text-[11px] text-star-400">can't cover the next increment</span>}
+					{ineligibleReason && <span className="text-[11px] text-star-400">{ineligibleReason}</span>}
 				{!passed ? (
-					<button type="button" className="ml-auto font-display text-xs font-bold uppercase tracking-widest text-fog-300 hover:text-rio-300 disabled:opacity-40" disabled={busy || locked} onClick={() => act({ type: 'pass' })}>
+					<button type="button" className="key ml-auto px-2.5 py-1 font-display text-xs font-semibold disabled:opacity-40" disabled={busy || locked} onClick={() => act({ type: 'pass' })}>
 						I'm out
 					</button>
 				) : (
-					<span className="ml-auto font-display text-[11px] font-bold uppercase tracking-widest text-fog-500">You're out · bid to rejoin</span>
+					<span className="ml-auto flex gap-2 text-[11px] text-fog-500">
+	<span className="font-semibold text-fog-300">You're out</span>
+	<span>Bid to rejoin</span>
+</span>
 				)}
 				<span className="hidden text-[10px] text-fog-500 xl:inline">
 					<Kbd>B</Kbd> <Kbd>+</Kbd> <Kbd>O</Kbd>
@@ -209,9 +215,9 @@ export default function BidControls({ snapshot, current, act, pending, error }: 
 			</div>
 			{situation}
 			{confirming !== null && (
-				<div className="flex flex-wrap items-center gap-3 rounded border border-star-500/50 bg-star-500/10 px-3 py-1.5 text-xs">
+				<div className="well flex flex-wrap items-center gap-3 px-3 py-1.5 text-xs">
 					<span className="text-fog-100">${confirming} is more than double the high bid. Place it?</span>
-					<button type="button" className="btn-primary !px-3 !py-1 text-xs" onClick={() => bid(confirming)}>
+					<button type="button" className="btn-secondary !px-3 !py-1 text-xs" onClick={() => bid(confirming)}>
 						Yes, bid ${confirming}
 					</button>
 					<button type="button" className="text-fog-500 hover:text-fog-100" onClick={() => setConfirming(null)}>

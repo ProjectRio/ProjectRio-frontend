@@ -67,15 +67,15 @@ export default function PoolPanel({
 					title={title}
 					aria-label={`${MODE_VERB[mode] || 'View'} ${entry.asset.name}`}
 					onClick={() => clickable && onSelect?.(entry.asset)}
-					className={`relative flex flex-col items-center justify-center rounded border transition-colors ${
-						selected ? 'border-rio-500 bg-rio-500/20' : starred ? 'border-star-500/70 bg-star-500/[0.08]' : reason ? 'border-transparent' : 'border-night-800 bg-night-850'
-					} ${clickable ? 'cursor-pointer hover:border-rio-400 hover:bg-rio-500/15' : 'cursor-default'}`}
+					className={`relative flex flex-col items-center justify-center rounded-[5px] border transition-colors ${
+						selected ? 'sel' : reason ? 'border-transparent' : clickable ? `key-on hover:!border-rim ${starred ? '!bg-[#5a4a12]' : ''}` : starred ? 'border-transparent bg-star-400/15' : 'border-transparent bg-black/20'
+					} ${clickable ? 'cursor-pointer' : 'cursor-default'}`}
 					style={{ width: tile + 8, height: isFixed ? tile + 20 : tile + 8 }}
 				>
 					<AssetSprite asset={entry.asset} size={tile} dim={!!reason} />
-					{isFixed && entry.price !== undefined && <span className="font-display text-[10px] font-bold leading-none tabular-nums text-fog-100">${entry.price}</span>}
+					{isFixed && entry.price !== undefined && <span className="font-mono text-[10px] font-semibold leading-none tabular-nums text-fog-100">${entry.price}</span>}
 					{entry.remaining_copies !== null && entry.remaining_copies > 1 && (
-						<span className="absolute right-0 top-0 rounded-bl rounded-tr bg-night-700 px-0.5 font-display text-[8px] font-bold tabular-nums text-fog-300">×{entry.remaining_copies}</span>
+						<span className="absolute right-0 top-0 rounded-bl rounded-tr bg-black/60 px-0.5 font-mono text-[8px] tabular-nums text-fog-300">×{entry.remaining_copies}</span>
 					)}
 					{entry.asset.captain && <span className="absolute left-0.5 top-0 text-[8px] text-star-400">✪</span>}
 					{entry.restriction_icons.length > 0 && <span className="absolute bottom-0 left-0.5 font-display text-[8px] font-bold text-star-400">{entry.restriction_icons.map((icon) => icon.code).join('')}</span>}
@@ -87,7 +87,7 @@ export default function PoolPanel({
 						aria-label={starred ? `Drop ${entry.asset.name} from targets` : `Target ${entry.asset.name}`}
 						title={starred ? 'Drop from targets' : 'Target'}
 						onClick={() => toggleTarget(draft.league_id, entry.asset.id)}
-						className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] leading-none ${starred ? 'bg-star-500 text-night-950' : 'bg-night-900/90 text-night-600 hover:text-star-400'}`}
+						className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] leading-none ${starred ? 'bg-star-400 text-night-950' : 'bg-[var(--card-side)] text-night-600 hover:text-star-400'}`}
 					>
 						{starred ? '★' : '☆'}
 					</button>
@@ -104,11 +104,11 @@ export default function PoolPanel({
 					if (entries.length === 0) return null;
 					return (
 						<div key={group.label}>
-							<div className="mb-1 flex items-center gap-1.5 font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">
+							<h4 className="mb-1 flex items-center gap-1.5 font-display text-xs font-semibold text-fog-300">
 								<span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: group.hue }} />
 								{group.label}
-								<span className="text-fog-500/70">{entries.length}</span>
-							</div>
+								<span className="font-mono font-normal tabular-nums text-fog-500">{entries.length}</span>
+							</h4>
 							<ul className="grid gap-1" style={{ gridTemplateColumns: `repeat(${group.cols}, max-content)` }}>
 								{entries.map(renderTile)}
 							</ul>
@@ -117,8 +117,13 @@ export default function PoolPanel({
 				})}
 				<div className="ml-auto flex flex-col items-end gap-1">
 					<input className="input !w-32 !py-1 !text-xs" placeholder="Find…" value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search pool" />
-					{mode !== 'browse' && <span className="font-display text-[10px] font-semibold uppercase tracking-widest text-rio-300">Click to {MODE_VERB[mode].toLowerCase()}</span>}
-					<span className="text-[10px] text-fog-500">✪ captain · ★ your target · C/G/L restriction · ×n copies</span>
+					{mode !== 'browse' && <span className="font-display text-xs font-semibold text-star-400">Click to {MODE_VERB[mode].toLowerCase()}</span>}
+					<span className="flex flex-wrap justify-end gap-x-2 text-[10px] text-fog-500">
+						<span>✪ captain</span>
+						<span>★ your target</span>
+						<span>C/G/L restriction</span>
+						<span>×n copies</span>
+					</span>
 				</div>
 			</div>
 			{available.length === 0 && <p className="py-4 text-center text-xs text-fog-500">Nothing left.</p>}

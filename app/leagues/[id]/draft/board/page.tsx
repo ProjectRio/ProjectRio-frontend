@@ -30,14 +30,17 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
 		<div>
 			<div className="mb-4 flex flex-wrap items-end justify-between gap-3">
 				<div>
-					<p className="kicker">{draft.league_name} · {draft.collection}</p>
-					<h1 className="flex items-center gap-3 text-3xl uppercase">
+					<p className="flex gap-2 font-display text-sm font-semibold text-star-400">
+						<span>{draft.league_name}</span>
+						<span className="text-fog-300">{draft.collection}</span>
+					</p>
+					<h1 className="flex items-center gap-3 text-3xl">
 						Draft board <StateChip state={draft.state} paused={draft.paused} />
 					</h1>
-				</div>
-				<Link href={`/leagues/${leagueId}/draft`} className="font-display text-xs font-semibold uppercase tracking-widest text-fog-500 hover:text-fog-100">
-					← Room
-				</Link>
+					</div>
+					<Link href={`/leagues/${leagueId}/draft`} className="key px-2.5 pb-0.5 pt-1 font-display text-xs font-semibold">
+					Room
+					</Link>
 			</div>
 			{(lot || clockTeam) && draft.state === 'live' && (
 				<Panel className="mb-4 flex flex-wrap items-center gap-6 p-4">
@@ -45,20 +48,23 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
 						<>
 							<AssetSprite asset={lot.asset} size={72} />
 							<div>
-								<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">On the block · {FORMAT_LABELS[draft.format]}</div>
-								<div className="text-3xl uppercase leading-none">{lot.asset.name}</div>
+								<div className="flex gap-2 font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">
+									<span>On the block</span>
+									<span className="text-fog-300">{FORMAT_LABELS[draft.format]}</span>
+								</div>
+								<div className="font-display text-3xl font-semibold leading-none">{lot.asset.name}</div>
 								<div className="text-xs text-fog-500">nom. {findTeam(snapshot, lot.nominated_by_team_id)?.name}</div>
 							</div>
 							{current.kind === 'auction' && current.awaiting_opening && (
 								<div className="ml-auto text-right">
-									<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Opening bid</div>
-									<div className="font-display text-xl font-bold uppercase leading-none text-fog-300">Waiting on {findTeam(snapshot, lot.nominated_by_team_id)?.name}</div>
+									<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Opening bid</div>
+									<div className="font-display text-xl font-semibold leading-none text-fog-100">Waiting on {findTeam(snapshot, lot.nominated_by_team_id)?.name}</div>
 								</div>
 							)}
 							{high && (
 								<div className="ml-auto text-right">
-									<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Leading</div>
-									<div className="font-display text-5xl font-bold leading-none tabular-nums">
+									<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Leading</div>
+									<div className="font-mono text-5xl font-semibold leading-none tabular-nums text-star-400">
 										<Money amount={high.amount} />
 									</div>
 									<div className="flex items-center justify-end gap-1.5 text-sm text-fog-300">
@@ -74,8 +80,11 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
 						<>
 							<TeamLogo logo={clockTeam.logo} name={clockTeam.name} size={64} />
 							<div>
-								<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">On the clock · pick {current.on_the_clock?.pick_number}</div>
-								<div className="text-3xl uppercase leading-none">{clockTeam.name}</div>
+								<div className="flex gap-2 font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">
+									<span>On the clock</span>
+									<span className="font-mono normal-case tracking-normal text-fog-300">pick {current.on_the_clock?.pick_number}</span>
+								</div>
+								<div className="font-display text-3xl font-semibold leading-none">{clockTeam.name}</div>
 							</div>
 							<div className="ml-auto">
 								<Clock closesAt={current.on_the_clock?.closes_at ?? null} paused={draft.paused} serverNow={handle.serverNow} untimedLabel="No clock" total={draft.config.pick_seconds ?? undefined} size={96} />
@@ -89,7 +98,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
 					<DraftBoard snapshot={snapshot} previous={handle.previous} readOnly />
 				</Panel>
 				<Panel>
-					<div className="border-b border-night-700 bg-night-850 px-3 py-2 font-display text-xs font-bold uppercase tracking-widest text-fog-300">Results</div>
+					<h2 className="px-3 pb-1 pt-3 text-lg">Results</h2>
 					<ResultsFeed snapshot={snapshot} limit={20} maxHeight="max-h-[80vh]" />
 				</Panel>
 			</div>

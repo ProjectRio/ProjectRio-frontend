@@ -12,7 +12,6 @@ import { useDraft, type DraftHandle } from '@/lib/draft/useDraft';
 import DraftBoard from '@/components/draft/DraftBoard';
 import PreviewBar from '@/components/draft/PreviewBar';
 import { AssetSprite, findTeam, Money, PresenceDot, SectionLabel, StateChip, TeamLogo } from '@/components/draft/primitives';
-import { Tabs } from '@/components/overlay';
 import { Badge, EmptyState, PageHeader, Panel, Spinner } from '@/components/ui';
 
 function TeamNameEditor({ snapshot, handle, teamId }: { snapshot: DraftSnapshot; handle: DraftHandle; teamId: number }) {
@@ -21,7 +20,7 @@ function TeamNameEditor({ snapshot, handle, teamId }: { snapshot: DraftSnapshot;
 	const [value, setValue] = useState(team.name);
 	if (!editing) {
 		return (
-			<button type="button" className="text-[11px] text-fog-500 underline decoration-dotted underline-offset-2 hover:text-fog-100" onClick={() => setEditing(true)}>
+			<button type="button" className="key px-1.5 py-0.5 text-[11px]" onClick={() => setEditing(true)}>
 				Rename
 			</button>
 		);
@@ -35,10 +34,10 @@ function TeamNameEditor({ snapshot, handle, teamId }: { snapshot: DraftSnapshot;
 			}}
 		>
 			<input className="input !w-44 !py-1 !text-sm" maxLength={28} value={value} onChange={(event) => setValue(event.target.value)} autoFocus />
-			<button type="submit" className="btn-primary !px-3 !py-1 text-xs">
+			<button type="submit" className="key px-2.5 py-1 text-xs font-semibold">
 				Save
 			</button>
-			<button type="button" className="text-xs text-fog-500" onClick={() => setEditing(false)}>
+			<button type="button" className="text-xs text-fog-500 hover:text-fog-100" onClick={() => setEditing(false)}>
 				Cancel
 			</button>
 		</form>
@@ -53,14 +52,14 @@ function OverviewTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dr
 		<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
 			<Panel>
 				<SectionLabel>Teams</SectionLabel>
-				<ul className="divide-y divide-night-800">
+				<ul className="px-1 pb-1">
 					{teams.map((team) => (
-						<li key={team.id} className={`flex items-center gap-3 px-4 py-3 ${team.id === you.team_id ? 'bg-rio-500/[0.06]' : ''}`}>
+						<li key={team.id} className={`flex items-center gap-3 rounded-md px-3 py-2.5 ${team.id === you.team_id ? 'bg-star-400/[0.06]' : ''}`}>
 							<TeamLogo logo={team.logo} name={team.name} size={36} />
 							<div className="min-w-0 flex-1">
 								<div className="flex flex-wrap items-center gap-2">
-									<span className="font-display text-base font-bold uppercase tracking-wide">{team.name}</span>
-									{team.id === you.team_id && <Badge color="red">You</Badge>}
+									<span className="font-display text-base font-semibold text-fog-100">{team.name}</span>
+									{team.id === you.team_id && <Badge color="gold">You</Badge>}
 									{(team.id === you.team_id || you.role === 'commissioner') && <TeamNameEditor snapshot={snapshot} handle={handle} teamId={team.id} />}
 								</div>
 								<div className="flex flex-wrap gap-x-3 text-xs text-fog-500">
@@ -74,11 +73,18 @@ function OverviewTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dr
 							</div>
 							<div className="text-right text-xs text-fog-500">
 								{draft.format !== 'snake' && (
-									<div>
-										Salary <Money amount={draft.state === 'completed' ? team.spent : 0} className="text-fog-300" /> · cap <Money amount={Math.round(draft.config.budget * 1.25)} />
+									<div className="flex justify-end gap-3">
+										<span>
+											Salary <Money amount={draft.state === 'completed' ? team.spent : 0} className="font-mono text-fog-100" />
+										</span>
+										<span>
+											cap <Money amount={Math.round(draft.config.budget * 1.25)} className="font-mono text-fog-300" />
+										</span>
 									</div>
 								)}
-								<div>{team.picks.length} rostered</div>
+								<div>
+									<span className="font-mono tabular-nums text-fog-300">{team.picks.length}</span> rostered
+								</div>
 							</div>
 						</li>
 					))}
@@ -87,13 +93,19 @@ function OverviewTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dr
 			<div className="space-y-4">
 				<Panel className="p-4">
 					<div className="flex items-center justify-between">
-						<span className="font-display text-xs font-bold uppercase tracking-widest text-fog-300">Draft</span>
+						<h2 className="text-xl">Draft</h2>
 						<StateChip state={draft.state} paused={draft.paused} />
-					</div>
-					<p className="mt-2 text-sm text-fog-300">
-						{FORMAT_LABELS[draft.format]} · {draft.format !== 'snake' ? `$${draft.config.budget} · ` : ''}
-						{draft.config.slots.character}+{draft.config.slots.stadium} slots
-					</p>
+						</div>
+						<p className="mt-2 flex flex-wrap gap-x-3 text-sm text-fog-300">
+						<span>{FORMAT_LABELS[draft.format]}</span>
+						{draft.format !== 'snake' && <span className="font-mono tabular-nums">${draft.config.budget}</span>}
+						<span>
+							<span className="font-mono tabular-nums">
+								{draft.config.slots.character}+{draft.config.slots.stadium}
+							</span>{' '}
+							slots
+						</span>
+						</p>
 					{league.scheduled_at && draft.state === 'lobby' && <p className="text-xs text-fog-500">Scheduled {new Date(league.scheduled_at).toLocaleString()}</p>}
 					<div className="mt-3 flex flex-wrap gap-2">
 						<Link href={roomHref} className="btn-primary !py-2 text-sm">
@@ -107,14 +119,15 @@ function OverviewTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dr
 					</div>
 				</Panel>
 				<Panel className="p-4 text-sm text-fog-300">
-					<span className="font-display text-xs font-bold uppercase tracking-widest text-fog-300">About</span>
+					<h2 className="text-xl text-fog-100">About</h2>
 					<p className="mt-2">{league.description}</p>
-					<p className="mt-2 text-xs text-fog-500">
-						Commissioner: {teams.flatMap((team) => team.managers).find((manager) => draft.commissioner_ids.includes(manager.rio_user_id))?.username ?? 'MattGree'} · Trades{' '}
-						{draft.config.trades.enabled ? `on (${draft.config.trades.approval_model.replace('_', ' ')})` : 'off'} · Free agency {draft.config.free_agency.mode}
-					</p>
-					<Link href={`/leagues/${draft.league_id}/history`} className="mt-3 inline-block text-xs text-rio-300 hover:text-rio-200">
-						Price history for {draft.collection} →
+					<ul className="mt-2 space-y-0.5 text-xs text-fog-500">
+						<li>Commissioner: {teams.flatMap((team) => team.managers).find((manager) => draft.commissioner_ids.includes(manager.rio_user_id))?.username ?? 'MattGree'}</li>
+						<li>Trades {draft.config.trades.enabled ? `on (${draft.config.trades.approval_model.replace('_', ' ')})` : 'off'}</li>
+						<li>Free agency {draft.config.free_agency.mode}</li>
+					</ul>
+					<Link href={`/leagues/${draft.league_id}/history`} className="mt-3 inline-block text-xs text-star-400 underline decoration-transparent underline-offset-4 hover:decoration-star-400">
+						Price history for {draft.collection}
 					</Link>
 				</Panel>
 			</div>
@@ -135,18 +148,18 @@ function RostersTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 				{teams.map((team) => (
 					<Panel key={team.id}>
-						<div className={`flex items-center gap-2 border-b border-night-700 px-3 py-2 ${team.id === you.team_id ? 'bg-rio-500/[0.08]' : 'bg-night-850'}`}>
+						<div className={`flex items-center gap-2 px-3 pb-1 pt-3 ${team.id === you.team_id ? 'bg-star-400/[0.08]' : ''}`}>
 							<TeamLogo logo={team.logo} name={team.name} size={22} />
-							<span className="font-display text-xs font-bold uppercase tracking-widest">{team.name}</span>
+							<h3 className={`font-display text-sm font-semibold ${team.id === you.team_id ? 'text-star-400' : 'text-fog-100'}`}>{team.name}</h3>
 							{draft.format !== 'snake' && (
-								<span className="ml-auto font-display text-xs font-bold tabular-nums text-fog-300">
+								<span className="ml-auto font-mono text-xs font-semibold tabular-nums text-fog-100">
 									<Money amount={team.spent} />
 								</span>
 							)}
 						</div>
-						<ul className="divide-y divide-night-800">
+						<ul className="pb-2">
 							{team.picks.map((pick) => (
-								<li key={pick.id} className="flex items-center gap-2 px-3 py-1.5 text-sm">
+								<li key={pick.id} className="flex items-center gap-2 px-3 py-1 text-sm">
 									<AssetSprite asset={pick.asset} size={24} />
 									<span className="min-w-0 flex-1 truncate">
 										{pick.nickname ? (
@@ -158,8 +171,8 @@ function RostersTab({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 										)}
 										{pick.asset.captain && <span className="ml-1 text-star-400">✪</span>}
 									</span>
-									{pick.is_keeper && <span className="text-[9px] font-bold uppercase tracking-widest text-star-400">Keeper</span>}
-									{draft.format !== 'snake' && <span className={`font-display text-xs font-bold tabular-nums ${pick.took_remaining_budget ? 'text-star-400' : 'text-fog-300'}`}>${pick.price}</span>}
+									{pick.is_keeper && <span className="plate !px-1 !py-0 text-[9px] text-star-300 [--plate:#5a4a12]">Keeper</span>}
+									{draft.format !== 'snake' && <span className={`font-mono text-xs tabular-nums ${pick.took_remaining_budget ? 'text-star-400' : 'text-fog-300'}`}>${pick.price}</span>}
 								</li>
 							))}
 							{team.picks.length === 0 && <li className="px-3 py-3 text-xs text-fog-500">{draft.format === 'fixed_price' && draft.state !== 'completed' ? 'Build is private until completion.' : 'Nothing yet.'}</li>}
@@ -183,7 +196,7 @@ function TradesTab({ snapshot }: { snapshot: DraftSnapshot }) {
 				{!enabled ? (
 					<EmptyState title="Trades are off" detail="The commissioner disabled trades for this league — typical for fixed-price leagues." />
 				) : sample ? (
-					<ul className="divide-y divide-night-800">
+					<ul>
 						<li className="px-4 py-3">
 							<div className="flex flex-wrap items-center gap-2 text-sm">
 								<TeamLogo logo={teams[0].logo} name={teams[0].name} size={20} />
@@ -211,7 +224,7 @@ function TradesTab({ snapshot }: { snapshot: DraftSnapshot }) {
 				)}
 			</Panel>
 			<Panel className="p-4 text-sm">
-				<span className="font-display text-xs font-bold uppercase tracking-widest text-fog-300">Approval model</span>
+				<h2 className="text-xl">Approval model</h2>
 				<p className="mt-2 text-fog-300">{enabled ? { parties_only: 'Both parties accept and it executes.', commissioner: 'Both parties accept, then the commissioner approves.', league_veto: 'Both parties accept; the league has a veto window.' }[draft.config.trades.approval_model] : 'Trades are disabled.'}</p>
 				{enabled && (
 					<button type="button" className="btn-secondary mt-4 !py-2 text-sm" disabled title="Trade proposals come with the league page build">
@@ -234,7 +247,7 @@ export default function LeaguePage({ params }: { params: Promise<{ id: string }>
 	return (
 		<div>
 			<PreviewBar leagueId={leagueId} compact />
-			<PageHeader kicker={`${league.collection} · ${league.season}`} title={league.name}>
+			<PageHeader kicker={`${league.collection} ${league.season}`} title={league.name}>
 				<Badge color="gray">{FORMAT_LABELS[league.format]}</Badge>
 				{snapshot && <StateChip state={snapshot.draft.state} paused={snapshot.draft.paused} />}
 				{competitionForLeague(leagueId) && (
@@ -243,15 +256,17 @@ export default function LeaguePage({ params }: { params: Promise<{ id: string }>
 					</Link>
 				)}
 			</PageHeader>
-			<Tabs
-				tabs={[
+			<div className="tab-strip mb-6" role="tablist">
+				{[
 					{ id: 'overview', label: 'Overview' },
 					{ id: 'rosters', label: 'Rosters' },
 					{ id: 'trades', label: 'Trades' }
-				]}
-				active={tab}
-				onChange={setTab}
-			/>
+				].map((option) => (
+					<button key={option.id} type="button" role="tab" aria-selected={tab === option.id} onClick={() => setTab(option.id)}>
+						{option.label}
+					</button>
+				))}
+			</div>
 			{!snapshot ? (
 				<Spinner label="Loading league…" />
 			) : (

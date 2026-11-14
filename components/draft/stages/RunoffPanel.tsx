@@ -20,20 +20,25 @@ export default function RunoffPanel({ snapshot, handle, runoff, asset, tiedAmoun
 	const busy = handle.pending.has('runoff_bid') || handle.pending.has('runoff_pass');
 
 	return (
-		<div className="rounded-lg border border-star-500/50 bg-star-500/5 p-4">
+		<div className="sel p-4">
 			<div className="flex flex-wrap items-center justify-between gap-4">
 				<div className="flex items-center gap-3">
 					{asset && <AssetSprite asset={asset} size={44} />}
 					<div>
-						<p className="font-display text-[10px] font-bold uppercase tracking-widest text-star-400">Runoff</p>
-						<h3 className="text-xl uppercase leading-none">{asset ? asset.name : 'Tie-break'} · tied at ${tiedAmount ?? '?'}</h3>
+						<p className="font-display text-sm font-semibold text-star-400">Runoff</p>
+						<h3 className="flex flex-wrap items-baseline gap-x-3 font-display text-xl font-semibold leading-none">
+							<span>{asset ? asset.name : 'Tie-break'}</span>
+							<span className="text-sm font-normal text-fog-300">
+								tied at <span className="font-mono tabular-nums">${tiedAmount ?? '?'}</span>
+							</span>
+						</h3>
 						<p className="mt-1 text-xs text-fog-500">Only the tied teams bid, in ${draft.config.bid_increment} steps, until all but one pass.</p>
 					</div>
 				</div>
 				<div className="flex items-center gap-4">
 					<div>
-						<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Runoff high</div>
-						<div className="font-display text-3xl font-bold leading-none tabular-nums">{high ? <Money amount={high.amount} /> : '—'}</div>
+						<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Runoff high</div>
+						<div className="font-mono text-3xl font-semibold leading-none tabular-nums text-star-400">{high ? <Money amount={high.amount} /> : '—'}</div>
 						<div className="text-xs text-fog-300">{high ? findTeam(snapshot, high.team_id)?.name : 'no runoff bids yet'}</div>
 					</div>
 					<Clock closesAt={runoff.closes_at} paused={draft.paused} serverNow={handle.serverNow} size={72} total={draft.config.lot_seconds ?? undefined} />
@@ -44,7 +49,7 @@ export default function RunoffPanel({ snapshot, handle, runoff, asset, tiedAmoun
 					const team = findTeam(snapshot, id);
 					const out = runoff.passed_team_ids.includes(id);
 					return (
-						<li key={id} className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${high?.team_id === id ? 'border-rio-500 bg-rio-500/15 text-fog-100' : out ? 'border-night-800 text-fog-500 line-through' : 'border-night-600 text-fog-300'}`}>
+						<li key={id} className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs ${high?.team_id === id ? 'bg-star-400 font-semibold text-night-950' : out ? 'text-fog-500 line-through' : 'bg-black/30 text-fog-300'}`}>
 							{team && <TeamLogo logo={team.logo} name={team.name} size={14} />}
 							{team?.name}
 						</li>
@@ -63,12 +68,12 @@ export default function RunoffPanel({ snapshot, handle, runoff, asset, tiedAmoun
 							void handle.act({ type: 'runoff_bid', payload: { amount } });
 						}}
 					>
-						<input type="number" min={floor} max={maxBid} value={amount} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-24 font-display font-bold tabular-nums" disabled={!canAct || busy} aria-label="Runoff bid" />
+						<input type="number" min={floor} max={maxBid} value={amount} onChange={(event) => setAmount(Number(event.target.value) || floor)} className="input !w-24 font-mono font-semibold tabular-nums" disabled={!canAct || busy} aria-label="Runoff bid" />
 						<button type="submit" className="btn-secondary !py-2 text-sm disabled:opacity-40" disabled={!canAct || busy || amount < floor || amount > maxBid}>
 							Bid ${amount}
 						</button>
 					</form>
-					<button type="button" className="ml-auto font-display text-xs font-bold uppercase tracking-widest text-fog-300 hover:text-rio-300 disabled:opacity-40" disabled={!canAct || busy} onClick={() => handle.act({ type: 'runoff_pass' })}>
+					<button type="button" className="key ml-auto px-2.5 py-1 font-display text-xs font-semibold disabled:opacity-40" disabled={!canAct || busy} onClick={() => handle.act({ type: 'runoff_pass' })}>
 						{youAreHigh ? 'You lead' : passed ? "You're out" : "I'm out"}
 					</button>
 				</div>

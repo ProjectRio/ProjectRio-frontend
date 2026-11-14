@@ -19,20 +19,20 @@ function NicknameEditor({ pick, onSave, onCancel }: { pick: SnapshotPick; onSave
 	const [value, setValue] = useState(pick.nickname ?? '');
 	return (
 		<form
-			className="absolute left-1/2 top-full z-30 mt-1 w-44 -translate-x-1/2 rounded-lg border border-night-600 bg-night-900 p-2 shadow-xl"
+			className="popover absolute left-1/2 top-full z-30 mt-1 w-44 -translate-x-1/2 p-2"
 			onSubmit={(event) => {
 				event.preventDefault();
 				onSave(value.trim() || null);
 			}}
 			onClick={(event) => event.stopPropagation()}
 		>
-			<label className="label !mb-1 !text-[10px]">Nickname · {pick.asset.name}</label>
-			<input autoFocus className="input !py-1 !text-xs" maxLength={24} value={value} onChange={(event) => setValue(event.target.value)} placeholder={pick.asset.name} />
+			<label className="label !mb-1 !text-[10px]">Nickname</label>
+			<input autoFocus className="input !py-1 !text-xs" maxLength={24} value={value} onChange={(event) => setValue(event.target.value)} placeholder={pick.asset.name} aria-label={`Nickname for ${pick.asset.name}`} />
 			<div className="mt-1.5 flex justify-end gap-2 text-[11px]">
 				<button type="button" className="text-fog-500 hover:text-fog-100" onClick={onCancel}>
 					Cancel
 				</button>
-				<button type="submit" className="font-semibold text-rio-300">
+				<button type="submit" className="key px-2 py-0.5 font-semibold">
 					Save
 				</button>
 			</div>
@@ -51,19 +51,19 @@ interface Pending {
 function GhostCell({ pending, money }: { pending: Pending; money: boolean }) {
 	if (!pending.asset) {
 		return (
-			<div className={`${CELL} flex items-center justify-center rounded border border-dashed border-rio-500/70`} title="On the clock">
+			<div className={`${CELL} sel flex items-center justify-center`} title="On the clock">
 				<span className="h-2 w-2 animate-pulse rounded-full bg-rio-500" />
 			</div>
 		);
 	}
 	return (
 		<div
-			className={`relative flex ${CELL} flex-col items-center justify-center rounded border border-dashed ${pending.yours ? 'border-rio-400 bg-rio-500/15' : 'border-star-400/80 bg-star-500/10'}`}
+			className={`sel relative flex ${CELL} flex-col items-center justify-center`}
 			title={`${pending.asset.name} — leading at $${pending.price}`}
 		>
 			<AssetSprite asset={pending.asset} size={money ? 30 : 36} className="opacity-70" />
 			{money && pending.price !== null && (
-				<span className={`font-display text-[11px] font-bold leading-none tabular-nums ${pending.yours ? 'text-rio-300' : 'text-star-400'}`}>
+				<span className={`font-mono text-[11px] font-semibold leading-none tabular-nums ${pending.yours ? 'text-star-400' : 'text-fog-100'}`}>
 					<Money amount={pending.price} />
 				</span>
 			)}
@@ -87,7 +87,7 @@ function Cell({
 	money: boolean;
 }) {
 	const [editing, setEditing] = useState(false);
-	if (!pick) return <div className={`${CELL} rounded border border-dashed border-night-800`} />;
+	if (!pick) return <div className={`${CELL} well`} />;
 	const icons = snapshot.pool.find((entry) => entry.asset.id === pick.asset.id)?.restriction_icons ?? [];
 	const title = [
 		pick.nickname ? `${pick.nickname} (${pick.asset.name})` : pick.asset.name,
@@ -101,13 +101,11 @@ function Cell({
 		<div
 			title={title}
 			onClick={() => editable && setEditing(true)}
-			className={`relative flex ${CELL} flex-col items-center justify-center rounded border transition-shadow ${
-				fresh ? 'border-rio-500 shadow-[0_0_14px_rgb(230_0_18_/_0.55)]' : pick.is_keeper ? 'border-star-500/50 bg-star-500/5' : 'border-night-700 bg-night-850'
-			} ${editable ? 'cursor-text hover:border-fog-500' : ''}`}
+			className={`key-on relative flex ${CELL} flex-col items-center justify-center rounded-[5px] border transition-colors ${fresh ? '!bg-[#5a4a12]' : ''} ${editable ? 'cursor-text hover:!border-rim' : ''}`}
 		>
 			<AssetSprite asset={pick.asset} size={money ? 30 : 36} />
 			{money && (
-				<span className={`font-display text-[11px] font-bold leading-none tabular-nums ${pick.took_remaining_budget ? 'text-star-400' : 'text-fog-100'}`}>
+				<span className={`font-mono text-[11px] font-semibold leading-none tabular-nums ${pick.took_remaining_budget ? 'text-star-400' : 'text-fog-100'}`}>
 					<Money amount={pick.price} />
 				</span>
 			)}
@@ -131,12 +129,12 @@ function TeamHead({ snapshot, teamId, activeIds }: { snapshot: DraftSnapshot; te
 	const team = snapshot.teams.find((row) => row.id === teamId)!;
 	const yours = team.id === snapshot.you.team_id;
 	return (
-		<div className={`relative flex min-w-[9.5rem] items-center gap-2 pl-2 ${activeIds.has(team.id) ? 'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:bg-rio-500' : ''}`}>
+		<div className={`relative flex min-w-[9.5rem] items-center gap-2 pl-2 ${activeIds.has(team.id) ? 'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:bg-star-400' : ''}`}>
 			<TeamLogo logo={team.logo} name={team.name} size={24} />
 			<div className="min-w-0">
 				<div className="flex items-center gap-1">
 					<PresenceDot present={team.present} />
-					<span className={`truncate font-display text-[11px] font-bold uppercase tracking-wider ${yours ? 'text-rio-300' : 'text-fog-100'}`}>{team.name}</span>
+					<span className={`truncate font-display text-xs font-semibold ${yours ? 'text-star-400' : 'text-fog-100'}`}>{team.name}</span>
 				</div>
 				<div className="truncate text-[10px] leading-tight text-fog-500" title={team.managers.map((manager) => `${manager.username}${manager.connected ? '' : ' (away)'}`).join(', ')}>
 					{team.managers.map((manager) => manager.username).join(' & ')}
@@ -197,42 +195,42 @@ function QueueCell({
 	const roundKind = current.kind === 'round_pool' && current.phase === 'nominating' ? current.round_kind : null;
 	const soon = !roundPool && position <= 2;
 	const title = entry.asset ? `${entry.asset.name}${entry.reason ? ` — ${entry.reason}` : ''}${interactive ? ' · click to change' : ''}` : interactive ? 'Nothing queued — click to nominate' : 'Nothing queued';
-	const tone = waitingOnThis ? 'border-rio-500 bg-rio-500/15 animate-pulse' : !entry.valid && entry.asset ? 'border-star-500/60' : front ? 'border-rio-500/50 bg-rio-500/10' : interactive && !entry.asset && soon ? 'border-star-500/50' : 'border-night-800';
+	const tone = waitingOnThis ? 'sel' : front && entry.asset ? 'key-on rounded-[5px]' : 'well';
 	const body = (
 		<>
-			<span className={`w-3 font-display text-[10px] font-bold tabular-nums ${front ? 'text-rio-400' : 'text-fog-500'}`}>{roundPool ? '' : position}</span>
+			<span className={`w-3 font-mono text-[10px] tabular-nums ${front ? 'text-star-400' : 'text-fog-500'}`}>{roundPool ? '' : position}</span>
 			{entry.asset ? (
 				<>
 					<AssetSprite asset={entry.asset} size={30} dim={!entry.valid} />
 					{!entry.valid && <span className="text-[10px] text-star-400">!</span>}
 				</>
 			) : interactive ? (
-				<span className={`flex-1 text-center font-display text-lg font-bold leading-none ${waitingOnThis || soon ? 'text-rio-300' : 'text-fog-500'}`}>+</span>
+				<span className={`flex-1 text-center font-display text-lg font-bold leading-none ${waitingOnThis || soon ? 'text-star-400' : 'text-fog-500'}`}>+</span>
 			) : (
-				<span className="text-[9px] uppercase tracking-wider text-fog-500">none</span>
+				<span className="text-[9px] text-fog-500">none</span>
 			)}
 		</>
 	);
 	if (!interactive || !act) {
 		return (
-			<div className={`flex h-[52px] w-[4.25rem] items-center gap-1 rounded border px-1 ${tone}`} title={title}>
+			<div className={`flex h-[52px] w-[4.25rem] items-center gap-1 border px-1 ${tone}`} title={title}>
 				{body}
 			</div>
 		);
 	}
 	return (
 		<div ref={wrap} className="relative">
-			<button ref={button} type="button" className={`flex h-[52px] w-[4.25rem] items-center gap-1 rounded border px-1 text-left hover:border-rio-400 ${tone}`} title={title} onClick={toggle} aria-expanded={open}>
+			<button ref={button} type="button" className={`flex h-[52px] w-[4.25rem] items-center gap-1 border px-1 text-left hover:!border-rim ${tone}`} title={title} onClick={toggle} aria-expanded={open}>
 				{body}
 			</button>
 			{open && anchor && (
-				<div className="fixed z-40 w-60 rounded-lg border border-night-600 bg-night-900 p-2 shadow-xl" style={{ top: anchor.top, right: anchor.right }}>
+				<div className="popover fixed z-40 w-60 p-2" style={{ top: anchor.top, right: anchor.right }}>
 					<div className="mb-1.5 flex items-center justify-between">
-						<span className="font-display text-[10px] font-bold uppercase tracking-widest text-fog-300">Your nomination</span>
+						<span className="font-display text-sm font-semibold text-fog-100">Your nomination</span>
 						{entry.asset && (
 							<button
 								type="button"
-								className="text-[11px] text-fog-500 hover:text-rio-300"
+								className="text-[11px] text-fog-500 hover:text-fog-100"
 								onClick={() => {
 									void act({ type: 'clear_nomination' });
 									setOpen(false);
@@ -331,7 +329,7 @@ export default function DraftBoard({
 
 	const canNickname = (teamId: number) => !readOnly && !!act && (teamId === you.team_id || you.role === 'commissioner') && draft.state !== 'setup';
 	const onNickname = (pick: SnapshotPick, nickname: string | null) => act?.({ type: 'set_nickname', payload: { pick_id: pick.id, nickname } });
-	const head = 'px-1 pb-1 text-center font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500';
+	const head = 'px-1 pb-1 text-center font-display text-[10px] font-semibold uppercase tracking-wider text-fog-500';
 
 	if (draft.format === 'snake') {
 		// Rounds down, teams across — the classic fantasy board.
@@ -351,7 +349,7 @@ export default function DraftBoard({
 											<PresenceDot present={team.present} />
 											<TeamLogo logo={team.logo} name={team.name} size={22} />
 										</span>
-										<span className={`max-w-[5.5rem] truncate font-display text-[10px] font-bold uppercase tracking-wider ${team.id === you.team_id ? 'text-rio-300' : 'text-fog-300'} ${active.has(team.id) ? 'underline decoration-rio-500 underline-offset-2' : ''}`}>
+										<span className={`max-w-[5.5rem] truncate font-display text-[11px] font-semibold ${team.id === you.team_id ? 'text-star-400' : 'text-fog-300'} ${active.has(team.id) ? 'underline decoration-star-400 decoration-2 underline-offset-2' : ''}`}>
 											{team.name}
 										</span>
 									</div>
@@ -364,14 +362,14 @@ export default function DraftBoard({
 							const sequence = round % 2 === 1 ? order : [...order].reverse();
 							return (
 								<tr key={round}>
-									<td className="pr-1 font-display text-xs font-bold tabular-nums text-fog-500">{round}</td>
+									<td className="pr-1 font-mono text-xs tabular-nums text-fog-500">{round}</td>
 									{order.map((team) => {
 										const pick = team.picks.find((candidate) => candidate.round === round) ?? null;
 										const position = sequence.indexOf(team) + 1;
 										const onClock = !pick && clock?.team_id === team.id && clock.round === round && pending;
 										return (
 											<td key={team.id} className="relative">
-												<span className="pointer-events-none absolute left-1 top-0.5 z-10 font-display text-[8px] tabular-nums text-fog-500">
+												<span className="pointer-events-none absolute left-1 top-0.5 z-10 font-mono text-[8px] tabular-nums text-fog-500">
 													{round}.{position}
 												</span>
 												{onClock ? <GhostCell pending={pending} money={false} /> : <Cell pick={pick} snapshot={snapshot} fresh={pick ? freshIds.has(pick.id) : false} editable={!!pick && canNickname(team.id)} onNickname={onNickname} money={false} />}
@@ -417,7 +415,7 @@ export default function DraftBoard({
 						const leader = pending?.team_id === team.id && pending.asset ? pending : null;
 						const ghostIndex = leader ? (leader.asset!.kind === 'character' ? characters.length : stadiums.length) : -1;
 						const yours = team.id === you.team_id;
-						const rowTone = leader ? (yours ? 'bg-rio-500/[0.14]' : 'bg-star-500/[0.07]') : yours ? 'bg-rio-500/[0.06]' : '';
+						const rowTone = leader ? (yours ? 'bg-star-400/[0.12]' : 'bg-black/30') : yours ? 'bg-star-400/[0.05]' : '';
 						return (
 							<tr key={team.id} className={`${rowTone} ${full && draft.state === 'live' ? 'opacity-70' : ''}`}>
 								<td className="pr-1">
@@ -430,7 +428,7 @@ export default function DraftBoard({
 									return (
 										<td key={column.key}>
 											{teamHidden ? (
-												<div className={`${CELL} flex items-center justify-center rounded border border-night-800 text-[9px] uppercase tracking-widest text-fog-500`}>{team.submitted ? 'sealed' : ''}</div>
+												<div className={`${CELL} well flex items-center justify-center text-[9px] text-fog-500`}>{team.submitted ? 'sealed' : ''}</div>
 											) : ghost ? (
 												<GhostCell pending={leader} money={money} />
 											) : (
@@ -440,11 +438,11 @@ export default function DraftBoard({
 									);
 								})}
 								{money && (
-									<td className="text-right font-display text-sm font-bold tabular-nums text-fog-100">
+									<td className="text-right font-mono text-sm font-semibold tabular-nums text-fog-100">
 										{teamHidden ? '—' : <Money amount={draft.state === 'completed' ? team.spent : team.remaining} />}
 									</td>
 								)}
-								{showMax && <td className="text-right font-display text-xs font-bold tabular-nums text-fog-400">{full ? '—' : <Money amount={team.max_bid} />}</td>}
+								{showMax && <td className="text-right font-mono text-xs tabular-nums text-fog-300">{full ? '—' : <Money amount={team.max_bid} />}</td>}
 								{showQueue && (
 									<td className="pl-1">
 										{!full && positions.has(team.id) && <QueueCell snapshot={snapshot} teamId={team.id} position={positions.get(team.id)!} act={act} interactive={canQueue && yours} />}

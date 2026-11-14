@@ -97,7 +97,7 @@ export function AssetCombobox({
 				}}
 			/>
 			{open && (
-				<ul role="listbox" className="absolute left-0 top-full z-30 mt-1 w-56 overflow-hidden rounded border border-night-600 bg-night-900 shadow-xl">
+				<ul role="listbox" className="popover absolute left-0 top-full z-30 mt-1 w-56 overflow-hidden p-1">
 					{options.map(({ entry, reason }, index) => (
 						<li key={entry.asset.id} role="option" aria-selected={index === cursor} aria-disabled={!!reason}>
 							<button
@@ -105,14 +105,14 @@ export function AssetCombobox({
 								disabled={!!reason}
 								onMouseEnter={() => setCursor(index)}
 								onClick={() => choose(index)}
-								className={`flex w-full items-center gap-2 px-2 py-1 text-left text-xs ${reason ? 'cursor-not-allowed text-fog-500' : index === cursor ? 'bg-rio-500/15 text-fog-100' : 'text-fog-100'}`}
+								className={`flex w-full items-center gap-2 rounded-md border px-2 py-1 text-left text-xs ${reason ? 'cursor-not-allowed border-transparent text-fog-500' : index === cursor ? 'sel text-fog-100' : 'border-transparent text-fog-100'}`}
 							>
 								<AssetSprite asset={entry.asset} size={20} dim={!!reason} />
 								<span className="flex-1 truncate">{entry.asset.name}</span>
 								{entry.asset.captain && <span className="text-star-400">✪</span>}
 								<RestrictionMarks icons={entry.restriction_icons} />
-								{entry.remaining_copies !== null && entry.remaining_copies > 1 && <span className="text-[10px] text-fog-500">×{entry.remaining_copies}</span>}
-								{reason && <span className="max-w-[7rem] truncate text-[10px] uppercase tracking-wider text-fog-500">{reason}</span>}
+								{entry.remaining_copies !== null && entry.remaining_copies > 1 && <span className="font-mono text-[10px] tabular-nums text-fog-500">×{entry.remaining_copies}</span>}
+								{reason && <span className="max-w-[7rem] truncate text-[10px] text-fog-500">{reason}</span>}
 							</button>
 						</li>
 					))}
@@ -145,18 +145,18 @@ export function NominationInline({
 	const pending = handle.pending.has('queue_nomination') || handle.pending.has('clear_nomination');
 	return (
 		<div className="flex flex-wrap items-center gap-2 text-xs">
-			<span className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">{label}</span>
+			<span className="font-display text-xs font-semibold text-fog-300">{label}</span>
 			{entry?.asset ? (
-				<span className={`inline-flex items-center gap-1.5 rounded border px-1.5 py-0.5 ${entry.valid ? 'border-night-600 bg-night-850' : 'border-star-500/60 bg-star-500/10'}`}>
+				<span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 ${entry.valid ? 'key-on rounded-[5px]' : 'well'}`}>
 					<AssetSprite asset={entry.asset} size={22} dim={!entry.valid} />
-					<span className="font-display text-xs font-bold uppercase tracking-wide text-fog-100">{entry.asset.name}</span>
+					<span className="font-display text-sm font-semibold text-fog-100">{entry.asset.name}</span>
 					{!entry.valid && entry.reason && <span className="text-[10px] text-star-400">{entry.reason}</span>}
-					<button type="button" className="ml-1 text-fog-500 hover:text-rio-300" title="Clear" aria-label="Clear nomination" disabled={pending} onClick={() => handle.act({ type: 'clear_nomination' })}>
+					<button type="button" className="ml-1 text-fog-500 hover:text-fog-100" title="Clear" aria-label="Clear nomination" disabled={pending} onClick={() => handle.act({ type: 'clear_nomination' })}>
 						×
 					</button>
 				</span>
 			) : (
-				<span className="italic text-fog-500">{hint}</span>
+				<span className="text-fog-500">{hint}</span>
 			)}
 			<AssetCombobox snapshot={snapshot} kind={kind} onPick={queue} placeholder={entry?.asset ? 'Change…' : 'Type a name…'} className="w-36" />
 			<Reason error={handle.error} types={['queue_nomination', 'clear_nomination']} className="!text-xs" />

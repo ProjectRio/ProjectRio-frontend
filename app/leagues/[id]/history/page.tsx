@@ -29,10 +29,10 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 
 	return (
 		<div>
-			<PageHeader kicker={`${league.collection} · price history`} title="Draft history">
-				<Link href={`/leagues/${league.id}`} className="btn-secondary !py-2 text-sm">
-					← {league.name}
-				</Link>
+			<PageHeader kicker={`${league.collection} price history`} title="Draft history">
+			<Link href={`/leagues/${league.id}`} className="btn-secondary !py-2 text-sm">
+				{league.name}
+			</Link>
 			</PageHeader>
 			<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
 				<Panel>
@@ -40,19 +40,16 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 						<EmptyState title="No past drafts" detail={`${league.collection} has no completed drafts to price from yet.`} />
 					) : (
 						<>
-							<div className="flex flex-wrap items-center gap-2 border-b border-night-700 bg-night-850 px-3 py-2">
-								{FILTERS.map((option) => (
-									<button
-										key={option}
-										type="button"
-										className={`border-b-2 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-widest ${filter === option ? 'text-fog-100' : 'text-fog-500 hover:text-fog-300'}`}
-										style={{ borderColor: filter === option ? (option === 'Stadiums' ? '#f59e0b' : (CLASS_HUES[option] ?? 'var(--color-rio-500)')) : 'transparent' }}
-										onClick={() => setFilter(option)}
-									>
-										{option}
-									</button>
-								))}
-								<select className="ml-auto rounded border border-night-600 bg-night-900 px-2 py-1 text-xs text-fog-300" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}>
+							<div className="flex flex-wrap items-center gap-2 px-4 py-3">
+								<div className="seg flex-wrap">
+									{FILTERS.map((option) => (
+										<button key={option} type="button" aria-pressed={filter === option} className="flex items-center gap-1.5 !px-2.5 !text-sm" onClick={() => setFilter(option)}>
+											{option !== 'All' && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: option === 'Stadiums' ? '#f59e0b' : CLASS_HUES[option] }} />}
+											{option}
+										</button>
+									))}
+								</div>
+								<select className="input ml-auto !w-auto !py-1 !text-xs" aria-label="Sort" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}>
 									<option value="avg">Highest average</option>
 									<option value="max">Highest ever</option>
 									<option value="name">Name</option>
@@ -63,11 +60,11 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 									<thead>
 										<tr>
 											<th>Asset</th>
-											<th className="text-right">Avg</th>
-											<th className="text-right">Low</th>
-											<th className="text-right">High</th>
+											<th className="!text-right">Avg</th>
+											<th className="!text-right">Low</th>
+											<th className="!text-right">High</th>
 											{seasons.map((season) => (
-												<th key={season} className="text-right">
+												<th key={season} className="!text-right">
 													{season}
 												</th>
 											))}
@@ -88,19 +85,19 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 															</div>
 														</div>
 													</td>
-													<td className="text-right font-display font-bold tabular-nums text-fog-100">
+													<td className="num font-semibold text-fog-100">
 														<Money amount={entry.avg} />
 													</td>
-													<td className="text-right tabular-nums text-fog-500">${entry.min}</td>
-													<td className="text-right tabular-nums text-fog-500">${entry.max}</td>
+													<td className="num text-fog-500">${entry.min}</td>
+													<td className="num text-fog-500">${entry.max}</td>
 													{entry.samples.map((sample) => (
-														<td key={sample.season} className="text-right tabular-nums text-fog-300">
+														<td key={sample.season} className="num text-fog-300">
 															${sample.price}
 														</td>
 													))}
 													<td>
-														<div className="h-1.5 w-full rounded-full bg-night-800">
-															<div className="h-full rounded-full bg-fog-300" style={{ width: `${(entry.avg / maxAvg) * 100}%` }} />
+														<div className="well h-2 w-full overflow-hidden !rounded-full">
+															<div className="h-full bg-fog-300" style={{ width: `${(entry.avg / maxAvg) * 100}%` }} />
 														</div>
 													</td>
 												</tr>
@@ -114,17 +111,17 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 				</Panel>
 				<div className="space-y-4">
 					<Panel>
-						<div className="border-b border-night-700 bg-night-850 px-3 py-2 font-display text-xs font-bold uppercase tracking-widest text-fog-300">Drafts in {league.collection}</div>
-						<ul className="divide-y divide-night-800">
+						<h2 className="px-4 pb-1 pt-4 text-lg">Drafts in {league.collection}</h2>
+						<ul className="space-y-1 px-4 pb-3">
 							{[league, ...past].map((candidate) => (
-								<li key={candidate.id} className="px-3 py-2.5">
-									<Link href={`/leagues/${candidate.id}/draft`} className="font-display text-sm font-bold uppercase tracking-wide hover:text-rio-300">
+								<li key={candidate.id}>
+									<Link href={`/leagues/${candidate.id}/draft`} className="pick block !py-1.5 font-display text-sm font-semibold text-fog-100">
 										{candidate.name}
 									</Link>
 									<div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-fog-500">
 										<Badge color="gray">{FORMAT_LABELS[candidate.format]}</Badge>
 										<StateChip state={candidate.state} paused={false} />
-										{candidate.completed_at && <span>{new Date(candidate.completed_at).toLocaleDateString()}</span>}
+										{candidate.completed_at && <span className="font-mono tabular-nums">{new Date(candidate.completed_at).toLocaleDateString()}</span>}
 									</div>
 								</li>
 							))}

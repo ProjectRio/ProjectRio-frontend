@@ -54,8 +54,8 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 					<WaitingCard snapshot={snapshot} handle={handle} teamId={current.waiting_on_team_id} reason={snapshot.queue.find((entry) => entry.team_id === current.waiting_on_team_id)?.reason ?? null} />
 				) : (
 					<div>
-						<p className="kicker">Between lots</p>
-						<h2 className="text-xl uppercase leading-none">{draft.advance === 'manual' && draft.state === 'live' ? 'Waiting for the commissioner to open bidding' : 'Next nomination is on its way'}</h2>
+						<p className="font-display text-sm font-semibold text-fog-500">Between lots</p>
+						<h2 className="text-xl leading-none">{draft.advance === 'manual' && draft.state === 'live' ? 'Waiting for the commissioner to open bidding' : 'Next nomination is on its way'}</h2>
 					</div>
 				)}
 				{current.last_sale && <LastSaleRibbon snapshot={snapshot} asset={current.last_sale.asset} teamId={current.last_sale.team_id} price={current.last_sale.price} label="Last sale" />}
@@ -80,34 +80,35 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 
 				{/* The leader block — the one thing a viewer needs to read at a glance. */}
 				<div
-					className={`flex items-center gap-3 rounded-lg border px-3 py-1.5 transition-all ${
-						current.awaiting_opening
-							? 'border-dashed border-night-600'
-							: youLead
-								? 'border-rio-500 bg-rio-500/15 shadow-[0_0_18px_rgb(230_0_18_/_0.35)]'
-								: youWereOutbid
-									? 'border-star-500/70 bg-star-500/10'
-									: 'border-night-600 bg-night-850'
-					} ${flash ? 'ring-2 ring-rio-400/70' : ''}`}
+					className={`flex items-center gap-3 px-3 py-1.5 transition-colors ${current.awaiting_opening ? 'well' : 'sel'} ${flash ? '!bg-[#5a4a12]' : ''}`}
 					aria-live="off"
 				>
 					{current.awaiting_opening ? (
 						<div>
-							<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Opening bid</div>
-							<div className="font-display text-lg font-bold uppercase leading-none text-fog-300">{isNominator ? 'You set it' : `Waiting on ${nominator?.name}`}</div>
+							<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Opening bid</div>
+							<div className="font-display text-lg font-semibold leading-none text-fog-100">{isNominator ? 'You set it' : `Waiting on ${nominator?.name}`}</div>
 							<div className="mt-0.5 text-[10px] text-fog-500">the clock starts on it</div>
 						</div>
 					) : (
 						<>
 							{highTeam && <TeamLogo logo={highTeam.logo} name={highTeam.name} size={44} />}
 							<div className="min-w-0">
-								<div className={`font-display text-[10px] font-semibold uppercase tracking-widest ${youLead ? 'text-rio-300' : youWereOutbid ? 'text-star-400' : 'text-fog-500'}`}>
-									{youLead ? 'You lead' : youWereOutbid ? 'Outbid · leading' : 'Leading'}
-									{high?.rescind === 'requested' && <span className="ml-1.5 rounded-sm bg-star-500/20 px-1 text-[9px] text-star-400">rescind?</span>}
+								<div className={`flex items-center gap-1.5 font-display text-xs font-semibold ${youLead ? 'text-star-400' : youWereOutbid ? 'text-sand-400' : 'text-fog-500'}`}>
+									{youWereOutbid ? (
+										<>
+											<span>Outbid</span>
+											<span className="text-fog-500">Leading</span>
+										</>
+									) : youLead ? (
+										'You lead'
+									) : (
+										'Leading'
+									)}
+									{high?.rescind === 'requested' && <span className="plate !px-1 !py-0 text-[9px] normal-case text-star-300 [--plate:#5a4a12]">rescind?</span>}
 								</div>
-								<div className={`truncate font-display text-lg font-bold uppercase leading-none tracking-wide ${youLead ? 'text-rio-300' : 'text-fog-100'}`}>{highTeam?.name}</div>
-							</div>
-							<div className="font-display text-5xl font-bold leading-none tabular-nums text-fog-100">{high && <Money amount={high.amount} />}</div>
+								<div className={`truncate font-display text-lg font-semibold leading-none ${youLead ? 'text-star-400' : 'text-fog-100'}`}>{highTeam?.name}</div>
+								</div>
+								<div className="font-mono text-5xl font-semibold leading-none tabular-nums text-star-400">{high && <Money amount={high.amount} />}</div>
 						</>
 					)}
 					<p className="sr-only" aria-live="polite">
@@ -118,8 +119,9 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 				<Clock closesAt={nomination.closes_at} pausedRemaining={nomination.paused_remaining_s} paused={draft.paused || !!rescind} serverNow={handle.serverNow} untimedLabel={current.awaiting_opening ? 'Opening' : 'Untimed'} total={draft.config.lot_seconds ?? undefined} size={84} />
 
 				<div className="min-w-0">
-					<div className="mb-1 flex items-center gap-2 font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">
-						Still in · {stillIn.length}
+					<div className="mb-1 flex items-center gap-2 text-xs text-fog-500">
+						<span className="font-display font-semibold text-fog-300">Still in</span>
+						<span className="font-mono tabular-nums text-fog-100">{stillIn.length}</span>
 						{current.everyone_out && <span className="text-star-400">everyone else is out</span>}
 					</div>
 					<ul className="flex flex-wrap gap-1">
@@ -132,7 +134,7 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 									<li
 										key={team.id}
 										title={`${team.name} — ${isHigh ? 'leading' : inLot ? `can go to $${team.max_bid}` : current.passed_team_ids.includes(team.id) ? 'out' : "can't afford the next bid"}`}
-										className={`rounded-full border p-0.5 ${isHigh ? 'border-rio-500 bg-rio-500/20' : inLot ? 'border-night-600' : 'border-transparent opacity-30 grayscale'}`}
+										className={`rounded-full p-0.5 ${isHigh ? 'bg-star-400' : inLot ? 'bg-black/30' : 'opacity-30 grayscale'}`}
 									>
 										<TeamLogo logo={team.logo} name={team.name} size={22} />
 									</li>
@@ -145,7 +147,7 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 					<ol className="min-w-[7rem] text-[11px] leading-tight" aria-label="Recent bids">
 						{current.bids.slice(1, 4).map((bid) => (
 							<li key={bid.id} className={`flex items-center gap-1.5 text-fog-500 ${bid.rescind === 'approved' ? 'line-through opacity-50' : ''}`}>
-								<span className="w-7 font-display font-bold tabular-nums">${bid.amount}</span>
+								<span className="w-7 font-mono tabular-nums text-fog-300">${bid.amount}</span>
 								<span className="truncate">{findTeam(snapshot, bid.team_id)?.name}</span>
 							</li>
 						))}
@@ -155,8 +157,11 @@ export default function AuctionStage({ snapshot, handle }: StageProps) {
 			</div>
 
 			{rescind && (
-				<div className="rounded border border-star-500/50 bg-star-500/10 px-3 py-1 text-xs text-fog-100">
-					<span className="font-display font-bold uppercase tracking-widest text-star-400">Clock frozen</span> — {findTeam(snapshot, rescind.team_id)?.name} asked to rescind ${rescind.amount}. The commissioner decides.
+				<div className="well flex flex-wrap items-center gap-x-3 px-3 py-1 text-xs text-fog-100">
+					<span className="font-display text-sm font-semibold text-star-400">Clock frozen</span>
+					<span>
+						{findTeam(snapshot, rescind.team_id)?.name} asked to rescind ${rescind.amount}. The commissioner decides.
+					</span>
 				</div>
 			)}
 			<StickyBidBar>

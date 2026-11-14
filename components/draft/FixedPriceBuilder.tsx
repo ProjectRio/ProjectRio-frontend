@@ -33,8 +33,8 @@ function BuildPanel({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 	const captain = team.restriction_status.find((status) => status.label.startsWith('Needs'));
 
 	const Slot = ({ index, pick, kind }: { index: number; pick: (typeof characters)[number] | undefined; kind: Asset['kind'] }) => (
-		<li className={`flex items-center gap-2.5 rounded border px-2 py-1.5 ${pick ? 'border-night-700 bg-night-850' : 'border-dashed border-night-700'}`}>
-			<span className="w-5 font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">{kind === 'stadium' ? 'ST' : index + 1}</span>
+		<li className={`flex items-center gap-2.5 px-2 py-1.5 ${pick ? 'key-on rounded-md' : 'well'}`}>
+			<span className="w-5 font-mono text-[10px] tabular-nums text-fog-500">{kind === 'stadium' ? 'ST' : index + 1}</span>
 			{pick ? (
 				<>
 					<AssetSprite asset={pick.asset} size={28} />
@@ -43,11 +43,11 @@ function BuildPanel({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 						{pick.asset.captain && <span className="ml-1 text-star-400">✪</span>}
 					</span>
 					<ClassDot asset={pick.asset} />
-					<span className="font-display text-sm font-bold tabular-nums">
+					<span className="font-mono text-sm font-semibold tabular-nums text-fog-100">
 						<Money amount={pick.price} />
 					</span>
 					{editable && (
-						<button type="button" className="ml-1 text-fog-500 hover:text-rio-300" aria-label={`Remove ${pick.asset.name}`} onClick={() => handle.act({ type: 'remove', payload: { pick_id: pick.id } })}>
+						<button type="button" className="ml-1 text-fog-500 hover:text-fog-100" aria-label={`Remove ${pick.asset.name}`} onClick={() => handle.act({ type: 'remove', payload: { pick_id: pick.id } })}>
 							×
 						</button>
 					)}
@@ -62,16 +62,16 @@ function BuildPanel({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 		<div className="p-3">
 			<div className="mb-3">
 				<div className="flex items-baseline justify-between">
-					<span className="font-display text-2xl font-bold tabular-nums">
+					<span className="font-mono text-2xl font-semibold tabular-nums text-star-400">
 						<Money amount={team.remaining} />
-						<span className="text-sm text-fog-500"> left of ${team.draft_budget}</span>
+						<span className="font-body text-sm font-normal text-fog-500"> left of ${team.draft_budget}</span>
 					</span>
 					<span className="text-xs text-fog-500">
-						{slots.character + slots.stadium - team.open_slots_total}/{slots.character + slots.stadium} slots
+						<span className="font-mono tabular-nums text-fog-300">{slots.character + slots.stadium - team.open_slots_total}/{slots.character + slots.stadium}</span> slots
 					</span>
-				</div>
-				<div className="mt-1.5 h-1.5 rounded-full bg-night-800">
-					<div className={`h-full rounded-full ${pct >= 100 ? 'bg-star-400' : 'bg-rio-500'}`} style={{ width: `${pct}%` }} />
+					</div>
+					<div className="well mt-1.5 h-2 overflow-hidden !rounded-full">
+					<div className={`h-full ${pct >= 100 ? 'bg-fog-100' : 'bg-star-400'}`} style={{ width: `${pct}%` }} />
 				</div>
 			</div>
 			<ul className="space-y-1">
@@ -86,7 +86,7 @@ function BuildPanel({ snapshot, handle }: { snapshot: DraftSnapshot; handle: Dra
 			<div className="mt-3 flex flex-wrap items-center gap-3">
 				{submitted ? (
 					<>
-						<span className="rounded border border-emerald-500/40 bg-emerald-500/15 px-2 py-1 font-display text-xs font-bold uppercase tracking-widest text-emerald-300">Submitted</span>
+						<span className="plate text-emerald-300 [--plate:#0d4534]">Submitted</span>
 						{!current.locked && you.can_act && (
 							<button type="button" className="btn-secondary !py-2 text-sm" disabled={busy} onClick={() => handle.act({ type: 'unsubmit' })}>
 								Withdraw and rebuild
@@ -114,7 +114,7 @@ export default function FixedPriceBuilder({ leagueId }: { leagueId: number }) {
 			<div>
 				<PreviewBar leagueId={leagueId} />
 				<Panel className="p-8 text-center">
-					<p className="font-display text-lg font-semibold uppercase tracking-wider text-rio-300">Server unreachable</p>
+					<h2 className="text-2xl text-rio-300">Server unreachable</h2>
 					<p className="mt-2 text-sm text-fog-500">Your build is saved on the server as you go. Reconnecting…</p>
 				</Panel>
 			</div>
@@ -139,27 +139,33 @@ export default function FixedPriceBuilder({ leagueId }: { leagueId: number }) {
 			<PreviewBar leagueId={leagueId} />
 			<RoomHeader snapshot={snapshot} connection={connection} sound={handle.preview.sound} focus={handle.preview.focus} />
 			<div className="mb-4 grid gap-3 sm:grid-cols-3">
-				<div className="rounded-lg border border-night-700 bg-night-900 p-3">
-					<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Deadline</div>
-					<div className="font-display text-2xl font-bold tabular-nums">
+				<div className="panel p-3">
+					<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Deadline</div>
+					<div className="text-2xl font-semibold text-star-400">
 						<DeadlineLabel deadline={current.deadline} serverNow={handle.serverNow} />
 					</div>
-					<div className="text-xs text-fog-500">{current.deadline ? new Date(current.deadline).toLocaleString() : ''}</div>
+					<div className="font-mono text-xs tabular-nums text-fog-500">{current.deadline ? new Date(current.deadline).toLocaleString() : ''}</div>
 				</div>
-				<div className="rounded-lg border border-night-700 bg-night-900 p-3">
-					<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Submitted</div>
-					<div className="font-display text-2xl font-bold tabular-nums">
+				<div className="panel p-3">
+					<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Submitted</div>
+					<div className="font-mono text-2xl font-semibold tabular-nums text-fog-100">
 						{submittedCount}
 						<span className="text-sm text-fog-500"> / {teams.length}</span>
 					</div>
 					<div className="text-xs text-fog-500">{revealed ? 'Builds revealed' : 'Builds stay private until the commissioner completes the draft'}</div>
 				</div>
-				<div className="rounded-lg border border-night-700 bg-night-900 p-3">
-					<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Rules</div>
-					<div className="text-sm text-fog-300">
-						${draft.config.budget} · {draft.config.slots.character} characters + {draft.config.slots.stadium} stadium
+				<div className="panel p-3">
+					<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Rules</div>
+					<div className="flex flex-wrap gap-x-3 text-sm text-fog-300">
+						<span className="font-mono tabular-nums">${draft.config.budget}</span>
+						<span>
+							{draft.config.slots.character} characters + {draft.config.slots.stadium} stadium
+						</span>
 					</div>
-					<div className="text-xs text-fog-500">Identical rosters allowed · no trades</div>
+					<div className="flex flex-wrap gap-x-3 text-xs text-fog-500">
+						<span>Identical rosters allowed</span>
+						<span>No trades</span>
+					</div>
 				</div>
 			</div>
 
@@ -175,14 +181,16 @@ export default function FixedPriceBuilder({ leagueId }: { leagueId: number }) {
 					<aside className="space-y-4">
 						{canBuild ? (
 							<Panel>
-								<SectionLabel>Your build · {findTeam(snapshot, you.team_id)?.name}</SectionLabel>
+								<SectionLabel>
+	Your build <span className="ml-2 font-body font-normal text-fog-500">{findTeam(snapshot, you.team_id)?.name}</span>
+</SectionLabel>
 								<BuildPanel snapshot={snapshot} handle={handle} />
 							</Panel>
 						) : (
 							<Panel className="p-4 text-sm text-fog-500">
 								{you.role === 'none' ? (
 									<>
-										<Link href="/login" className="text-rio-300">
+										<Link href="/login" className="text-star-400 underline underline-offset-4">
 											Log in
 										</Link>{' '}
 										as a manager to build a team.
@@ -200,7 +208,7 @@ export default function FixedPriceBuilder({ leagueId }: { leagueId: number }) {
 						)}
 					</aside>
 					<Panel>
-						<SectionLabel action={canBuild && !findTeam(snapshot, you.team_id)?.submitted ? <span className="font-display text-[10px] font-semibold uppercase tracking-widest text-rio-300">Click to add</span> : undefined}>
+						<SectionLabel action={canBuild && !findTeam(snapshot, you.team_id)?.submitted ? <span className="font-display text-xs font-semibold text-star-400">Click to add</span> : undefined}>
 							Price sheet
 						</SectionLabel>
 						<PoolPanel snapshot={snapshot} mode={canBuild && !findTeam(snapshot, you.team_id)?.submitted ? 'add' : 'browse'} onSelect={(asset) => handle.act({ type: 'add', payload: { asset_id: asset.id } })} />
@@ -208,12 +216,12 @@ export default function FixedPriceBuilder({ leagueId }: { leagueId: number }) {
 					<aside className="space-y-4">
 						<Panel>
 							<SectionLabel>Teams</SectionLabel>
-							<ul className="divide-y divide-night-800">
+							<ul className="px-1 pb-1">
 								{teams.map((team) => (
-									<li key={team.id} className={`flex items-center gap-2 px-3 py-2 text-sm ${team.id === you.team_id ? 'bg-rio-500/[0.07]' : ''}`}>
+									<li key={team.id} className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${team.id === you.team_id ? 'bg-star-400/[0.07]' : ''}`}>
 										<TeamLogo logo={team.logo} name={team.name} size={22} />
 										<span className="min-w-0 flex-1 truncate text-fog-100">{team.name}</span>
-										{team.submitted ? <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Submitted</span> : <span className="text-[10px] uppercase tracking-widest text-fog-500">Building</span>}
+										{team.submitted ? <span className="plate text-[10px] text-emerald-300 [--plate:#0d4534]">Submitted</span> : <span className="text-xs text-fog-500">Building</span>}
 									</li>
 								))}
 							</ul>

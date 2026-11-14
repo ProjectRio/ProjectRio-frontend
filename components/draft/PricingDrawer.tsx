@@ -38,42 +38,45 @@ export default function PricingDrawer({ snapshot, open, onClose }: { snapshot: D
 		});
 
 	return (
-		<Drawer open={open} onClose={onClose} title="Pricing" kicker={`${snapshot.draft.collection} · past drafts`} width="w-[min(100vw,36rem)]">
-			<div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b border-night-700 bg-night-850 px-2 py-1.5">
-				{FILTERS.map((option) => (
-					<button
-						key={option}
-						type="button"
-						className={`border-b-2 px-1.5 py-0.5 font-display text-[10px] font-bold uppercase tracking-widest ${filter === option ? 'text-fog-100' : 'text-fog-500 hover:text-fog-300'}`}
-						style={{ borderColor: filter === option ? (option === 'Stadiums' ? '#f59e0b' : (CLASS_HUES[option] ?? 'var(--color-rio-500)')) : 'transparent' }}
-						onClick={() => setFilter(option)}
-					>
-						{option}
-					</button>
-				))}
+		<Drawer open={open} onClose={onClose} title="Pricing" kicker={
+				<>
+					<span>{snapshot.draft.collection}</span>
+					<span>Past drafts</span>
+				</>
+			} width="w-[min(100vw,36rem)]">
+			<div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 bg-[#0b2219] px-3 py-2">
+				<div className="seg flex-wrap">
+					{FILTERS.map((option) => (
+						<button key={option} type="button" aria-pressed={filter === option} className="flex items-center gap-1 !px-2 !py-0.5 !text-[11px]" onClick={() => setFilter(option)}>
+							{option !== 'All' && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: option === 'Stadiums' ? '#f59e0b' : CLASS_HUES[option] }} />}
+							{option}
+						</button>
+					))}
+				</div>
 				<input className="input ml-auto !w-28 !py-0.5 !text-xs" placeholder="Find…" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search" />
-				<select className="rounded border border-night-600 bg-night-900 px-1 py-0.5 text-[11px] text-fog-300" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} aria-label="Sort">
+				<select className="input !w-auto !py-0.5 !text-[11px]" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} aria-label="Sort">
 					<option value="avg">Avg</option>
 					<option value="max">High</option>
 					<option value="name">Name</option>
 				</select>
 			</div>
-			<table className="w-full text-[11px]">
+			<div className="overflow-x-auto px-1">
+			<table className="stat-table text-[11px] [&_td]:!px-1 [&_td]:!py-0.5 [&_th]:!px-1 [&_th]:!py-1 [&_th]:!text-[10px]">
 				<thead>
-					<tr className="font-display text-[9px] font-semibold uppercase tracking-widest text-fog-500">
+					<tr>
 						<th className="w-6" />
-						<th className="px-1 py-1 text-left">Asset</th>
-						<th className="px-1 text-right">Avg</th>
-						<th className="px-1 text-right text-fog-500/70">Lo–Hi</th>
+						<th className="text-left">Asset</th>
+						<th className="!text-right">Avg</th>
+						<th className="!text-right">Lo–Hi</th>
 						{seasons.map((season) => (
-							<th key={season} className="px-1 text-right">
+							<th key={season} className="!text-right">
 								{season.replace(/^Season /, 'S')}
 							</th>
 						))}
-						<th className="px-1 text-left">This draft</th>
+						<th className="text-left">This draft</th>
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-night-800">
+				<tbody>
 					{rows.map((entry) => {
 						const asset = entry.asset;
 						const price = history[asset.id];
@@ -82,7 +85,7 @@ export default function PricingDrawer({ snapshot, open, onClose }: { snapshot: D
 						const gone = entry.remaining_copies !== null && entry.remaining_copies <= 0;
 						const queued = queuedBy.get(asset.id);
 						return (
-							<tr key={asset.id} className={`${starred ? 'bg-star-500/[0.06]' : ''} hover:bg-night-800/60`}>
+							<tr key={asset.id} className={starred ? 'bg-star-400/[0.06]' : ''}>
 								<td className="pl-1">
 									<button type="button" className={`px-0.5 text-sm ${starred ? 'text-star-400' : 'text-night-600 hover:text-fog-300'}`} onClick={() => toggleTarget(leagueId, asset.id)} aria-pressed={starred} aria-label={starred ? `Unstar ${asset.name}` : `Target ${asset.name}`}>
 										{starred ? '★' : '☆'}
@@ -95,35 +98,35 @@ export default function PricingDrawer({ snapshot, open, onClose }: { snapshot: D
 										<ClassDot asset={asset} />
 									</span>
 								</td>
-								<td className="px-1 text-right font-display font-bold tabular-nums text-fog-100">{price ? <Money amount={Math.round(price.avg)} /> : <span className="text-fog-500">—</span>}</td>
-								<td className="px-1 text-right tabular-nums text-fog-500">{price ? `${price.min}–${price.max}` : ''}</td>
+								<td className="num font-semibold text-fog-100">{price ? <Money amount={Math.round(price.avg)} /> : <span className="text-fog-500">—</span>}</td>
+								<td className="num text-fog-500">{price ? `${price.min}–${price.max}` : ''}</td>
 								{seasons.map((season) => {
 									const sample = price?.samples.find((candidate) => candidate.season === season);
 									return (
-										<td key={season} className="px-1 text-right tabular-nums text-fog-300">
+										<td key={season} className="num text-fog-300">
 											{sample ? `$${sample.price}` : <span className="text-fog-500/50">·</span>}
 										</td>
 									);
 								})}
 								<td className="px-1">
 									<span className="flex items-center gap-1">
-										{onBlock === asset.id && <span className="rounded-sm bg-rio-500/20 px-1 font-display text-[9px] font-bold uppercase tracking-widest text-rio-300">On the block</span>}
+										{onBlock === asset.id && <span className="plate !px-1 !py-0 text-[9px] text-rio-300 [--plate:#56161b]">On the block</span>}
 										{sales.map((sale, index) => {
 											const team = findTeam(snapshot, sale.team_id);
 											return (
 												<span key={index} className="flex items-center gap-0.5" title={`${team?.name} · $${sale.price}`}>
 													{team && <TeamLogo logo={team.logo} name={team.name} size={14} />}
-													<span className="font-display font-bold tabular-nums text-star-400">${sale.price}</span>
+													<span className="font-mono font-semibold tabular-nums text-star-400">${sale.price}</span>
 												</span>
 											);
 										})}
 										{queued !== undefined && onBlock !== asset.id && (
 											<span className="flex items-center gap-0.5 text-fog-500" title={`Queued by ${findTeam(snapshot, queued)?.name}`}>
 												<TeamLogo logo={findTeam(snapshot, queued)?.logo ?? null} name={findTeam(snapshot, queued)?.name ?? ''} size={14} />
-												<span className="text-[9px] uppercase tracking-wider">queued</span>
+												<span className="text-[10px]">queued</span>
 											</span>
 										)}
-										{!gone && entry.remaining_copies !== null && entry.remaining_copies > 0 && sales.length > 0 && <span className="text-[9px] uppercase tracking-wider text-fog-500">{entry.remaining_copies} left</span>}
+										{!gone && entry.remaining_copies !== null && entry.remaining_copies > 0 && sales.length > 0 && <span className="text-[10px] text-fog-500">{entry.remaining_copies} left</span>}
 									</span>
 								</td>
 							</tr>
@@ -131,6 +134,7 @@ export default function PricingDrawer({ snapshot, open, onClose }: { snapshot: D
 					})}
 				</tbody>
 			</table>
+			</div>
 			{rows.length === 0 && <p className="p-4 text-center text-xs text-fog-500">No matches.</p>}
 		</Drawer>
 	);

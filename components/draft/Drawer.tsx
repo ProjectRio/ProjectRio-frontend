@@ -5,7 +5,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 
-export default function Drawer({ open, onClose, title, kicker, width = 'w-[min(100vw,30rem)]', children }: { open: boolean; onClose: () => void; title: string; kicker?: string; width?: string; children: ReactNode }) {
+export default function Drawer({ open, onClose, title, kicker, width = 'w-[min(100vw,30rem)]', children }: { open: boolean; onClose: () => void; title: string; kicker?: ReactNode; width?: string; children: ReactNode }) {
 	useEffect(() => {
 		if (!open) return;
 		function onKey(event: KeyboardEvent) {
@@ -17,14 +17,14 @@ export default function Drawer({ open, onClose, title, kicker, width = 'w-[min(1
 	if (!open) return null;
 	return (
 		<div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
-			<button type="button" className="absolute inset-0 bg-night-950/60" aria-label="Close" onClick={onClose} />
-			<aside className={`absolute inset-y-0 right-0 flex ${width} flex-col border-l border-night-700 bg-night-900 shadow-2xl`}>
-				<header className="flex items-center gap-3 border-b border-night-700 bg-night-850 px-4 py-2.5">
+			<button type="button" className="absolute inset-0 bg-black/60" aria-label="Close" onClick={onClose} />
+			<aside className={`popover absolute inset-y-0 right-0 flex ${width} flex-col !rounded-none`}>
+				<header className="flex items-center gap-3 px-4 pb-2 pt-3">
 					<div className="min-w-0 flex-1">
-						{kicker && <p className="kicker">{kicker}</p>}
-						<h2 className="text-lg uppercase leading-none">{title}</h2>
+						<h2 className="text-xl leading-none">{title}</h2>
+						{kicker && <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-fog-500">{kicker}</p>}
 					</div>
-					<button type="button" className="rounded border border-night-600 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-widest text-fog-300 hover:border-fog-500 hover:text-fog-100" onClick={onClose}>
+					<button type="button" className="key px-2.5 pb-0.5 pt-1 font-display text-xs font-semibold" onClick={onClose}>
 						Close
 					</button>
 				</header>

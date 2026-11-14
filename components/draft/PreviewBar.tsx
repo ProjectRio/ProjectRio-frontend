@@ -15,7 +15,8 @@ function parseViewAs(key: string): ViewAs {
 	return { kind: key as 'commissioner' | 'spectator' | 'anonymous' };
 }
 
-const linkClass = 'text-fog-400 underline decoration-dotted underline-offset-2 hover:text-fog-100';
+const linkClass = 'key px-1.5 py-0.5 text-[11px]';
+const selectClass = 'input !w-auto !py-0.5 !pl-1.5 !pr-1 !text-[11px]';
 
 export default function PreviewBar({ leagueId, compact = false }: { leagueId: number; compact?: boolean }) {
 	const preview = usePreview();
@@ -34,15 +35,16 @@ export default function PreviewBar({ leagueId, compact = false }: { leagueId: nu
 	}
 
 	return (
-		<div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-dashed border-star-500/30 px-2 py-1 text-[11px] text-fog-500">
-			<span className="font-display font-bold uppercase tracking-widest text-star-400/80">Preview</span>
+		<div className="well mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-2 py-1 text-[11px] text-fog-500">
+			<span className="plate text-star-300 [--plate:#5a4a12]">Preview</span>
+			<span className="text-fog-300">Mock draft server with bot teams. Nothing here is real data.</span>
 			<label className="flex items-center gap-1">
 				as
-				<select className="rounded border border-night-700 bg-night-900 px-1 py-0.5 text-fog-100" value={viewAsKey(preview.viewAs)} onChange={(event) => setPreview({ viewAs: parseViewAs(event.target.value) })}>
-					<option value="commissioner">Commissioner · MattGree</option>
+				<select className={selectClass} value={viewAsKey(preview.viewAs)} onChange={(event) => setPreview({ viewAs: parseViewAs(event.target.value) })}>
+					<option value="commissioner">Commissioner (MattGree)</option>
 					{league?.teams.map((team) => (
 						<option key={team.id} value={`team:${team.id}`}>
-							{teamName(team.id)} · {team.managers[0].username}
+							{teamName(team.id)} ({team.managers[0].username})
 						</option>
 					))}
 					<option value="spectator">Spectator</option>
@@ -52,11 +54,11 @@ export default function PreviewBar({ leagueId, compact = false }: { leagueId: nu
 			{!compact && (
 				<>
 					<label className="flex items-center gap-1">
-						<input type="checkbox" className="accent-rio-500" checked={preview.slowNetwork} onChange={(event) => setPreview({ slowNetwork: event.target.checked })} />
+						<input type="checkbox" className="accent-star-400" checked={preview.slowNetwork} onChange={(event) => setPreview({ slowNetwork: event.target.checked })} />
 						slow net
 					</label>
 					<label className="flex items-center gap-1">
-						<input type="checkbox" className="accent-rio-500" checked={preview.offline} onChange={(event) => setPreview({ offline: event.target.checked })} />
+						<input type="checkbox" className="accent-star-400" checked={preview.offline} onChange={(event) => setPreview({ offline: event.target.checked })} />
 						unreachable
 					</label>
 					<button type="button" className={linkClass} onClick={() => getServer(leagueId)?.restart()}>
@@ -64,7 +66,7 @@ export default function PreviewBar({ leagueId, compact = false }: { leagueId: nu
 					</button>
 					<label className="flex items-center gap-1">
 						drop
-						<select className="rounded border border-night-700 bg-night-900 px-1 py-0.5 text-fog-100" value="" onChange={(event) => toggleTeam(event.target.value)}>
+						<select className={selectClass} value="" onChange={(event) => toggleTeam(event.target.value)}>
 							<option value="">team…</option>
 							{league?.teams.map((team) => (
 								<option key={team.id} value={team.id}>

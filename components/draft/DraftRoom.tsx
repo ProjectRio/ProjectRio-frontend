@@ -47,7 +47,13 @@ function RulesLine({ snapshot }: { snapshot: DraftSnapshot }) {
 		config.last_slot_takes_remaining && format !== 'snake' && format !== 'fixed_price' ? 'last slot takes remaining budget' : null,
 		...config.restrictions.map((rule) => (rule.type === 'group_max' ? `${rule.name} ≤ ${rule.max}` : rule.type === 'captain_required' ? 'captain required' : rule.type === 'must_be_captain' ? 'must-be-captain' : 'handedness'))
 	].filter(Boolean);
-	return <p className="text-[11px] text-fog-500">{parts.join(' · ')}</p>;
+	return (
+		<ul className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-fog-500">
+			{parts.map((part, index) => (
+				<li key={index}>{part}</li>
+			))}
+		</ul>
+	);
 }
 
 function Lobby({ snapshot, handle }: { snapshot: DraftSnapshot; handle: DraftHandle }) {
@@ -58,17 +64,21 @@ function Lobby({ snapshot, handle }: { snapshot: DraftSnapshot; handle: DraftHan
 	return (
 		<div className="space-y-2">
 			<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-				<div>
-					<p className="kicker">Lobby</p>
-					<h2 className="text-xl uppercase leading-none">Waiting for the commissioner</h2>
-				</div>
-				<p className="text-xs text-fog-500">
-					{teams.filter((team) => team.present).length}/{teams.length} arrived{needsQueue ? ` · ${queued}/${queue.length} first nominations in` : ''}
+				<h2 className="text-xl leading-none">Waiting for the commissioner</h2>
+				<p className="flex gap-3 text-xs text-fog-500">
+					<span>
+						<span className="font-mono tabular-nums text-fog-100">{teams.filter((team) => team.present).length}/{teams.length}</span> arrived
+					</span>
+					{needsQueue && (
+						<span>
+							<span className="font-mono tabular-nums text-fog-100">{queued}/{queue.length}</span> first nominations in
+						</span>
+					)}
 				</p>
 				<ol className="flex flex-wrap gap-1" title="Draft order">
 					{teams.map((team, index) => (
-						<li key={team.id} className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] ${team.id === you.team_id ? 'border-rio-500/60' : 'border-night-700'}`} title={team.managers.map((manager) => manager.username).join(' & ')}>
-							<span className="font-display font-bold tabular-nums text-fog-500">{index + 1}</span>
+						<li key={team.id} className={`flex items-center gap-1 rounded-full border border-transparent px-1.5 py-0.5 text-[11px] ${team.id === you.team_id ? 'sel !rounded-full' : ''}`} title={team.managers.map((manager) => manager.username).join(' & ')}>
+							<span className="font-mono tabular-nums text-fog-500">{index + 1}</span>
 							<TeamLogo logo={team.logo} name={team.name} size={16} />
 							<span className="text-fog-300">{team.name}</span>
 							<PresenceDot present={team.present} />
@@ -83,7 +93,7 @@ function Lobby({ snapshot, handle }: { snapshot: DraftSnapshot; handle: DraftHan
 			</div>
 			<RulesLine snapshot={snapshot} />
 			{needsQueue && yourEntry && you.team_id !== null && (
-				<div className={`rounded border px-3 py-1.5 ${yourEntry.asset ? 'border-night-700 bg-night-850' : 'border-rio-500/50 bg-rio-500/5'}`}>
+				<div className={`px-3 py-1.5 ${yourEntry.asset ? 'well' : 'sel'}`}>
 					<NominationInline snapshot={snapshot} handle={handle} label="Your first nomination" />
 				</div>
 			)}
@@ -99,15 +109,15 @@ function CompletedSummary({ snapshot }: { snapshot: DraftSnapshot }) {
 	return (
 		<div className="flex flex-wrap items-center gap-x-6 gap-y-2">
 			<div>
-				<p className="kicker">Completed</p>
-				<h2 className="text-xl uppercase leading-none">Final rosters</h2>
-				<p className="mt-0.5 text-[11px] text-fog-500">{draft.completed_at ? `${new Date(draft.completed_at).toLocaleString()} · ` : ''}committed to the ledger; changes from here are trades</p>
+				<h2 className="text-xl leading-none">Final rosters</h2>
+				{draft.completed_at && <p className="mt-0.5 font-mono text-[11px] tabular-nums text-fog-300">{new Date(draft.completed_at).toLocaleString()}</p>}
+				<p className="text-[11px] text-fog-500">Committed to the ledger; changes from here are trades</p>
 			</div>
 			{draft.format !== 'snake' && (
 				<>
 					<div>
-						<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Spent</div>
-						<div className="font-display text-2xl font-bold tabular-nums">
+						<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Spent</div>
+						<div className="font-mono text-2xl font-semibold tabular-nums text-star-400">
 							<Money amount={total} />
 						</div>
 					</div>
@@ -115,9 +125,11 @@ function CompletedSummary({ snapshot }: { snapshot: DraftSnapshot }) {
 						<div className="flex items-center gap-2">
 							<AssetSprite asset={priciest.asset} size={36} />
 							<div>
-								<div className="font-display text-[10px] font-semibold uppercase tracking-widest text-fog-500">Biggest price</div>
-								<div className="text-sm text-fog-100">
-									{priciest.asset.name} · <span className="font-display font-bold text-star-400">${priciest.price}</span> · {findTeam(snapshot, priciest.team_id)?.name}
+								<div className="font-display text-[11px] font-semibold uppercase tracking-wider text-fog-500">Biggest price</div>
+								<div className="flex gap-2 text-sm text-fog-100">
+									<span>{priciest.asset.name}</span>
+									<span className="font-mono tabular-nums">${priciest.price}</span>
+									<span className="text-fog-300">{findTeam(snapshot, priciest.team_id)?.name}</span>
 								</div>
 							</div>
 						</div>
@@ -134,7 +146,7 @@ function CompletedSummary({ snapshot }: { snapshot: DraftSnapshot }) {
 function Unreachable({ leagueId, hasSnapshot }: { leagueId: number; hasSnapshot: boolean }) {
 	return (
 		<Panel className="p-8 text-center">
-			<p className="font-display text-lg font-semibold uppercase tracking-wider text-rio-300">Server unreachable</p>
+			<h2 className="text-2xl text-rio-300">Server unreachable</h2>
 			<p className="mx-auto mt-2 max-w-md text-sm text-fog-500">{hasSnapshot ? 'Showing the last snapshot we received. ' : ''}Reconnecting… bids placed while disconnected are rejected, never lost.</p>
 			<button type="button" className="btn-secondary mt-5" onClick={() => setPreview({ offline: false })}>
 				Retry now
@@ -194,8 +206,8 @@ export default function DraftRoom({ leagueId }: { leagueId: number }) {
 			<div>
 				<PreviewBar leagueId={leagueId} />
 				<Panel className="p-8 text-center">
-					<p className="kicker">{draft.league_name}</p>
-					<p className="mt-1 font-display text-lg font-semibold uppercase tracking-wider text-fog-300">Sign in to enter the draft room</p>
+					<p className="font-display text-sm font-semibold text-fog-500">{draft.league_name}</p>
+					<h2 className="mt-1 text-2xl">Sign in to enter the draft room</h2>
 					<p className="mx-auto mt-2 max-w-md text-sm text-fog-500">Managers bid for their teams; anyone else signed in can spectate.</p>
 					<Link href="/login" className="btn-primary mt-6 inline-block">
 						Log in
@@ -240,20 +252,20 @@ export default function DraftRoom({ leagueId }: { leagueId: number }) {
 
 			<div className={`grid gap-2 lg:grid-cols-[minmax(0,1fr)_14rem] ${you.team_id !== null && draft.state === 'live' ? 'max-lg:pb-24' : ''}`}>
 				<div className="min-w-0 space-y-2">
-					<Panel className="relative p-3">
-						<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_80%_at_10%_0%,rgb(230_0_18_/_0.10),transparent)]" />
-						<div className="relative">{stage}</div>
-					</Panel>
+					<Panel className="p-3">{stage}</Panel>
 
 					<Panel className="p-1.5">
 						<DraftBoard snapshot={snapshot} previous={handle.previous} act={handle.act} />
 					</Panel>
 
 					<Panel>
-						<button type="button" className="flex w-full items-center gap-2 border-b border-night-800 px-2 py-1 text-left font-display text-[10px] font-bold uppercase tracking-widest text-fog-500 hover:text-fog-300" onClick={() => setPoolOpen(!poolOpen)} aria-expanded={poolOpen}>
-							Pool · {poolCount} left
-							{poolMode !== 'browse' && <span className="text-rio-300">· click to {poolMode === 'pick' ? 'draft' : 'queue'}</span>}
-							<span className="ml-auto">{poolOpen ? '▴' : '▾'}</span>
+						<button type="button" className="flex w-full items-center gap-3 px-3 py-1.5 text-left font-display text-sm font-semibold text-fog-300 hover:text-fog-100" onClick={() => setPoolOpen(!poolOpen)} aria-expanded={poolOpen}>
+							<span>Pool</span>
+							<span className="font-body text-xs font-normal text-fog-500">
+								<span className="font-mono tabular-nums text-fog-300">{poolCount}</span> left
+							</span>
+							{poolMode !== 'browse' && <span className="font-body text-xs font-normal text-star-400">Click to {poolMode === 'pick' ? 'draft' : 'queue'}</span>}
+							<span className="ml-auto text-fog-500">{poolOpen ? '▴' : '▾'}</span>
 						</button>
 						{poolOpen && <PoolPanel snapshot={snapshot} mode={poolMode} onSelect={onPoolSelect} selectedId={selected?.id ?? null} />}
 					</Panel>
@@ -267,7 +279,7 @@ export default function DraftRoom({ leagueId }: { leagueId: number }) {
 					)}
 					{you.role === 'commissioner' && (
 						<Panel>
-							<div className="border-b border-night-800 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-fog-500">Commissioner</div>
+							<h3 className="px-3 pb-1 pt-2.5 font-display text-sm font-semibold text-fog-300">Commissioner</h3>
 							<CommissionerPanel snapshot={snapshot} handle={handle} />
 						</Panel>
 					)}
@@ -288,5 +300,5 @@ export function DeadlineLabel({ deadline, serverNow }: { deadline: number | null
 	}, [serverNow]);
 	if (!deadline) return <span>No deadline</span>;
 	const remaining = deadline - now;
-	return <span className={remaining < 3600_000 ? 'text-rio-300' : ''}>{remaining > 0 ? formatDuration(remaining) : 'Passed'}</span>;
+	return <span className={`font-mono tabular-nums ${remaining < 3600_000 ? 'text-rio-300' : ''}`}>{remaining > 0 ? formatDuration(remaining) : 'Passed'}</span>;
 }

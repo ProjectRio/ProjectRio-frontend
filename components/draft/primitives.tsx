@@ -50,7 +50,7 @@ export function ClassDot({ asset, className = '' }: { asset: Asset; className?: 
 export function ClassTag({ asset }: { asset: Asset }) {
 	const label = asset.kind === 'stadium' ? 'Stadium' : asset.class;
 	return (
-		<span className="inline-flex items-center gap-1.5 font-display text-xs font-semibold uppercase tracking-widest text-fog-500">
+		<span className="inline-flex items-center gap-1.5 font-display text-xs font-semibold tracking-wide text-fog-500">
 			<ClassDot asset={asset} />
 			{label}
 			{asset.captain && <span className="text-star-400" title="Captain-eligible">✪</span>}
@@ -71,7 +71,7 @@ export function TeamLogo({ logo, name, size = 28, className = '' }: { logo: stri
 	if (!logo) {
 		return (
 			<span
-				className={`inline-flex shrink-0 items-center justify-center rounded-full bg-night-700 font-display text-[10px] font-bold uppercase text-fog-300 ${className}`}
+				className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--key)] font-display text-[10px] font-bold uppercase text-fog-300 ${className}`}
 				style={{ width: size, height: size }}
 			>
 				{name.slice(0, 2)}
@@ -100,7 +100,7 @@ export function RestrictionMarks({ icons, size = 'sm' }: { icons: RestrictionIco
 				<span
 					key={icon.code + icon.label}
 					title={icon.label}
-					className={`inline-flex items-center justify-center rounded-sm border border-star-500/50 bg-night-950/80 font-display font-bold leading-none text-star-400 ${sizing}`}
+					className={`plate justify-center !p-0 font-bold leading-none tracking-normal text-star-300 [--plate:#5a4a12] ${sizing}`}
 				>
 					{icon.code}
 				</span>
@@ -113,7 +113,7 @@ export function PresenceDot({ present, className = '' }: { present: boolean; cla
 	return (
 		<span
 			title={present ? 'Connected' : 'Away'}
-			className={`inline-block h-2 w-2 shrink-0 rounded-full ${present ? 'bg-emerald-400 shadow-[0_0_6px_rgb(52_211_153_/_0.8)]' : 'bg-night-600'} ${className}`}
+			className={`inline-block h-2 w-2 shrink-0 rounded-full ${present ? 'bg-emerald-400' : 'bg-night-600'} ${className}`}
 		/>
 	);
 }
@@ -129,16 +129,16 @@ export function SlotDots({ open, total, className = '' }: { open: number; total:
 }
 
 export function StateChip({ state, paused }: { state: DraftState; paused: boolean }) {
-	if (paused) return <span className="inline-flex items-center gap-1.5 rounded border border-star-500/40 bg-star-500/15 px-2 py-0.5 font-display text-xs font-bold uppercase tracking-widest text-star-400">Paused</span>;
+	if (paused) return <span className="plate text-star-300 [--plate:#5a4a12]">Paused</span>;
 	const styles: Record<DraftState, string> = {
-		setup: 'border-night-600 bg-night-700/50 text-fog-300',
-		lobby: 'border-fog-500/40 bg-night-700/50 text-fog-100',
-		live: 'border-rio-500/50 bg-rio-500/15 text-rio-300',
-		completed: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+		setup: 'text-fog-300',
+		lobby: 'text-fog-100',
+		live: 'text-rio-300 [--plate:#56161b]',
+		completed: 'text-emerald-300 [--plate:#0d4534]'
 	};
 	const labels: Record<DraftState, string> = { setup: 'Setup', lobby: 'Lobby', live: 'Live', completed: 'Completed' };
 	return (
-		<span className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 font-display text-xs font-bold uppercase tracking-widest ${styles[state]}`}>
+		<span className={`plate gap-1.5 ${styles[state]}`}>
 			{state === 'live' && (
 				<span className="relative flex h-2 w-2">
 					<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rio-400 opacity-75" />
@@ -151,7 +151,7 @@ export function StateChip({ state, paused }: { state: DraftState; paused: boolea
 }
 
 export function Kbd({ children }: { children: ReactNode }) {
-	return <kbd className="rounded border border-night-600 bg-night-850 px-1.5 py-0.5 font-mono text-[10px] text-fog-500">{children}</kbd>;
+	return <kbd className="key px-1.5 py-0.5 font-mono text-[10px] text-fog-300">{children}</kbd>;
 }
 
 export function Reason({ error, types, className = '' }: { error: ActionError | null; types?: string[]; className?: string }) {
@@ -166,8 +166,8 @@ export function Reason({ error, types, className = '' }: { error: ActionError | 
 
 export function SectionLabel({ children, action }: { children: ReactNode; action?: ReactNode }) {
 	return (
-		<div className="flex items-center justify-between border-b border-night-700 bg-night-850 px-3 py-2">
-			<h3 className="font-display text-xs font-bold uppercase tracking-widest text-fog-300">{children}</h3>
+		<div className="flex items-center justify-between gap-2 px-3 pb-1 pt-2.5">
+			<h3 className="font-display text-sm font-semibold text-fog-300">{children}</h3>
 			{action}
 		</div>
 	);
@@ -236,16 +236,16 @@ export function Clock({
 	return (
 		<div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }} aria-hidden={closesAt !== null}>
 			<svg width={size} height={size} className="absolute inset-0 -rotate-90">
-				<circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--color-night-700)" strokeWidth={4} />
+				<circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgb(0 0 0 / 0.42)" strokeWidth={4} />
 				{closesAt !== null && !frozen && (
 					<circle
 						cx={size / 2}
 						cy={size / 2}
 						r={radius}
 						fill="none"
-						stroke={urgent ? 'var(--color-rio-400)' : 'var(--color-fog-100)'}
+						stroke={urgent ? 'var(--color-rio-400)' : 'var(--color-star-400)'}
 						strokeWidth={4}
-						strokeLinecap="round"
+						strokeLinecap="butt"
 						strokeDasharray={circumference}
 						strokeDashoffset={circumference * (1 - fraction)}
 					/>
@@ -253,8 +253,8 @@ export function Clock({
 				{frozen && <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--color-star-500)" strokeWidth={4} strokeDasharray="6 6" />}
 			</svg>
 			<span
-				className={`relative font-display font-bold tabular-nums leading-none ${urgent && !frozen && closesAt ? 'animate-pulse text-rio-400' : frozen ? 'text-star-400' : 'text-fog-100'} ${
-					isTiny ? 'text-xs uppercase tracking-widest' : ''
+				className={`relative font-bold tabular-nums leading-none ${urgent && !frozen && closesAt ? 'animate-pulse font-mono text-rio-400' : frozen ? 'font-mono text-star-400' : closesAt === null ? 'font-display text-fog-300' : 'font-mono text-star-400'} ${
+					isTiny ? 'font-display text-xs' : ''
 				}`}
 				style={{ fontSize: isTiny ? undefined : size * 0.32 }}
 			>
