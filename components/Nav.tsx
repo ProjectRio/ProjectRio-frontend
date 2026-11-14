@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUsername } from '@/lib/useUsername';
 import { useRioStaff } from '@/lib/useRioStaff';
-import { SECTIONS, sectionFor } from '@/lib/siteMap';
+import { SECTIONS, pageFor, sectionFor, type SectionKey } from '@/lib/siteMap';
 
 function AccountMenu({ username }: { username: string }) {
 	const [open, setOpen] = useState(false);
@@ -69,13 +69,16 @@ function AccountMenu({ username }: { username: string }) {
  * The site's sections (lib/siteMap.ts), the same list the landing page stands
  * up as its title menu, laid down with the same cursor: one selection bar
  * that rests on the section you are in and steps to whatever is hovered or
- * focused. A step takes 14 frames, as it does on the disc.
+ * focused. A step takes 14 frames, as it does on the disc. A section with
+ * pages under it opens them below the bar while the cursor is on it, the way
+ * a menu on the disc opens the next one.
  */
 function PrimaryLinks({ pathname }: { pathname: string }) {
 	const navRef = useRef<HTMLElement>(null);
-	const [hovered, setHovered] = useState<string | null>(null);
+	const [hovered, setHovered] = useState<SectionKey | null>(null);
 	const [bar, setBar] = useState<{ left: number; width: number } | null>(null);
-	const active = sectionFor(pathname)?.key;
+	const activeSection = sectionFor(pathname);
+	const active = activeSection?.key;
 	const target = hovered ?? active ?? null;
 
 	useLayoutEffect(() => {
@@ -98,29 +101,74 @@ function PrimaryLinks({ pathname }: { pathname: string }) {
 			className="relative hidden flex-1 items-center xl:flex"
 			aria-label="Primary"
 			onMouseLeave={() => setHovered(null)}
-			onBlur={() => setHovered(null)}
+			onBlur={(event) => {
+				// Focus moving from a section into its own menu is not leaving.
+				if (!event.currentTarget.contains(event.relatedTarget)) setHovered(null);
+			}}
+			onKeyDown={(event) => {
+				if (event.key === 'Escape') setHovered(null);
+			}}
 		>
 			<span
 				aria-hidden
 				className="sel pointer-events-none absolute top-1/2 h-9 -translate-y-1/2 transition-[left,width,opacity] duration-[233ms] ease-[var(--ease-step)] motion-reduce:transition-none"
 				style={bar ? { left: bar.left, width: bar.width, opacity: 1 } : { left: 0, width: 0, opacity: 0 }}
 			/>
-			{SECTIONS.map((section) => (
-				<Link
-					key={section.key}
-					href={section.href}
-					data-section={section.key}
-					aria-current={section.key === active ? 'page' : undefined}
-					onMouseEnter={() => setHovered(section.key)}
-					onFocus={() => setHovered(section.key)}
-					className={`relative whitespace-nowrap px-3 py-2 font-display text-[1.05rem] font-semibold uppercase tracking-wider outline-none transition-colors ${
-						section.key === target ? 'text-fog-100' : 'text-fog-300'
-					}`}
-				>
-					{section.label}
-				</Link>
-			))}
+			{SECTIONS.map((section) => {
+				const here = section.key === active ? pageFor(section, pathname) : null;
+				return (
+					<div
+						key={section.key}
+						data-section={section.key}
+						className="relative"
+						onMouseEnter={() => setHovered(section.key)}
+						onFocus={() => setHovered(section.key)}
+					>
+						<Link
+							href={section.href}
+							aria-current={section.key === active ? 'page' : undefined}
+							onClick={() => setHovered(null)}
+							className={`block whitespace-nowrap px-3 py-2 font-display text-[1.05rem] font-semibold uppercase tracking-wider outline-none transition-colors ${
+								section.key === target ? 'text-fog-100' : 'text-fog-300'
+							}`}
+						>
+							{section.label}
+						</Link>
+						{hovered === section.key && section.pages.length > 0 && (
+							// The padding bridges the gap to the header's bottom edge, so the cursor never leaves the nav on the way down.
+							<div className="route-in absolute left-0 top-full z-50 pt-[17px]">
+								<ul className="popover w-max min-w-[12rem] p-1.5" aria-label={section.label}>
+									{section.pages.map((page) => (
+										<li key={page.href}>
+											<Link
+												href={page.href}
+												aria-current={page === here ? 'page' : undefined}
+												onClick={() => setHovered(null)}
+												className={`pick !mx-0 flex items-center justify-between gap-4 font-display text-[1.05rem] font-medium leading-tight tracking-wide ${
+													page === here ? 'text-star-400' : 'text-fog-300 hover:text-fog-100 focus-visible:text-fog-100'
+												}`}
+											>
+												{page.label}
+												{page.preview && <PreviewPlate />}
+											</Link>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+					</div>
+				);
+			})}
 		</nav>
+	);
+}
+
+/** Marks a page that runs on sample data until its backend exists. */
+function PreviewPlate() {
+	return (
+		<span className="plate text-star-300" style={{ '--plate': '#5a4a12' } as React.CSSProperties}>
+			Preview
+		</span>
 	);
 }
 
@@ -191,17 +239,38 @@ export default function Nav() {
 			</div>
 
 			{open && (
-				<nav className={`border-t border-night-700 bg-[var(--wall)] px-4 py-4 ${home ? 'lg:hidden' : 'xl:hidden'}`} aria-label="Mobile">
+				<nav
+					className={`max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-night-700 bg-[var(--wall)] px-4 py-4 ${home ? 'lg:hidden' : 'xl:hidden'}`}
+					aria-label="Mobile"
+				>
 					<ul className="space-y-1">
-						{SECTIONS.map((link) => (
-							<li key={link.key}>
+						{SECTIONS.map((section) => (
+							<li key={section.key}>
 								<Link
-									href={link.href}
+									href={section.href}
 									className="block px-3 py-2 font-display font-semibold uppercase tracking-wider text-fog-300 hover:text-fog-100"
 									onClick={() => setOpen(false)}
 								>
-									{link.label}
+									{section.label}
 								</Link>
+								{section.pages.length > 0 && (
+									<ul className="mb-2 ml-3 border-l-2 border-[var(--rim)] pl-3">
+										{section.pages
+											.filter((page) => page.href !== section.href)
+											.map((page) => (
+												<li key={page.href}>
+													<Link
+														href={page.href}
+														className="flex items-center gap-3 px-3 py-1.5 font-display text-[1.05rem] font-medium tracking-wide text-fog-300 hover:text-fog-100"
+														onClick={() => setOpen(false)}
+													>
+														{page.label}
+														{page.preview && <PreviewPlate />}
+													</Link>
+												</li>
+											))}
+									</ul>
+								)}
 							</li>
 						))}
 						{username && isStaff && (
